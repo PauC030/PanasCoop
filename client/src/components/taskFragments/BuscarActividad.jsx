@@ -15,7 +15,7 @@ export function BuscarActividad() {
         Buscar y Filtrar Actividades
       </h2>
 
-      <div className="bg-white shadow-md p-4 rounded-md flex flex-wrap items-center gap-3">
+      <div className="border-2 bg-white shadow-md p-4 rounded-md flex flex-wrap items-center gap-3">
         {/* Campo de búsqueda */}
         <div className="flex items-center bg-[#d3d3d3] rounded px-2 w-full md:w-auto">
           <Search className="text-black w-4 h-4" />

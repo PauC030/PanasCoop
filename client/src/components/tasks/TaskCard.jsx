@@ -22,6 +22,28 @@ export function TaskCard({ task }) {
     
         <header>
   <h1 className="text-1x1 font-bold break-words overflow-hidden text-ellipsis whitespace-nowrap">{task.title}</h1>
+  {task.place && (
+                <p className="text-gray-600">
+                  <span className="font-semibold">Lugar:</span> {task.place}
+                </p>
+              )}
+
+              {task.responsible && task.responsible.length > 0 && (
+                <p className="text-gray-600">
+                  <span className="font-semibold">Responsables:</span> {task.responsible.join(", ")}
+                </p>
+              )}
+
+              <p className="text-gray-600">
+                <span className="font-semibold">Fecha:</span>{" "}
+                {task.date &&
+                  new Date(task.date).toLocaleDateString("es-ES", {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+              </p>
 </header>
 
 <div className="mt-6 flex justify-between items-center w-full">

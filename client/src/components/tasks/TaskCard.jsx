@@ -5,6 +5,7 @@ import deleteImage from '../../assets/eliminarr.png';
 import editImage from '../../assets/Editar.png';
 import { ButtonIcon } from "../ui/ButtonIcon";
 import { ButtonLinkIcon } from "../ui/ButtonLinkIcon";
+import { CardActivi } from "../ui/CardActivi";
 
 export function TaskCard({ task }) {
   const { deleteTask } = useTasks();
@@ -18,38 +19,40 @@ export function TaskCard({ task }) {
 
   return (
     <>
-      <Card>
+      <CardActivi>
     
-        <header>
-  <h1 className="text-1x1 font-bold break-words overflow-hidden text-ellipsis whitespace-nowrap">{task.title}</h1>
+       <header >
+  <h1 className="text-lg font-semibold break-words overflow-hidden text-ellipsis whitespace-nowrap">{task.title}</h1>
+    <div className="border-b border-[#c7c0c0] mt-2 mb-4 w-full"></div>
   {task.place && (
-                <p className="text-gray-600">
-                  <span className="font-semibold">Lugar:</span> {task.place}
-                </p>
-              )}
+    
+   <p className="text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap">
+   <span className="font-semibold">Lugar:</span> {task.place}</p>)}
 
-              {task.responsible && task.responsible.length > 0 && (
-                <p className="text-gray-600">
-                  <span className="font-semibold">Responsables:</span> {task.responsible.join(", ")}
-                </p>
-              )}
+  {task.responsible && task.responsible.length > 0 && (
+  <p className="text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap">
+  <span className="font-semibold ">Responsable: </span>
 
-              <p className="text-gray-600">
-                <span className="font-semibold">Fecha:</span>{" "}
-                {task.date &&
-                  new Date(task.date).toLocaleDateString("es-ES", {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-              </p>
-</header>
+  {task.responsible.join(", ")}</p>)}
+  
+ <p className="text-gray-500">
+ <span className="font-semibold">Fecha: </span>{" "}
+ {task.date &&
+ new Date(task.date).toLocaleDateString("es-ES", {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
 
-<div className="mt-6 flex justify-between items-center w-full">
+   })}
+   </p>          
+   </header>
+
+
+<div className="mt-5 flex justify-between items-center w-full">
   <button
     onClick={() => setShowDetailsModal(true)}
-    className="px-6 py-1 bg-[#22C55E] text-white rounded hover:bg-green-600 transition-colors"
+    className="px-6 py-1 bg-[#22C55E] text-white rounded hover:bg-green-600 transition-colors text-base whitespace-nowrap min-w-[110px] transform hover:brightness-105 active:brightness-95 scale-100"
   >
     Ver Detalles
   </button>
@@ -72,7 +75,7 @@ export function TaskCard({ task }) {
   </div>
 </div>
 
-      </Card>
+      </CardActivi>
 
             {/* Modal de Detalles */}
             {showDetailsModal && (

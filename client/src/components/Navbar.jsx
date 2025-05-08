@@ -24,9 +24,9 @@ export function Navbar() {
   }, []);
 
   return (
-    <nav className="bg-[#002326] text-white p-4 shadow-md">
+    <nav className="bg-[#002326] text-white p-2 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
-        <h1 className="text-xl font-bold">
+        <h1 className="text-xl p-2 font-bold  ">
           <Link
             to={isAuthenticated ? "/tasks" : "/"}
             className="hover:text-gray-300 transition-colors"
@@ -40,8 +40,7 @@ export function Navbar() {
             <>
               <Link
                 to={isAuthenticated ? "/tasks" : "/"}
-                className="text-sm underline underline-offset-4 decoration-gray-300 hover:text-gray-300 transition-colors"
-              >
+                className="text-sm md:text-base font-light px-2 md:px-1 underline underline-offset-4 decoration-[1px] decoration-gray-300 hover:text-gray-300 whitespace-nowrap transition-colors">
                 Mis actividades{" "}
               </Link>
 

@@ -71,6 +71,7 @@ export function TaskFormPage() {
         <Input
           type="text"
           name="title"
+          maxLength={90}
           placeholder="Title"
           {...register("title")}
           autoFocus
@@ -97,15 +98,17 @@ export function TaskFormPage() {
         <Input
           type="text"
           name="place"
+          maxLength={30}
           placeholder="¿Dónde se realizará?"
           {...register("place")}
         />
         
         {/* Nuevo campo: Responsables */}
-        <Label htmlFor="responsible">Responsables de la Actividad</Label>
+        <Label htmlFor="responsible">Responsable de la Actividad</Label>
         <Textarea
           name="responsible"
-          placeholder="Ingresa los responsables, separados por comas"
+          maxLength={70}
+          placeholder="Ingresa el responsable"
           {...register("responsible")}
         />
         <p className="text-sm text-gray-500">Separa cada responsable con una coma</p>

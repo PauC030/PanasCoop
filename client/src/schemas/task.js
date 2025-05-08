@@ -7,4 +7,8 @@ export const taskSchema = z.object({
   description: z.string({
     required_error: "Description is required",
   }),
+  place: z.string({
+    required_error: "place is required",
+  })
+  
 });

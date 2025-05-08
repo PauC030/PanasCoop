@@ -5,6 +5,7 @@ export function ConfigurarNotificaciones() {
   const [selectedActivity, setSelectedActivity] = useState("");
   const [anticipationDays, setAnticipationDays] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [actividadesConfiguradas, setActividadesConfiguradas] = useState([]);
 
   const actividades = [
     {
@@ -33,6 +34,18 @@ export function ConfigurarNotificaciones() {
       return;
     }
 
+    const actividadSeleccionada = actividades.find(
+      (act) => act.id === parseInt(selectedActivity)
+    );
+
+    // Agrega la actividad si no está ya configurada
+    if (
+      actividadSeleccionada &&
+      !actividadesConfiguradas.find((a) => a.id === actividadSeleccionada.id)
+    ) {
+      setActividadesConfiguradas([...actividadesConfiguradas, actividadSeleccionada]);
+    }
+
     setMensaje("¡Configuración guardada correctamente!");
     setTimeout(() => setMensaje(""), 3000);
   };
@@ -44,19 +57,23 @@ export function ConfigurarNotificaciones() {
       </h2>
 
       <div className="border-2 rounded-md p-6 shadow-lg grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Próximas actividades */}
+        {/* Próximas actividades configuradas */}
         <div>
           <h3 className="text-black font-bold mb-4">Próximas Actividades</h3>
-          {actividades.map((actividad) => (
-            <div
-              key={actividad.id}
-              className="bg-[#e5eae6] p-4 rounded mb-3 shadow-sm text-black"
-            >
-              <p className="font-medium">{actividad.nombre}</p>
-              <p>Fecha: {actividad.fecha}</p>
-              <p>Lugar: {actividad.lugar}</p>
-            </div>
-          ))}
+          {actividadesConfiguradas.length === 0 ? (
+            <p className="text-gray-500">No hay actividades configuradas.</p>
+          ) : (
+            actividadesConfiguradas.map((actividad) => (
+              <div
+                key={actividad.id}
+                className="bg-[#e5eae6] p-4 rounded mb-3 shadow-sm text-black"
+              >
+                <p className="font-medium">{actividad.nombre}</p>
+                <p>Fecha: {actividad.fecha}</p>
+                <p>Lugar: {actividad.lugar}</p>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Configuración de notificaciones */}

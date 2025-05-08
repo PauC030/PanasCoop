@@ -2,39 +2,68 @@ import { useEffect } from "react";
 import { useTasks } from "../context/tasksContext";
 import { TaskCard } from "../components/tasks/TaskCard";
 import { ImFileEmpty } from "react-icons/im";
-import { Link, Outlet, useLocation } from "react-router-dom"; // Añadimos useLocation
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 export function TasksPage() {
   const { tasks, getTasks } = useTasks();
-  const location = useLocation(); // Obtenemos la ubicación actual
+  const location = useLocation();
 
   useEffect(() => {
     getTasks();
   }, []);
 
-  // Verificamos si estamos en la ruta base (/tasks)
   const isBaseRoute = location.pathname === "/tasks";
 
   return (
     <div className="flex min-h-screen bg-white-100">
-      {/* Sidebar izquierda */}
-      <aside className="w-64 bg-[#004D37] text-white p-4 hidden md:block">
-        <h1 className="text-xl font-bold mb-6">Actividades solidarias</h1>
-        <ul className="space-y-1">
-          <li><Link to="buscar" className="block hover:bg-[#003529] p-3 rounded">Buscar y Filtrar Actividad</Link></li>
-          <li><Link to="lista" className="block hover:bg-[#003529] p-3 rounded">Lista de Actividades</Link></li>
-          <li><Link to="promocionadas" className="block hover:bg-[#003529] p-3 rounded">Actividades Promocionadas</Link></li>
-          <li><Link to="notificaciones" className="block hover:bg-[#003529] p-3 rounded">Configurar Notificaciones</Link></li>
-          <li><Link to="publicar" className="block hover:bg-[#003529] p-3 rounded">Publicar en Redes Sociales</Link></li>
-          <li><Link to="asistencia" className="block hover:bg-[#003529] p-3 rounded">Gestionar Asistencia</Link></li>
-        </ul>
-      </aside>
+      {/* Sidebar izquierda - visible en todos los tamaños */}
+      <div className="bg-[#004D37] p-4 max-md:p-3 max-sm:p-2">
+        <aside className="w-48 sm:w-60 md:w-64 max-md:w-48 max-sm:w-40 text-white">
+          <h1 className="text-base max-md:text-sm max-sm:text-xs font-bold mb-6 max-md:mb-5 max-sm:mb-4">
+            Actividades solidarias
+          </h1>
 
-      {/* Contenido principal*/}
-      <main className="flex-1 p-4"> 
-        <Outlet /> {/* Aquí se renderizan los fragmentos */}
-        
-        {/* Mostramos contenido solo en la ruta base */}
+          <div className="mb-4 max-md:mb-3 max-sm:mb-2">
+            <ul className="space-y-1">
+              <li>
+                <Link to="buscar" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
+                  Buscar y Filtrar Actividad
+                </Link>
+              </li>
+              <li>
+                <Link to="lista" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
+                  Lista de Actividades
+                </Link>
+              </li>
+              <li>
+                <Link to="promocionadas" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
+                  Actividades Promocionadas
+                </Link>
+              </li>
+              <li>
+                <Link to="notificaciones" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
+                  Configurar Notificaciones
+                </Link>
+              </li>
+              <li>
+                <Link to="publicar" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
+                  Publicar en Redes Sociales
+                </Link>
+              </li>
+              <li>
+                <Link to="asistencia" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
+                  Gestionar Asistencia
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+
+      {/* Contenido principal */}
+      <main className="flex-1 p-4">
+        <Outlet />
+
         {isBaseRoute && (
           <>
             {tasks.length === 0 && (
@@ -56,6 +85,6 @@ export function TasksPage() {
           </>
         )}
       </main>
-    </div>
-  );
+    </div>
+  );
 }

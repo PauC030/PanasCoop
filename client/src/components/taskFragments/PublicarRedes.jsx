@@ -15,60 +15,61 @@ export function PublicarRedes() {
 
   return (
     <div className="bg-white min-h-screen p-6">
-      {/* Título alineado a la izquierda */}
+      {/* Título principal */}
       <h2 className="text-[#03673E] font-semibold text-lg mb-6">
-        Publicar en redes Sociales
+        Publicar en Redes Sociales
       </h2>
 
-      {/* Contenedor centrado */}
-      <div className="border-black flex items-center justify-center">
-        <form
-          onSubmit={handleSubmit}
-          className="border-2 p-8 rounded-lg shadow-lg w-full max-w-md"
-        >
-          <h3 className="text-center text-green-900 text-lg font-semibold mb-6">
-            Publicar <span className="text-green-700">Actividades Sociales</span>
+      {/* Contenedor del formulario */}
+      <div className="border-2 bg-white shadow-md p-8 rounded-md max-w-xl mx-auto">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <h3 className="text-center text-green-900 text-xl font-semibold">
+            Publica tu Actividad
           </h3>
 
-          <div className="mb-4">
-            <label className="block mb-1">Descripción</label>
+          {/* Campo Descripción */}
+          <div>
+            <label className="block mb-1 text-sm font-medium text-gray-700">Descripción</label>
             <input
               type="text"
               placeholder="Descripción de la actividad"
-              className="w-full p-2 border rounded bg-white text-black"
+              className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-green-600"
               value={descripcion}
               onChange={(e) => setDescripcion(e.target.value)}
               required
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block mb-1">Enlace</label>
+          {/* Campo Enlace */}
+          <div>
+            <label className="block mb-1 text-sm font-medium text-gray-700">Enlace</label>
             <input
               type="text"
               placeholder="Enlace de la actividad"
-              className="w-full p-2 border rounded bg-white text-black"
+              className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-green-600"
               value={enlace}
               onChange={(e) => setEnlace(e.target.value)}
               required
             />
           </div>
 
-          <div className="mb-6">
-            <label className="block mb-2">Selecciona red social</label>
-            <div className="flex gap-2">
+          {/* Selección de Red Social */}
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">Selecciona red social</label>
+            <div className="flex gap-4">
               <button
                 type="button"
-                className={`flex items-center gap-2 px-3 py-2 rounded text-white text-sm ${
-                  redSocial === "Facebook" ? "bg-blue-700" : "bg-blue-500"
+                className={`flex items-center gap-2 px-4 py-2 rounded text-white text-sm transition-all ${
+                  redSocial === "Facebook" ? "bg-[#0173ED]" : "bg-[#4da3f7]"
                 }`}
                 onClick={() => setRedSocial("Facebook")}
               >
                 <FaFacebookF /> Facebook
               </button>
+
               <button
                 type="button"
-                className={`flex items-center gap-2 px-3 py-2 rounded text-white text-sm ${
+                className={`flex items-center gap-2 px-4 py-2 rounded text-white text-sm transition-all ${
                   redSocial === "Instagram" ? "bg-pink-700" : "bg-pink-500"
                 }`}
                 onClick={() => setRedSocial("Instagram")}
@@ -78,9 +79,10 @@ export function PublicarRedes() {
             </div>
           </div>
 
+          {/* Botón Publicar */}
           <Button
             type="submit"
-            className="w-full bg-green-800 text-white py-2 px-4 rounded hover:bg-green-700"
+            className="w-full bg-green-800 text-white py-2 px-4 rounded hover:bg-green-700 transition-all shadow"
           >
             Publicar
           </Button>

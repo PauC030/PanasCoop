@@ -10,37 +10,39 @@ export function BuscarActividad() {
 
   return (
     <div className="bg-white p-6 min-h-screen">
-      <h2 className="text-[#03673E] font-semibold text-lg mb-4">
+      {/* Título fuera del border y alineado a la izquierda */}
+      <h2 className="text-[#03673E] font-semibold text-lg mb-6">
         Buscar y Filtrar Actividades
       </h2>
 
-      <div className="border-2 bg-white shadow-md p-6 rounded-md">
-        {/* Campo de búsqueda centrado */}
-        <div className="mb-4 flex flex-col items-center">
-          <label className="block text-sm text-gray-700 mb-1 text-center">
+      {/* Contenedor con border y sombra similar al otro componente */}
+      <div className="border-2 rounded-md p-6 shadow-lg">
+        {/* Barra de búsqueda */}
+        <div className="mb-6">
+          <label className="block text-gray-700 mb-2 text-left">
             Buscar por palabra clave (título o descripción)
           </label>
-          <div className="flex items-center bg-[#d3d3d3] rounded px-2 w-full md:w-2/3">
-            <Search className="text-black w-4 h-4" />
+          <div className="relative flex items-center">
+            <Search className="text-gray-400 w-4 h-4 absolute left-3" />
             <input
               type="text"
               placeholder="Ejemplo: alimentos, plaza, recolección"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-transparent text-black outline-none px-2 py-1 w-full placeholder:text-black"
+              className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-green-600 pl-10" // Añadí un padding a la izquierda para hacer espacio al ícono
             />
           </div>
         </div>
 
-        {/* Filtros */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        {/* Filtros en línea */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           {/* Filtro por fecha */}
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Filtrar por fecha</label>
+            <label className="block text-gray-700 mb-2">Filtrar por fecha</label>
             <select
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
-              className="bg-[#d3d3d3] text-black rounded px-2 py-2 outline-none w-full"
+              className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-green-600"
             >
               <option value="">Todas</option>
               <option value="proximas">Próximas</option>
@@ -50,34 +52,34 @@ export function BuscarActividad() {
 
           {/* Filtro por lugar */}
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Filtrar por lugar</label>
+            <label className="block text-gray-700 mb-2">Filtrar por lugar</label>
             <input
               type="text"
               placeholder="Ejemplo: Plaza Central"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="bg-[#d3d3d3] text-black rounded px-2 py-2 outline-none w-full placeholder:text-black"
+              className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-green-600"
             />
           </div>
 
           {/* Filtro por estado */}
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Filtrar por estado</label>
+            <label className="block text-gray-700 mb-2">Filtrar por estado</label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="bg-[#d3d3d3] text-black rounded px-2 py-2 outline-none w-full"
+              className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-green-600"
             >
               <option value="">Todas</option>
-              <option value="Promocionadas">Promocionadas</option>
+              <option value="promocionadas">Promocionadas</option>
             </select>
           </div>
         </div>
 
-        {/* Botón Buscar */}
-        <div className="flex justify-end">
-          <Button className="bg-blue-600 text-white rounded px-4 py-2 shadow hover:bg-blue-700 transition-all">
-            Buscar
+        {/* Botón BUSCAR */}
+        <div className="text-left">
+          <Button className="bg-gradient-to-r from-green-600 to-green-800 text-white px-6 py-2 rounded shadow hover:brightness-110 uppercase">
+            BUSCAR
           </Button>
         </div>
       </div>

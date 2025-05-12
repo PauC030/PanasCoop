@@ -11,14 +11,12 @@ import { ConfigurarNotificaciones } from "./components/taskFragments/ConfigurarN
 import { PublicarRedes } from "./components/taskFragments/PublicarRedes";
 import { GestionarAsistencia } from "./components/taskFragments/GestionarAsistencia";
 
-
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import { TaskFormPage } from "./pages/TaskFormPage";
 import { LoginPage } from "./pages/LoginPage";
 import { TasksPage } from "./pages/TasksPage";
 import { TaskProvider } from "./context/tasksContext";
-
 
 function App() {
   return (
@@ -27,7 +25,6 @@ function App() {
         <BrowserRouter>
           <main className="content-container mx-auto md:px-0">
             <Navbar />
-
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />

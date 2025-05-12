@@ -84,7 +84,7 @@ export function ConfigurarNotificaciones() {
           <select
             value={selectedActivity}
             onChange={(e) => setSelectedActivity(e.target.value)}
-            className="bg-[#d3d3d3] text-black rounded px-3 py-2 mb-4 w-full outline-none"
+            className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-green-600 mb-4"
           >
             <option value="">Seleccione una actividad</option>
             {actividades.map((actividad) => (
@@ -103,7 +103,7 @@ export function ConfigurarNotificaciones() {
             placeholder="Ingrese el número de días"
             value={anticipationDays}
             onChange={(e) => setAnticipationDays(e.target.value)}
-            className="bg-[#d3d3d3] text-black rounded px-3 py-2 mb-4 w-full outline-none placeholder:text-black"
+            className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-green-600 mb-4 placeholder:text-black"
           />
 
           <Button

@@ -6,7 +6,7 @@ import { TaskCard }  from "../tasks/TaskCard";
 export function ListaActividades() {
   const { othersTasks } = useTasks();
 
-  if (!othersTasks) return <p className="text-gray-500">Cargando actividades...</p>;
+  if (!othersTasks) return <p className=" text-gray-500">Cargando actividades...</p>;
 
   return (
     <div className="text-black p-4">

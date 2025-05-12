@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState,useEffect } from "react";
 import {
   createTaskRequest,
   deleteTaskRequest,
@@ -6,6 +6,7 @@ import {
   getTaskRequest,
   updateTaskRequest,
   getOthersTasksRequest, //Nuevo import
+
 } from "../api/tasks";
 
 const TaskContext = createContext();
@@ -20,19 +21,34 @@ export function TaskProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [othersTasks, setOthersTasks] = useState([]); //  Nuevo estado
 
-  const getTasks = async () => {
-    const res = await getTasksRequest();
-    setTasks(res.data);
-  };
 
-  const getOthersTasks = async () => {
-    try {
-      const res = await getOthersTasksRequest(); 
-      setOthersTasks(res.data);                  //Actualiza estado
-    } catch (error) {
-      console.error("Error al obtener tareas de otros usuarios", error);
-    }
-  };
+
+const getOthersTasks = async () => {
+  try {
+    const res = await getOthersTasksRequest(); // Llama al API
+    setOthersTasks(res.data || []); // Asegura que el estado nunca sea undefined
+  } catch (error) {
+    console.error("Error al obtener tareas de otros usuarios:", error);
+  }
+};
+useEffect(() => {
+  getOthersTasks(); // Llamamos la función cuando se carga la app
+}, []);
+
+const getTasks = async () => {
+  try {
+    const res = await getTasksRequest();
+    const tasksConPropiedad = res.data.map(task => ({
+      ...task,
+      isOwner: true, // Agregar propiedad a tareas propias
+    }));
+    setTasks(tasksConPropiedad);
+  } catch (error) {
+    console.error("Error al obtener tareas:", error);
+  }
+};
+
+
 
   const deleteTask = async (id) => {
     try {
@@ -78,13 +94,13 @@ export function TaskProvider({ children }) {
     <TaskContext.Provider
       value={{
         tasks,
+        othersTasks,
         getTasks,
         deleteTask,
         createTask,
         getTask,
         updateTask,
-        othersTasks,      // nuevo 
-        getOthersTasks,   // nuevo
+        getOthersTasks
       }}
     >
       {children}

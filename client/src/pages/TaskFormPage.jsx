@@ -98,7 +98,7 @@ export function TaskFormPage() {
         <Input
           type="text"
           name="place"
-          maxLength={30}
+          maxLength={40}
           placeholder="¿Dónde se realizará?"
           {...register("place")}
         />

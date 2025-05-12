@@ -24,7 +24,7 @@ export function Navbar() {
   }, []);
 
   return (
-    <nav className="bg-[#002326] text-white p-2 shadow-md">
+    <nav className=" sticky top-0 z-50 bg-[#002326] text-white p-2 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
         <h1 className="text-xl p-2 font-bold  ">
           <Link

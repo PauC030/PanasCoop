@@ -29,16 +29,17 @@ export function TasksPage() {
 
         <div className="mb-4 max-md:mb-3 max-sm:mb-2">
           <ul className="space-y-1">
+              <li>
+              <Link to="lista" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
+                Lista de Actividades
+              </Link>
+            </li>
             <li>
               <Link to="buscar" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
                 Buscar y Filtrar Actividad
               </Link>
             </li>
-            <li>
-              <Link to="lista" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
-                Lista de Actividades
-              </Link>
-            </li>
+          
             <li>
               <Link to="promocionadas" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
                 Actividades Promocionadas

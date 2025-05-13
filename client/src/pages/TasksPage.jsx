@@ -16,10 +16,10 @@ export function TasksPage() {
   const isBaseRoute = location.pathname === "/tasks";
  // #003529//
  return (
-  <div className="flex min-h-screen bg-white-100">
+  <div className="flex min-h-screen bg-white-100 ">
     {/* Sidebar izquierda - visible en todos los tamaños */}
-    <div className="bg-[#004D37] p-4 max-md:p-3 max-sm:p-2">
-    <aside className="w-36 sm:w-44 md:w-52 max-md:w-36 max-sm:w-32 text-white">
+    <div className="  bg-[#004D37] p-4 max-md:p-3 max-sm:p-2">
+    <aside className=" w-36 sm:w-44 md:w-52 max-md:w-36 max-sm:w-32 text-white">
 
 
 

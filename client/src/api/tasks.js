@@ -17,6 +17,10 @@ export const searchTasksRequest = async (params) => {
   return await axios.get('/tasks/search', { params });
 };
 
+export const togglePromotionRequest = async (id, data) => axios.patch(`/tasks/${id}/promotion`, data);
+
+export const getPromotedTasksRequest = async () =>  axios.get("/tasks/promoted");
+
 
 
 

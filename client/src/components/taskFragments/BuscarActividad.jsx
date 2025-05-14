@@ -7,7 +7,7 @@ import { TaskCard } from "../tasks/TaskCard";
 export function BuscarActividad() {
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState(""); // Se mantiene
   const [dateFilter, setDateFilter] = useState("");
   const { searchTasks, results, loading } = useSearch();
 
@@ -19,6 +19,10 @@ export function BuscarActividad() {
       date: dateFilter,
     });
   };
+
+  const filteredResults = status === "promocionada"
+    ? results.filter(task => task.promoted) // Filtrar solo las promocionadas
+    : results; // Si no se selecciona "promocionada", mostrar todas las actividades
 
   return (
     <div className="bg-white p-6 min-h-screen">
@@ -76,7 +80,7 @@ export function BuscarActividad() {
               className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-green-600"
             >
               <option value="">Todas</option>
-              <option value="promocionadas">Promocionadas</option>
+              <option value="promocionada">Promocionadas</option>
             </select>
           </div>
         </div>
@@ -91,21 +95,27 @@ export function BuscarActividad() {
         </div>
       </div>
 
-      {/* Resultados de búsqueda (opcional) */}
+      {/* Resultados de búsqueda */}
       <div className="mt-6">
         {loading && <p>Buscando actividades...</p>}
-        {!loading && results.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-  {Array.isArray(results) && results.length > 0 ? (
-    results.map((task) => (
-      <TaskCard key={task._id || task.id} task={task} />
-    ))
-  ) : (
-    <div className="col-span-full text-center text-gray-500">
-      Actividad no encontrada
-    </div>
-  )}
-</div>
+        {!loading && (
+          <>
+            {Array.isArray(filteredResults) && filteredResults.length > 0 ? (
+              <div className="text-black grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                {filteredResults.map((task) => (
+                  <TaskCard
+                    key={task._id || task.id}
+                    task={task}
+                    showPromoBadge={task.promoted} // Aquí indicamos que si la actividad está promocionada, se le añade el diseño especial
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 font-medium mt-8">
+                No se encontraron actividades con esos criterios.
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

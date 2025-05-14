@@ -3,7 +3,7 @@ import { Navbar } from "./components/Navbar";
 import { AuthProvider } from "./context/authContext";
 import { ProtectedRoute } from "./routes";
 
-import { SearchProvider } from "./context/searchContext"; 
+import { SearchProvider } from "./context/searchContext";  // Aquí se importa el SearchProvider
 import { BuscarActividad } from "./components/taskFragments/BuscarActividad";
 import { ListaActividades } from "./components/taskFragments/ListaActividades";
 import { ActividadesPromocionadas } from "./components/taskFragments/ActividadesPromocionadas";
@@ -23,7 +23,7 @@ function App() {
   return (
     <AuthProvider>
       <TaskProvider>
-        <SearchProvider> 
+        <SearchProvider>  {/*  el SearchProvider envuelve el contenido que usa la búsqueda */}
           <BrowserRouter>
             <main className="content-container mx-auto md:px-0">
               <Navbar />

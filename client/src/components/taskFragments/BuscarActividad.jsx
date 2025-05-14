@@ -21,7 +21,7 @@ export function BuscarActividad() {
   };
 
   return (
-    <div className="bg-white p-6 min-h-screen">
+    <div className="text-black bg-white p-6 min-h-screen">
       <h2 className="text-[#03673E] font-semibold text-lg mb-6">
         Buscar y Filtrar Actividades
       </h2>
@@ -91,21 +91,26 @@ export function BuscarActividad() {
         </div>
       </div>
 
-      {/* Resultados de búsqueda (opcional) */}
+      {/* Resultados de búsqueda */}
       <div className="mt-6">
         {loading && <p>Buscando actividades...</p>}
         {!loading && results.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-  {Array.isArray(results) && results.length > 0 ? (
-    results.map((task) => (
-      <TaskCard key={task._id || task.id} task={task} />
-    ))
-  ) : (
-    <div className="col-span-full text-center text-gray-500">
-      Actividad no encontrada
-    </div>
-  )}
-</div>
+           {Array.isArray(results) && results.length > 0 ? (
+  results.map((task) => (
+    <TaskCard
+      key={task._id || task.id}
+      task={task}
+      showPromoBadge={task.estado === "promocionadas"} // 👈 Añadir esto
+    />
+  ))
+) : (
+  <div className="col-span-full text-center text-gray-500">
+    Actividad no encontrada
+  </div>
+)}
+
+          </div>
         )}
       </div>
     </div>

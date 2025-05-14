@@ -25,7 +25,7 @@ export function BuscarActividad() {
     : results; // Si no se selecciona "promocionada", mostrar todas las actividades
 
   return (
-    <div className="bg-white p-6 min-h-screen">
+    <div className="text-black bg-white p-6 min-h-screen">
       <h2 className="text-[#03673E] font-semibold text-lg mb-6">
         Buscar y Filtrar Actividades
       </h2>
@@ -98,24 +98,23 @@ export function BuscarActividad() {
       {/* Resultados de búsqueda */}
       <div className="mt-6">
         {loading && <p>Buscando actividades...</p>}
-        {!loading && (
-          <>
-            {Array.isArray(filteredResults) && filteredResults.length > 0 ? (
-              <div className="text-black grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                {filteredResults.map((task) => (
-                  <TaskCard
-                    key={task._id || task.id}
-                    task={task}
-                    showPromoBadge={task.promoted} // Aquí indicamos que si la actividad está promocionada, se le añade el diseño especial
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center text-gray-500 font-medium mt-8">
-                No se encontraron actividades con esos criterios.
-              </div>
-            )}
-          </>
+        {!loading && results.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+           {Array.isArray(results) && results.length > 0 ? (
+  results.map((task) => (
+    <TaskCard
+      key={task._id || task.id}
+      task={task}
+      showPromoBadge={task.estado === "promocionadas"} // 👈 Añadir esto
+    />
+  ))
+) : (
+  <div className="col-span-full text-center text-gray-500">
+    Actividad no encontrada
+  </div>
+)}
+          </div>
+
         )}
       </div>
     </div>

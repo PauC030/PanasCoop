@@ -7,7 +7,7 @@ import { TaskCard } from "../tasks/TaskCard";
 export function BuscarActividad() {
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
-  const [status, setStatus] = useState(""); // Se mantiene
+  const [status, setStatus] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const { searchTasks, results, loading } = useSearch();
 
@@ -19,10 +19,6 @@ export function BuscarActividad() {
       date: dateFilter,
     });
   };
-
-  const filteredResults = status === "promocionada"
-    ? results.filter(task => task.promoted) // Filtrar solo las promocionadas
-    : results; // Si no se selecciona "promocionada", mostrar todas las actividades
 
   return (
     <div className="text-black bg-white p-6 min-h-screen">
@@ -80,7 +76,7 @@ export function BuscarActividad() {
               className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-green-600"
             >
               <option value="">Todas</option>
-              <option value="promocionada">Promocionadas</option>
+              <option value="promocionadas">Promocionadas</option>
             </select>
           </div>
         </div>
@@ -113,8 +109,8 @@ export function BuscarActividad() {
     Actividad no encontrada
   </div>
 )}
-          </div>
 
+          </div>
         )}
       </div>
     </div>

@@ -91,28 +91,32 @@ export function BuscarActividad() {
         </div>
       </div>
 
-      {/* Resultados de búsqueda */}
-      <div className="mt-6">
-        {loading && <p>Buscando actividades...</p>}
-        {!loading && results.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-           {Array.isArray(results) && results.length > 0 ? (
-  results.map((task) => (
-    <TaskCard
-      key={task._id || task.id}
-      task={task}
-      showPromoBadge={task.estado === "promocionadas"} // 👈 Añadir esto
-    />
-  ))
-) : (
-  <div className="col-span-full text-center text-gray-500">
-    Actividad no encontrada
-  </div>
-)}
+{/* Resultados de búsqueda */}
+<div className="mt-6">
+  {loading && <p>Buscando actividades...</p>}
+  
+  {!loading && (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+      {results.length === 0 ? (
+        <div className="col-span-full text-center text-gray-500">
+          No se encontraron actividades
+        </div>
+      ) : (
+        results.map((task) => {
+          const showPromoBadge = task.estado === "promocionadas";
+          return (
+            <TaskCard
+              key={task._id}
+              task={task}
+              showPromoBadge={showPromoBadge}
+            />
+          );
+        })
+      )}
+    </div>
+  )}
+</div>
 
-          </div>
-        )}
-      </div>
     </div>
   );
 }

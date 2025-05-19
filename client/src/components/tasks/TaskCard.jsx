@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useTasks } from "../../context/tasksContext";
-import { ButtonLink } from "../ui";
 import deleteImage from '../../assets/eliminarr.png';
 import editImage from '../../assets/Editar.png';
 import { ButtonIcon } from "../ui/ButtonIcon";
@@ -84,8 +83,7 @@ export function TaskCard({ task, showPromoBadge = false }) {
 
           {task.responsible?.length > 0 && (
             <p className="text-gray-500 truncate">
-              <span className="font-semibold">Responsable:</span>{" "}
-              {task.responsible.join(", ")}
+              <span className="font-semibold">Responsable:</span> {task.responsible.join(", ")}
             </p>
           )}
 
@@ -186,16 +184,16 @@ export function TaskCard({ task, showPromoBadge = false }) {
 
             <div className="flex justify-center gap-4">
               <button
-                className="px-6 py-2 text-gray-700 font-medium hover:bg-gray-100 rounded"
+                className="px-6 py-2 text-gray-700 font-semibold rounded border border-gray-400 hover:bg-gray-100 transition"
                 onClick={() => setShowModal(false)}
               >
                 Cancelar
               </button>
               <button
-                className="px-6 py-2 bg-red-600 text-white font-medium hover:bg-red-700 rounded"
                 onClick={handleDelete}
+                className="px-6 py-2 text-white font-semibold rounded bg-gradient-to-r from-[#ef4444] to-[#b91c1c] hover:opacity-90"
               >
-                Confirmar
+                Eliminar
               </button>
             </div>
           </div>
@@ -204,4 +202,3 @@ export function TaskCard({ task, showPromoBadge = false }) {
     </>
   );
 }
-

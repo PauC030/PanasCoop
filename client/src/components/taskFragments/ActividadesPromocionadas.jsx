@@ -12,9 +12,11 @@ export function ActividadesPromocionadas() {
   return (
     <div className="text-black p-4">
     
-      <h2 className="font-semibold text-xl mb-4 text-gray-700">
-       ⭐ Actividades Promocionadas
+
+     <h2 className="text-[#03673E] font-semibold text-lg mb-6">
+        ⭐ Actividades Promocionadas
       </h2>
+     
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {promotedTasks.length === 0 ? (

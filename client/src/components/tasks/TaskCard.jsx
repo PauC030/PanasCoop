@@ -110,9 +110,12 @@ export function TaskCard({ task, showPromoBadge = false }) {
 
           {task.isOwner && (
             <div className="flex gap-x-1 items-center ml-4">
+
               <ButtonIcon onClick={() => setShowModal(true)}>
                 <img src={deleteImage} alt="Eliminar" className="h-6 w-6 hover:scale-110" />
               </ButtonIcon>
+
+              
               <ButtonLinkIcon to={`/tasks/${task._id}`}>
                 <img src={editImage} alt="Editar" className="h-6 w-6 hover:scale-110" />
               </ButtonLinkIcon>

@@ -53,7 +53,7 @@ export function ConfigurarNotificaciones() {
   return (
     <div className="bg-white p-6 min-h-screen">
       <h2 className="text-[#03673E] font-semibold text-lg mb-6">
-        Notificaciones de Actividades Sociales
+       ⚙️ Notificaciones de Actividades Sociales
       </h2>
 
       <div className="border-2 rounded-md p-6 shadow-lg grid grid-cols-1 md:grid-cols-2 gap-6">

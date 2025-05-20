@@ -17,7 +17,7 @@
       <div className="bg-white min-h-screen p-6">
         {/* Título principal */}
         <h2 className="text-[#03673E] font-semibold text-lg mb-6">
-          Publicar en Redes Sociales
+        📱 Publicar en Redes Sociales
         </h2>
 
         {/* Contenedor del formulario */}

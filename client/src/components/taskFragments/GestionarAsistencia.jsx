@@ -50,7 +50,7 @@ export function GestionarAsistencia() {
 
   return (
     <div className=" p-6 bg-white min-h-screen text-black relative">
-      <h1 className="text-xl font-semibold text-green-700 mb-4">Gestión de asistencia</h1>
+      <h1 className="text-xl font-semibold text-green-700 mb-4">✅ Gestión de asistencia</h1>
 
       <div className="bg-white shadow-xl p-4 rounded-md border-2">
         <div className="flex justify-between items-center mb-4">

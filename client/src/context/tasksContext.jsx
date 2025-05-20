@@ -66,7 +66,9 @@ export function TaskProvider({ children }) {
 const getOthersTasks = async () => {
   try {
     const res = await getOthersTasksRequest(); // Llama al API
-    setOthersTasks(res.data || []); // Asegura que el estado nunca sea undefined
+  const currentDate = new Date();                                                    
+    const filtered = res.data?.filter(task => new Date(task.date) >= currentDate) || [];     
+    setOthersTasks(filtered);
   } catch (error) {
     console.error("Error al obtener tareas de otros usuarios:", error);
   }

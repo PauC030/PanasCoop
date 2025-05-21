@@ -1,16 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTasks } from "../../context/tasksContext";
+import { useAsistencia } from "../../context/asistenciaContext";
 import deleteImage from '../../assets/eliminarr.png';
 import editImage from '../../assets/Editar.png';
 import { ButtonIcon } from "../ui/ButtonIcon";
 import { ButtonLinkIcon } from "../ui/ButtonLinkIcon";
 import { CardActivi } from "../ui/CardActivi";
 import { Switch } from '@headlessui/react';
+import toast from "react-hot-toast";
 
-export function TaskCard({ task, showPromoBadge = false }) {
+
+export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = false }) {
   const { togglePromotion, deleteTask } = useTasks();
+  const { confirmAttendance, cancelAttendance, fetchAttendees, attendees } = useAsistencia();
+
   const [showModal, setShowModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showAttendModal, setShowAttendModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+
+  const [email, setEmail] = useState(() => localStorage.getItem("userEmail") || "");
+  const [name, setName] = useState(() => localStorage.getItem("userName") || "");
+
+  const [isAttending, setIsAttending] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    fetchAttendees(task._id);
+  }, [task._id]);
+
+useEffect(() => {
+  const savedEmail = localStorage.getItem("userEmail");
+  if (savedEmail) {
+    const attending = attendees.some(
+      (a) =>
+        a.taskId === task._id &&
+        a.email.trim().toLowerCase() === savedEmail.trim().toLowerCase()
+    );
+    setIsAttending(attending);
+    console.log("¿Está asistiendo?", attending);
+  }
+}, [attendees, task._id]);
 
   const handleDelete = () => {
     deleteTask(task._id);
@@ -31,6 +61,57 @@ export function TaskCard({ task, showPromoBadge = false }) {
     }
   };
 
+const handleConfirmAttend = async () => {
+  if (!name.trim()) {
+    toast.error("Por favor ingresa tu nombre");
+    return;
+  }
+  if (!/\S+@\S+\.\S+/.test(email)) {
+    toast.error("Por favor ingresa un correo válido");
+    return;
+  }
+
+  setIsLoading(true);
+  try {
+    await confirmAttendance({
+      taskId: task._id,
+      email: email.trim().toLowerCase(),
+      name
+    });
+
+    localStorage.setItem("userEmail", email.trim().toLowerCase());
+    localStorage.setItem("userName", name);
+
+    await fetchAttendees(task._id); // Primero actualizamos la lista
+    setIsAttending(true); // Luego actualizamos el estado
+    setShowAttendModal(false);
+    toast.success("Asistencia confirmada ✅");
+  } catch (error) {
+    console.error("Error al asistir:", error);
+    toast.error("Error al asistir a la actividad");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+  const handleCancel = async () => {
+  setIsLoading(true);
+  try {
+    await cancelAttendance({ taskId: task._id, email });
+    await fetchAttendees(task._id);
+    setIsAttending(false);
+    setShowCancelModal(false);
+    // alert("Asistencia cancelada ❌");
+    toast.success("Asistencia cancelada ❌");
+  } catch (err) {
+    console.error("Error al cancelar asistencia:", err);
+    alert("Error al cancelar asistencia");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
   return (
     <>
       <CardActivi className="relative">
@@ -38,10 +119,6 @@ export function TaskCard({ task, showPromoBadge = false }) {
           <div className="absolute -top-1 -right-[1px] bg-[#EAB308] text-white px-3 py-1 text-xs font-semibold shadow z-20 flex items-center gap-1 rounded-bl-xl border-2 border-[#EAB308]/80">
             <span className="text-[0.75rem] tracking-wide">Promocionada</span>
             <span className="text-[0.65rem]">⭐</span>
-            <div className="absolute -right-[9px] top-0 w-0 h-0 
-              border-t-[12px] border-t-transparent
-              border-l-[10px] border-l-[#EAB308]
-              border-b-[12px] border-b-transparent" />
           </div>
         )}
 
@@ -108,14 +185,29 @@ export function TaskCard({ task, showPromoBadge = false }) {
             Ver Detalles
           </button>
 
+          {showAttendanceButton && (
+            !isAttending ? (
+              <button
+                onClick={() => setShowAttendModal(true)}
+                className="px-4 py-1 border border-green-500 text-green-700 rounded hover:bg-green-100 transition-colors"
+              >
+                Asistir a actividad
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowCancelModal(true)}
+                className="px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+              >
+                Cancelar Asistencia
+              </button>
+            )
+          )}
+
           {task.isOwner && (
             <div className="flex gap-x-1 items-center ml-4">
-
               <ButtonIcon onClick={() => setShowModal(true)}>
                 <img src={deleteImage} alt="Eliminar" className="h-6 w-6 hover:scale-110" />
               </ButtonIcon>
-
-              
               <ButtonLinkIcon to={`/tasks/${task._id}`}>
                 <img src={editImage} alt="Editar" className="h-6 w-6 hover:scale-110" />
               </ButtonLinkIcon>
@@ -124,7 +216,8 @@ export function TaskCard({ task, showPromoBadge = false }) {
         </div>
       </CardActivi>
 
-      {/* Modal Detalles */}
+
+      {/* Modal de Detalles */}
       {showDetailsModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-30">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full shadow-xl">
@@ -171,7 +264,78 @@ export function TaskCard({ task, showPromoBadge = false }) {
         </div>
       )}
 
-      {/* Modal Confirmación */}
+      {/* Modal de Confirmar Asistencia */}
+      {showAttendModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-xl shadow-md w-[90%] max-w-md space-y-4">
+            <h2 className="text-xl font-semibold">Confirmar asistencia</h2>
+            <p className="text-gray-600">Completa tus datos para asistir a esta actividad.</p>
+
+            <div className="flex flex-col gap-2">
+              <input
+                type="text"
+                placeholder="Nombre"
+                className="p-2 border rounded-md"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <input
+                type="email"
+                placeholder="Correo electrónico"
+                className="p-2 border rounded-md"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <button
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                onClick={() => setShowAttendModal(false)}
+                disabled={isLoading}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
+                onClick={handleConfirmAttend}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Confirmando...' : 'Confirmar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Cancelar Asistencia */}
+      {showCancelModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-xl shadow-md w-[90%] max-w-md space-y-4">
+            <h2 className="text-xl font-semibold">¿Cancelar asistencia?</h2>
+            <p className="text-gray-600">¿Estás seguro de que deseas cancelar tu asistencia a esta actividad?</p>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <button
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                onClick={() => setShowCancelModal(false)}
+                disabled={isLoading}
+              >
+                No
+              </button>
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
+                onClick={handleCancel}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Cancelando...' : 'Sí, cancelar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Eliminar Actividad */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">

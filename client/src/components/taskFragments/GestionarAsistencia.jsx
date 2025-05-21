@@ -1,66 +1,151 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
+import { useAsistencia } from "../../context/asistenciaContext"; // en lugar de useTasks
 import { Button } from '../ui';
+import toast from 'react-hot-toast';
+import Papa from 'papaparse';
+
+// Modal interno
+function ParticipantModal({ isOpen, onClose, onSave, attendeeToEdit, existingEmails, existingNames }) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    if (attendeeToEdit) {
+      setName(attendeeToEdit.name);
+      setEmail(attendeeToEdit.email);
+    } else {
+      setName('');
+      setEmail('');
+    }
+  }, [attendeeToEdit]);
+
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!validateEmail(email)) {
+      toast.error('Correo electrónico no válido');
+      return;
+    }
+
+    const isDuplicateEmail = !attendeeToEdit && existingEmails.includes(email);
+    const isDuplicateName = !attendeeToEdit && existingNames.includes(name);
+
+    if (isDuplicateEmail || isDuplicateName) {
+      toast.error('Nombre o correo ya registrados');
+      return;
+    }
+
+    onSave({ name, email });
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-md shadow-lg w-[300px]">
+        <h2 className="text-lg font-semibold mb-4">
+          {attendeeToEdit ? 'Editar Participante' : 'Agregar Participante'}
+        </h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            className="w-full mb-2 p-2 border border-gray-300 rounded"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Nombre"
+            required
+          />
+          <input
+            className="w-full mb-2 p-2 border border-gray-300 rounded"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Correo"
+            required
+          />
+          <div className="flex justify-between mt-4">
+            <button type="submit" className="bg-green-600 text-white px-4 py-1 rounded">
+              Guardar
+            </button>
+            <button type="button" onClick={onClose} className="text-red-600">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
 
 export function GestionarAsistencia() {
-  const [attendees, setAttendees] = useState([
-    { id: 1, name: 'pepito perez', email: 'Pepito@gmail.com' },
-    { id: 2, name: 'pepito perez', email: 'Pepito@gmail.com' },
-    { id: 3, name: 'pepito perez', email: 'Pepito@gmail.com' },
-    { id: 4, name: 'pepito prez', email: 'Pepito@gmail.com' },
-  ]);
+  const {
+    attendees,
+    deleteAttendee,
+    createAttendee,
+    updateAttendee
+  } = useAsistencia();
 
-  const [exportLink, setExportLink] = useState('');
-  const [showExportCard, setShowExportCard] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [attendeeToEdit, setAttendeeToEdit] = useState(null);
 
   const handleEdit = (id) => {
-    alert(`Editar asistente con ID: ${id}`);
+    const found = attendees.find((a) => a._id === id);
+    setAttendeeToEdit(found);
+    setModalOpen(true);
   };
 
   const handleDelete = (id) => {
-    const filtered = attendees.filter(attendee => attendee.id !== id);
-    setAttendees(filtered);
+    deleteAttendee(id);
+    toast.success('Participante eliminado');
   };
 
-  const convertToCSV = (data) => {
-    const header = ['Nombre', 'Correo Electronico'];
-    const rows = data.map(({ name, email }) => [name, email]);
+  const handleAdd = () => {
+    setAttendeeToEdit(null);
+    setModalOpen(true);
+  };
 
-    const csvContent = [header, ...rows]
-      .map(row => row.map(field => `"${field}"`).join(','))
-      .join('\n');
-
-    return csvContent;
+  const handleSave = async (data) => {
+    try {
+      if (attendeeToEdit) {
+        await updateAttendee(attendeeToEdit._id, data);
+        toast.success('Participante actualizado');
+      } else {
+        await createAttendee(data);
+        toast.success('Participante agregado');
+      }
+      setModalOpen(false);
+    } catch (err) {
+      toast.error('Error al guardar participante');
+    }
   };
 
   const handleExport = () => {
-    const csvData = convertToCSV(attendees);
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    if (!attendees.length) return;
+
+    const csv = Papa.unparse(attendees.map(({ name, email }) => ({ Nombre: name, Correo: email })));
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    setExportLink(url);
-    setShowExportCard(true);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'participantes.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(exportLink).then(() => {
-      alert('¡Enlace copiado al portapapeles!');
-    });
-  };
-
-  const closeCard = () => setShowExportCard(false);
 
   return (
-    <div className=" p-6 bg-white min-h-screen text-black relative">
+    <div className="p-6 bg-white min-h-screen text-black relative">
       <h1 className="text-xl font-semibold text-green-700 mb-4">✅ Gestión de asistencia</h1>
 
       <div className="bg-white shadow-xl p-4 rounded-md border-2">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="font-semibold text-lg">Lista de Actividades</h2>
-          <Button
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-            onClick={handleExport}
-          >
-            Exportar Lista
-          </Button>
+          <h2 className="font-semibold text-lg">Lista de Participantes</h2>
+          <div className="flex gap-2">
+            <Button onClick={handleAdd}>Agregar Participante</Button>
+            <Button onClick={handleExport}>Exportar Lista</Button>
+          </div>
         </div>
 
         <table className="w-full border-collapse text-black">
@@ -73,20 +158,14 @@ export function GestionarAsistencia() {
           </thead>
           <tbody>
             {attendees.map((attendee) => (
-              <tr key={attendee.id} className="border-t border-gray-200 text-sm">
+              <tr key={attendee._id}>
                 <td className="py-2 px-4">{attendee.name}</td>
                 <td className="py-2 px-4">{attendee.email}</td>
                 <td className="py-2 px-4">
-                  <button
-                    className="bg-yellow-400 text-white px-3 py-1 rounded mr-2 hover:bg-yellow-500"
-                    onClick={() => handleEdit(attendee.id)}
-                  >
+                  <button onClick={() => handleEdit(attendee._id)} className="text-blue-600 mr-4">
                     Editar
                   </button>
-                  <button
-                    className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                    onClick={() => handleDelete(attendee.id)}
-                  >
+                  <button onClick={() => handleDelete(attendee._id)} className="text-red-600">
                     Eliminar
                   </button>
                 </td>
@@ -94,52 +173,16 @@ export function GestionarAsistencia() {
             ))}
           </tbody>
         </table>
-
-        <div className="mt-4">
-          <Button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-            Agregar asistentes
-          </Button>
-        </div>
       </div>
 
-      {/* Tarjeta flotante con overlay */}
-      {showExportCard && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-30 z-40 flex items-center justify-center"
-          onClick={closeCard}
-        >
-          <div
-            className="bg-white border border-gray-300 shadow-xl rounded-md p-6 w-96 relative z-50 flex flex-col items-center text-center"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={closeCard}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-lg"
-            >
-              ✖
-            </button>
-            <h3 className="text-lg font-semibold mb-4">Lista Exportada</h3>
-
-            <div className="text-sm mb-4 break-words text-blue-700 underline bg-[#d3d3d3] rounded-md px-4 py-2 w-full">
-              <a
-                href={exportLink}
-                download="asistentes.csv"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Descargar asistentes.csv
-              </a>
-            </div>
-
-            <Button
-              onClick={handleCopy}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-              Copiar Enlace
-            </Button>
-          </div>
-        </div>
-      )}
+      <ParticipantModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={handleSave}
+        attendeeToEdit={attendeeToEdit}
+        existingEmails={attendees.map(a => a.email)}
+        existingNames={attendees.map(a => a.name)}
+      />
     </div>
   );
 }

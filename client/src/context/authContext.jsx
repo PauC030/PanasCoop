@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  //clear errors after 5 seconds
+  // Limpiar errores después de 5 segundos
   useEffect(() => {
     if (errors.length > 0) {
       const timer = setTimeout(() => {
@@ -27,12 +27,27 @@ export const AuthProvider = ({ children }) => {
     }
   }, [errors]);
 
+  const cleanupLocalStorage = (email) => {
+    if (email) {
+      localStorage.removeItem(`userAttendances_${email}`);
+    }
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userName");
+  };
+
+  const setupLocalStorage = (userData) => {
+    const normalizedEmail = userData.email.trim().toLowerCase();
+    localStorage.setItem("userEmail", normalizedEmail);
+    localStorage.setItem("userName", userData.name || "");
+  };
+
   const signup = async (user) => {
     try {
       const res = await registerRequest(user);
       if (res.status === 200) {
         setUser(res.data);
         setIsAuthenticated(true);
+        setupLocalStorage(res.data);
       }
     } catch (error) {
       console.log(error.response.data);
@@ -45,13 +60,18 @@ export const AuthProvider = ({ children }) => {
       const res = await loginRequest(user);
       setUser(res.data);
       setIsAuthenticated(true);
+      setupLocalStorage(res.data);
     } catch (error) {
       console.log(error);
-       setErrors(error.response.data.message);
+      setErrors(error.response.data.message);
+      // Limpiar localStorage en caso de error
+      cleanupLocalStorage(user.email);
     }
   };
 
   const logout = () => {
+    const email = localStorage.getItem("userEmail");
+    cleanupLocalStorage(email);
     Cookies.remove("token");
     setUser(null);
     setIsAuthenticated(false);
@@ -69,11 +89,18 @@ export const AuthProvider = ({ children }) => {
       try {
         const res = await verifyTokenRequest(cookies.token);
         console.log(res);
-        if (!res.data) return setIsAuthenticated(false);
+        if (!res.data) {
+          setIsAuthenticated(false);
+          return;
+        }
+        
         setIsAuthenticated(true);
         setUser(res.data);
+        // Sincronizar localStorage al verificar token
+        setupLocalStorage(res.data);
         setLoading(false);
       } catch (error) {
+        cleanupLocalStorage(localStorage.getItem("userEmail"));
         setIsAuthenticated(false);
         setLoading(false);
       }

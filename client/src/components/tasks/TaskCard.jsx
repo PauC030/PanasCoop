@@ -8,9 +8,12 @@ import { ButtonLinkIcon } from "../ui/ButtonLinkIcon";
 import { CardActivi } from "../ui/CardActivi";
 import { Switch } from '@headlessui/react';
 import toast from "react-hot-toast";
-
+import { useAttendance } from "../../hooks/useAttendance"
+import { useNavigate } from 'react-router-dom';
 
 export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = false }) {
+  const navigate = useNavigate();
+
   const { togglePromotion, deleteTask } = useTasks();
   const { confirmAttendance, cancelAttendance, fetchAttendees, attendees } = useAsistencia();
 
@@ -18,29 +21,30 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showAttendModal, setShowAttendModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
-
+ 
   const [email, setEmail] = useState(() => localStorage.getItem("userEmail") || "");
   const [name, setName] = useState(() => localStorage.getItem("userName") || "");
 
-  const [isAttending, setIsAttending] = useState(false);
+  const [isAttending, setIsAttending] = useAttendance(task._id);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchAttendees(task._id);
   }, [task._id]);
 
+
 useEffect(() => {
-  const savedEmail = localStorage.getItem("userEmail");
-  if (savedEmail) {
-    const attending = attendees.some(
-      (a) =>
-        a.taskId === task._id &&
-        a.email.trim().toLowerCase() === savedEmail.trim().toLowerCase()
-    );
-    setIsAttending(attending);
-    console.log("¿Está asistiendo?", attending);
-  }
+  const savedEmail = localStorage.getItem("userEmail")?.trim().toLowerCase();
+  if (!savedEmail) return;
+
+  const isUserAttending = attendees.some(
+    attendee => attendee.task === task._id && attendee.email === savedEmail
+  );
+  
+  setIsAttending(isUserAttending);
 }, [attendees, task._id]);
+ 
+            
 
   const handleDelete = () => {
     deleteTask(task._id);
@@ -62,51 +66,70 @@ useEffect(() => {
   };
 
 const handleConfirmAttend = async () => {
-  if (!name.trim()) {
-    toast.error("Por favor ingresa tu nombre");
-    return;
-  }
-  if (!/\S+@\S+\.\S+/.test(email)) {
-    toast.error("Por favor ingresa un correo válido");
+
+  if (!name?.trim() || !email) {
+    toast.error("Completa todos los campos");
     return;
   }
 
   setIsLoading(true);
   try {
+    const normalizedEmail = email.trim().toLowerCase();
+    
+    // 1. Actualización optimista
+    setIsAttending(true);
+    
+    // 2. Confirmar en backend
     await confirmAttendance({
       taskId: task._id,
-      email: email.trim().toLowerCase(),
-      name
+      email: normalizedEmail,
+      name: name.trim()
     });
 
-    localStorage.setItem("userEmail", email.trim().toLowerCase());
-    localStorage.setItem("userName", name);
-
-    await fetchAttendees(task._id); // Primero actualizamos la lista
-    setIsAttending(true); // Luego actualizamos el estado
+    // 3. Actualizar localStorage
+    localStorage.setItem("userEmail", normalizedEmail);
+    localStorage.setItem("userName", name.trim());
+    
+    // 4. Forzar recarga de asistentes
+    await fetchAttendees(task._id);
+    
     setShowAttendModal(false);
-    toast.success("Asistencia confirmada ✅");
+    toast.success("Asistencia confirmada!");
   } catch (error) {
-    console.error("Error al asistir:", error);
-    toast.error("Error al asistir a la actividad");
+    setIsAttending(false);
+    toast.error(error.response?.data?.message || "Error al confirmar");
   } finally {
     setIsLoading(false);
   }
 };
 
 
-  const handleCancel = async () => {
+const handleCancel = async () => {
   setIsLoading(true);
   try {
     await cancelAttendance({ taskId: task._id, email });
+    // Limpiar datos específicos de asistencia
+    localStorage.removeItem(`attendance_${task._id}`);
+    // 👇 Nuevo: Eliminar el registro de asistencia del usuario
+    const userEmail = localStorage.getItem("userEmail")?.trim().toLowerCase();
+    if (userEmail) {
+      const userAttendances = JSON.parse(
+        localStorage.getItem(`userAttendances_${userEmail}`) || '[]'
+      );
+      const updatedAttendances = userAttendances.filter(id => id !== task._id);
+      localStorage.setItem(
+        `userAttendances_${userEmail}`,
+        JSON.stringify(updatedAttendances)
+      );
+    }
+    
     await fetchAttendees(task._id);
     setIsAttending(false);
     setShowCancelModal(false);
-    // alert("Asistencia cancelada ❌");
     toast.success("Asistencia cancelada ❌");
   } catch (err) {
     console.error("Error al cancelar asistencia:", err);
-    alert("Error al cancelar asistencia");
+    toast.error("Error al cancelar asistencia");
   } finally {
     setIsLoading(false);
   }
@@ -177,41 +200,52 @@ const handleConfirmAttend = async () => {
           )}
         </header>
 
-        <div className="mt-6 flex justify-between items-center w-full">
-          <button
-            onClick={() => setShowDetailsModal(true)}
-            className="px-6 py-1 bg-[#22C55E] text-white rounded hover:bg-green-600 transition-colors"
-          >
-            Ver Detalles
-          </button>
 
-          {showAttendanceButton && (
-            !isAttending ? (
-              <button
-                onClick={() => setShowAttendModal(true)}
-                className="px-4 py-1 border border-green-500 text-green-700 rounded hover:bg-green-100 transition-colors"
-              >
-                Asistir a actividad
-              </button>
-            ) : (
-              <button
-                onClick={() => setShowCancelModal(true)}
-                className="px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-              >
-                Cancelar Asistencia
-              </button>
-            )
-          )}
+       <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2 w-full">
+      <button
+    onClick={() => setShowDetailsModal(true)}
+    className="w-full sm:w-auto px-4 sm:px-4 py-1 bg-[#22C55E] text-white rounded hover:bg-green-600 transition-colors text-sm sm:text-base whitespace-nowrap"
+  >
+    Ver Detalles
+  </button>
 
+  {showAttendanceButton && (
+    !isAttending ? (
+      <button
+        onClick={() => setShowAttendModal(true)}
+        className="w-full sm:w-auto px-3 sm:px-4 py-1 border border-green-500 text-green-700 rounded hover:bg-green-100 transition-colors text-sm sm:text-base whitespace-nowrap"
+      >
+        Asistir a actividad
+      </button>
+    ) : (
+      <button
+        onClick={() => setShowCancelModal(true)}
+        className="w-full sm:w-auto px-3 sm:px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm sm:text-base whitespace-nowrap"
+      >
+        Cancelar Asistencia
+      </button>
+    )
+  )}
+
+       
           {task.isOwner && (
-            <div className="flex gap-x-1 items-center ml-4">
-              <ButtonIcon onClick={() => setShowModal(true)}>
-                <img src={deleteImage} alt="Eliminar" className="h-6 w-6 hover:scale-110" />
-              </ButtonIcon>
-              <ButtonLinkIcon to={`/tasks/${task._id}`}>
-                <img src={editImage} alt="Editar" className="h-6 w-6 hover:scale-110" />
-              </ButtonLinkIcon>
-            </div>
+    <div className="flex gap-x-1 items-center ml-4">
+      {/* Botón de Asistencia */}
+      <button
+        onClick={() => navigate(`/tasks/asistencia?taskId=${task._id}`)}
+        className="text-sm text-blue-600 hover:text-blue-800 hover:underline mr-2"
+      > Asistencia
+      </button>
+      
+      {/* Botones existentes de editar/eliminar */}
+      <ButtonIcon onClick={() => setShowModal(true)}>
+        <img src={deleteImage} alt="Eliminar" className="h-6 w-6 hover:scale-110" />
+      </ButtonIcon>
+      <ButtonLinkIcon to={`/tasks/${task._id}`}>
+        <img src={editImage} alt="Editar" className="h-6 w-6 hover:scale-110" />
+      </ButtonLinkIcon>
+    </div>
+         
           )}
         </div>
       </CardActivi>

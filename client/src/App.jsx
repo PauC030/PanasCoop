@@ -38,14 +38,15 @@ function App() {
               <Route path="/register" element={<RegisterPage />} />
 
               <Route element={<ProtectedRoute />}>
-                <Route path="/tasks" element={<TasksPage />}>
-                  <Route path="buscar" element={<BuscarActividad />} />
-                  <Route path="lista" element={<ListaActividades />} />
-                  <Route path="promocionadas" element={<ActividadesPromocionadas />} />
-                  <Route path="notificaciones" element={<ConfigurarNotificaciones />} />
-                  <Route path="publicar" element={<PublicarRedes />} />
-                  <Route path="asistencia" element={<GestionarAsistencia />} />
-                </Route>
+              <Route path="/tasks" element={<TasksPage />}>
+              <Route path="buscar" element={<BuscarActividad />} />
+              <Route path="lista" element={<ListaActividades />} />
+              <Route path="promocionadas" element={<ActividadesPromocionadas />} />
+              <Route path="notificaciones" element={<ConfigurarNotificaciones />} />
+              <Route path="publicar" element={<PublicarRedes />} />
+            {/* Cambia el nombre de la ruta para que sea consistente */}
+              <Route path="asistencia" element={<GestionarAsistencia />} />
+             </Route>
                 <Route path="/add-task" element={<TaskFormPage />} />
                 <Route path="/tasks/:id" element={<TaskFormPage />} />
                 <Route path="/profile" element={<h1>Profile</h1>} />

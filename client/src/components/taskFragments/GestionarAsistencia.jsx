@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useAsistencia } from "../../context/asistenciaContext"; // en lugar de useTasks
 import { Button } from '../ui';
 import toast from 'react-hot-toast';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useTasks } from '../../context/tasksContext';
 import Papa from 'papaparse';
 
 // Modal interno
@@ -79,18 +81,57 @@ function ParticipantModal({ isOpen, onClose, onSave, attendeeToEdit, existingEma
 }
 
 export function GestionarAsistencia() {
+  const location = useLocation();
+  const navigate = useNavigate();
+   const { tasks, getTasks } = useTasks(); // Añade getTasks
   const {
     attendees,
     deleteAttendee,
     createAttendee,
-    updateAttendee
+    updateAttendee,
+    fetchAttendees
   } = useAsistencia();
 
+  // Obtener taskId de la URL
+  const queryParams = new URLSearchParams(location.search);
+  const taskIdFromUrl = queryParams.get('taskId');
+
+  // Estado local
   const [isModalOpen, setModalOpen] = useState(false);
   const [attendeeToEdit, setAttendeeToEdit] = useState(null);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [filteredAttendees, setFilteredAttendees] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Cargar datos iniciales
+  useEffect(() => {
+     const loadData = async () => {
+      try {
+        await getTasks(); // Cargar las tareas primero
+        if (taskIdFromUrl) {
+          const task = tasks.find(t => t._id === taskIdFromUrl);
+          setSelectedTask(task);
+          
+          if (task) {
+            await fetchAttendees(taskIdFromUrl);
+            const filtered = attendees.filter(a => a.task === taskIdFromUrl);
+            setFilteredAttendees(filtered);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading data:", error);
+        toast.error("Error al cargar los datos");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [taskIdFromUrl, tasks, fetchAttendees]);
+
+  // Handlers
   const handleEdit = (id) => {
-    const found = attendees.find((a) => a._id === id);
+    const found = filteredAttendees.find((a) => a._id === id);
     setAttendeeToEdit(found);
     setModalOpen(true);
   };
@@ -111,7 +152,11 @@ export function GestionarAsistencia() {
         await updateAttendee(attendeeToEdit._id, data);
         toast.success('Participante actualizado');
       } else {
-        await createAttendee(data);
+        // Asegurarse de asociar el asistente con la tarea actual
+        await createAttendee({
+          ...data,
+          task: taskIdFromUrl
+        });
         toast.success('Participante agregado');
       }
       setModalOpen(false);
@@ -121,58 +166,117 @@ export function GestionarAsistencia() {
   };
 
   const handleExport = () => {
-    if (!attendees.length) return;
+    if (!filteredAttendees.length) {
+      toast.error('No hay participantes para exportar');
+      return;
+    }
 
-    const csv = Papa.unparse(attendees.map(({ name, email }) => ({ Nombre: name, Correo: email })));
+    const csv = Papa.unparse(filteredAttendees.map(({ name, email }) => ({ 
+      Nombre: name, 
+      Correo: email 
+    })));
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'participantes.csv');
+    link.setAttribute('download', `asistentes-${selectedTask?.title || 'actividad'}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
+  const handleTaskChange = (e) => {
+    const newTaskId = e.target.value;
+    if (newTaskId) {
+      navigate(`/gestion-asistencia?taskId=${newTaskId}`);
+    }
+  };
+
   return (
     <div className="p-6 bg-white min-h-screen text-black relative">
-      <h1 className="text-xl font-semibold text-green-700 mb-4">✅ Gestión de asistencia</h1>
+     
+      <div className="flex justify-between items-start mb-6">
+        <div>
+          <h1 className="text-xl font-semibold text-green-700 mb-2">
+            ✅ Gestión de asistencia
+          </h1>
+          {selectedTask && (
+            <h2 className="text-lg font-medium">
+              Actividad: <span className="text-green-600">{selectedTask.title}</span>
+            </h2>
+          )}
+        </div>
+
+        {/* Selector de actividad */}
+        <select 
+          value={taskIdFromUrl || ''}
+          onChange={(e) => {
+            const newTaskId = e.target.value;
+            if (newTaskId) {
+              navigate(`/tasks/asistencia?taskId=${newTaskId}`);
+            }
+          }}
+          className="border p-2 rounded"
+        >
+          <option value="">Seleccionar otra actividad</option>
+          {tasks.map(task => (
+            <option key={task._id} value={task._id}>
+              {task.title}
+            </option>
+          ))}
+        </select>
+      </div>
+
 
       <div className="bg-white shadow-xl p-4 rounded-md border-2">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="font-semibold text-lg">Lista de Participantes</h2>
+          <h2 className="font-semibold text-lg">
+            Lista de Participantes ({filteredAttendees.length})
+          </h2>
           <div className="flex gap-2">
             <Button onClick={handleAdd}>Agregar Participante</Button>
             <Button onClick={handleExport}>Exportar Lista</Button>
           </div>
         </div>
 
-        <table className="w-full border-collapse text-black">
-          <thead>
-            <tr className="bg-gray-200 text-left text-sm">
-              <th className="py-2 px-4 font-semibold">Nombre</th>
-              <th className="py-2 px-4 font-semibold">Correo Electrónico</th>
-              <th className="py-2 px-4 font-semibold">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {attendees.map((attendee) => (
-              <tr key={attendee._id}>
-                <td className="py-2 px-4">{attendee.name}</td>
-                <td className="py-2 px-4">{attendee.email}</td>
-                <td className="py-2 px-4">
-                  <button onClick={() => handleEdit(attendee._id)} className="text-blue-600 mr-4">
-                    Editar
-                  </button>
-                  <button onClick={() => handleDelete(attendee._id)} className="text-red-600">
-                    Eliminar
-                  </button>
-                </td>
+        {filteredAttendees.length > 0 ? (
+          <table className="w-full border-collapse text-black">
+            <thead>
+              <tr className="bg-gray-200 text-left text-sm">
+                <th className="py-2 px-4 font-semibold">Nombre</th>
+                <th className="py-2 px-4 font-semibold">Correo Electrónico</th>
+                <th className="py-2 px-4 font-semibold">Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredAttendees.map((attendee) => (
+                <tr key={attendee._id} className="border-b">
+                  <td className="py-2 px-4">{attendee.name}</td>
+                  <td className="py-2 px-4">{attendee.email}</td>
+                  <td className="py-2 px-4">
+                    <button 
+                      onClick={() => handleEdit(attendee._id)} 
+                      className="text-blue-600 mr-4 hover:underline"
+                    >
+                      Editar
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(attendee._id)} 
+                      className="text-red-600 hover:underline"
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            No hay participantes registrados para esta actividad
+          </div>
+        )}
       </div>
 
       <ParticipantModal
@@ -180,8 +284,8 @@ export function GestionarAsistencia() {
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
         attendeeToEdit={attendeeToEdit}
-        existingEmails={attendees.map(a => a.email)}
-        existingNames={attendees.map(a => a.name)}
+        existingEmails={filteredAttendees.map(a => a.email)}
+        existingNames={filteredAttendees.map(a => a.name)}
       />
     </div>
   );

@@ -89,7 +89,6 @@ export function TasksPage() {
     {/* Contenido principal */}
     <main className="flex-1 p-4">
       <Outlet />
-
      
         {isBaseRoute && (
           <>

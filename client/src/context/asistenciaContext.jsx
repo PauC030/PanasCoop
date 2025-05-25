@@ -13,7 +13,7 @@ export const AsistenciaProvider = ({ children }) => {
   const [attendees, setAttendees] = useState([]);
   const [error, setError] = useState(null);      // Estado para errores
   const [forbidden, setForbidden] = useState(false); // Estado para 403 Forbidden
-  
+  const [setUserAttendances] = useState({});
 
   // 🔄 Cargar asistentes de una tarea
  
@@ -70,44 +70,45 @@ const confirmAttendance = async (data) => {
 
 
   // ❌ Cancelar asistencia
- const cancelAttendance = async ({ taskId, email }) => {
+
+const cancelAttendance = async ({ taskId, email }) => {
   setError(null);
   setForbidden(false);
+  
   try {
     const lowerEmail = email.trim().toLowerCase();
     
-    // 1. Cancelar en el servidor
+    // 1. Cancelar en el backend
     await cancelAttendanceRequest({ taskId, email: lowerEmail });
     
     // 2. Actualizar estado global
-    setAttendees(prev => prev.filter(a => a.email !== lowerEmail || a.task !== taskId));
-    
-    // 3. Actualizar localStorage
-    const userAttendances = JSON.parse(localStorage.getItem(`userAttendances_${lowerEmail}`) || '[]');
-    const updatedAttendances = userAttendances.filter(id => id !== taskId);
-    localStorage.setItem(
-      `userAttendances_${lowerEmail}`,
-      JSON.stringify(updatedAttendances)
+    setAttendees(prev => 
+      prev.filter(a => !(a.task === taskId && a.email === lowerEmail))
     );
     
-    // 4. Actualizar estado local si es necesario
-    setUserAttendances(prev => ({
-      ...prev,
-      [lowerEmail]: updatedAttendances
-    }));
-    
-    toast.success('Asistencia cancelada correctamente');
+    return true; // Éxito
   } catch (err) {
+    console.error("Error en cancelAttendance:", {
+      taskId,
+      email,
+      error: err.response?.data || err.message
+    });
+    
     if (err.response?.status === 403) {
       setForbidden(true);
       toast.error('No tienes permiso para esta acción');
     } else {
-      setError('Error al cancelar asistencia');
-      toast.error('Error al cancelar asistencia');
+      setError(err.response?.data?.message || 'Error al cancelar asistencia');
+      toast.error(err.response?.data?.message || 'Error al cancelar asistencia');
     }
-    console.error(err);
+    throw err; // Propagar el error para manejo adicional
   }
 };
+
+
+
+
+ 
 
   // ✏️ Editar asistencia
   const updateAttendance = async (id, updatedData) => {

@@ -35,14 +35,13 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
 
 useEffect(() => {
   const savedEmail = localStorage.getItem("userEmail")?.trim().toLowerCase();
-  if (!savedEmail) return;
-
-  const isUserAttending = attendees.some(
-    attendee => attendee.task === task._id && attendee.email === savedEmail
-  );
-  
-  setIsAttending(isUserAttending);
-}, [attendees, task._id]);
+  if (savedEmail) {
+    const userAttendances = JSON.parse(
+      localStorage.getItem(`userAttendances_${savedEmail}`) || '[]'
+    );
+    setIsAttending(userAttendances.includes(task._id));
+  }
+}, [task._id]);
  
             
 
@@ -65,18 +64,18 @@ useEffect(() => {
     }
   };
 
-const handleConfirmAttend = async () => {
 
+
+  const handleConfirmAttend = async () => {
   if (!name?.trim() || !email) {
     toast.error("Completa todos los campos");
     return;
   }
-
   setIsLoading(true);
   try {
     const normalizedEmail = email.trim().toLowerCase();
     
-    // 1. Actualización optimista
+    // 1. Actualizar estado local primero (optimistic update)
     setIsAttending(true);
     
     // 2. Confirmar en backend
@@ -86,54 +85,66 @@ const handleConfirmAttend = async () => {
       name: name.trim()
     });
 
-    // 3. Actualizar localStorage
+    // 3. Guardar en localStorage
     localStorage.setItem("userEmail", normalizedEmail);
     localStorage.setItem("userName", name.trim());
     
-    // 4. Forzar recarga de asistentes
-    await fetchAttendees(task._id);
-    
-    setShowAttendModal(false);
-    toast.success("Asistencia confirmada!");
-  } catch (error) {
-    setIsAttending(false);
-    toast.error(error.response?.data?.message || "Error al confirmar");
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-
-const handleCancel = async () => {
-  setIsLoading(true);
-  try {
-    await cancelAttendance({ taskId: task._id, email });
-    // Limpiar datos específicos de asistencia
-    localStorage.removeItem(`attendance_${task._id}`);
-    // 👇 Nuevo: Eliminar el registro de asistencia del usuario
-    const userEmail = localStorage.getItem("userEmail")?.trim().toLowerCase();
-    if (userEmail) {
-      const userAttendances = JSON.parse(
-        localStorage.getItem(`userAttendances_${userEmail}`) || '[]'
-      );
-      const updatedAttendances = userAttendances.filter(id => id !== task._id);
+    // 4. Actualizar lista de asistencias del usuario
+    const userAttendances = JSON.parse(
+      localStorage.getItem(`userAttendances_${normalizedEmail}`) || '[]'
+    );
+    if (!userAttendances.includes(task._id)) {
       localStorage.setItem(
-        `userAttendances_${userEmail}`,
-        JSON.stringify(updatedAttendances)
+        `userAttendances_${normalizedEmail}`,
+        JSON.stringify([...userAttendances, task._id])
       );
     }
-    
-    await fetchAttendees(task._id);
-    setIsAttending(false);
-    setShowCancelModal(false);
-    toast.success("Asistencia cancelada ❌");
-  } catch (err) {
-    console.error("Error al cancelar asistencia:", err);
-    toast.error("Error al cancelar asistencia");
+    setShowAttendModal(false);
+    toast.success("Asistencia confirmada correctamente!");
+  } catch (error) {
+    setIsAttending(false); // Revertir si hay error
+    toast.error(error.response?.data?.message || "Error al confirmar asistencia");
   } finally {
     setIsLoading(false);
   }
 };
+
+   const handleCancel = async () => {
+  setIsLoading(true);
+  try {
+    const userEmail = email.trim().toLowerCase();
+    
+    // 1. Actualización optimista
+    setIsAttending(false);
+    
+    // 2. Cancelar en el backend
+    await cancelAttendance({ 
+      taskId: task._id, 
+      email: userEmail 
+    });
+    
+    // 3. Actualizar localStorage
+    const userAttendances = JSON.parse(
+      localStorage.getItem(`userAttendances_${userEmail}`) || '[]'
+    );
+    const updatedAttendances = userAttendances.filter(id => id !== task._id);
+    localStorage.setItem(
+      `userAttendances_${userEmail}`,
+      JSON.stringify(updatedAttendances)
+    );
+    // 4. Forzar recarga de asistentes
+    await fetchAttendees(task._id);
+    setShowCancelModal(false);
+    toast.success("Asistencia cancelada correctamente ❌");
+  } catch (err) {
+    console.error("Error al cancelar asistencia:", err);
+    setIsAttending(true); // Revertir en caso de error
+    toast.error(err.response?.data?.message || "Error al cancelar asistencia");
+  } finally {
+    setIsLoading(false);
+  }
+};
+       
 
   return (
     <>

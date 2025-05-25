@@ -231,8 +231,8 @@ useEffect(() => {
       </button>
     ) : (
       <button
-        onClick={() => setShowCancelModal(true)}
-        className="w-full sm:w-auto px-3 sm:px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm sm:text-base whitespace-nowrap"
+        onClick={() => setShowCancelModal(true)} // px-4 py-1 rounded border border-red-600 text-red-600 font-semibold hover:bg-red-100 transition"
+        className="w-full sm:w-auto px-3 sm:px-4  py-1 rounded border border-red-600 text-red-600 font-semibold hover:bg-red-100 transition text-sm sm:text-base whitespace-nowrap"
       >
         Cancelar Asistencia
       </button>

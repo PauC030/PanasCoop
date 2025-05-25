@@ -6,6 +6,7 @@ import {
   updateAttendanceRequest,
   deleteAttendanceRequest,
 } from '../api/attendanceApi';
+ 
 
 export const AsistenciaContext = createContext();
 
@@ -13,7 +14,7 @@ export const AsistenciaProvider = ({ children }) => {
   const [attendees, setAttendees] = useState([]);
   const [error, setError] = useState(null);      // Estado para errores
   const [forbidden, setForbidden] = useState(false); // Estado para 403 Forbidden
-  const [setUserAttendances] = useState({});
+ 
 
   // 🔄 Cargar asistentes de una tarea
  
@@ -106,29 +107,29 @@ const cancelAttendance = async ({ taskId, email }) => {
 };
 
 
-
-
- 
-
   // ✏️ Editar asistencia
-  const updateAttendance = async (id, updatedData) => {
-    setError(null);
-    setForbidden(false);
-    try {
-      const response = await updateAttendanceRequest(id, updatedData);
-      setAttendees(prev =>
-        prev.map(a => a._id === id ? response.data.updated : a)
-      );
-    } catch (err) {
-      if (err.response?.status === 403) {
-        setForbidden(true);
-      } else {
-        setError('Error al actualizar asistencia');
-      }
-      console.error(err);
-      throw err;
+  
+const updateAttendance = async (id, updatedData) => {
+  setError(null);
+  setForbidden(false);
+  try {
+    const response = await updateAttendanceRequest(id, updatedData);
+    // Actualizar ambos estados: attendees global y filteredAttendees local
+    setAttendees(prev =>
+      prev.map(a => a._id === id ? { ...a, ...response.data.updated } : a)
+    );
+    return response.data.updated; // Devuelve el asistente actualizado
+  } catch (err) {
+    if (err.response?.status === 403) {
+      setForbidden(true);
+    } else {
+      setError('Error al actualizar asistencia');
     }
-  };
+    console.error(err);
+    throw err;
+  }
+};
+
 
   // 🗑 Eliminar asistencia
   const deleteAttendance = async (id) => {
@@ -146,6 +147,25 @@ const cancelAttendance = async ({ taskId, email }) => {
       console.error(err);
     }
   };
+
+
+  const createAttendee = async (data) => {
+  setError(null);
+  setForbidden(false);
+  try {
+    const response = await confirmAttendanceRequest({
+      taskId: data.task,
+      name: data.name,
+      email: data.email
+    });
+    
+    setAttendees(prev => [...prev, response.data.attendance]);
+    return response.data.attendance;
+  } catch (error) {
+    console.error("Error creating attendee:", error);
+    throw error;
+  }
+};
 
   
 
@@ -175,6 +195,7 @@ const cancelAttendance = async ({ taskId, email }) => {
         cancelAttendance,
         updateAttendance,
         deleteAttendance,
+        createAttendee,
       }}
     >
       {children}

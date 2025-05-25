@@ -10,6 +10,7 @@ import { Switch } from '@headlessui/react';
 import toast from "react-hot-toast";
 import { useAttendance } from "../../hooks/useAttendance"
 import { useNavigate } from 'react-router-dom';
+import { Button } from "../ui/Button";
 
 export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = false }) {
   const navigate = useNavigate();
@@ -213,12 +214,12 @@ useEffect(() => {
 
 
        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2 w-full">
-      <button
+      <Button
     onClick={() => setShowDetailsModal(true)}
     className="w-full sm:w-auto px-4 sm:px-4 py-1 bg-[#22C55E] text-white rounded hover:bg-green-600 transition-colors text-sm sm:text-base whitespace-nowrap"
   >
     Ver Detalles
-  </button>
+  </Button>
 
   {showAttendanceButton && (
     !isAttending ? (

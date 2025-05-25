@@ -1,18 +1,19 @@
-
 import React, { useState, useEffect } from 'react';
-import { useAsistencia } from "../../context/asistenciaContext"; // en lugar de useTasks
+import { useAsistencia } from "../../context/asistenciaContext";
 import { Button } from '../ui';
 import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTasks } from '../../context/tasksContext';
 import Papa from 'papaparse';
 
-// Modal interno
+
+
 function ParticipantModal({ isOpen, onClose, onSave, attendeeToEdit, existingEmails, existingNames }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
 
   useEffect(() => {
+     if (!isOpen) return;
     if (attendeeToEdit) {
       setName(attendeeToEdit.name);
       setEmail(attendeeToEdit.email);
@@ -20,13 +21,12 @@ function ParticipantModal({ isOpen, onClose, onSave, attendeeToEdit, existingEma
       setName('');
       setEmail('');
     }
-  }, [attendeeToEdit]);
+  }, [attendeeToEdit, isOpen]);
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (!validateEmail(email)) {
       toast.error('Correo electrónico no válido');
       return;
@@ -80,122 +80,194 @@ function ParticipantModal({ isOpen, onClose, onSave, attendeeToEdit, existingEma
   );
 }
 
+function ConfirmModal({ isOpen, onClose, onConfirm, message }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-md shadow-lg w-[300px]">
+        <h2 className="text-center font-semibold mb-4">Confirmar</h2>
+        <p className="mb-4 text-center">{message}</p>
+        <div className="flex justify-between mt-4">
+          <button 
+            onClick={onConfirm} 
+            className="bg-red-600 text-white px-4 py-1 rounded"
+          >
+            Eliminar
+          </button>
+          <button 
+            onClick={onClose} 
+            className="bg-gray-300 px-4 py-1 rounded"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function GestionarAsistencia() {
   const location = useLocation();
   const navigate = useNavigate();
-   const { tasks, getTasks } = useTasks(); // Añade getTasks
+  const { tasks, getTasks } = useTasks();
   const {
     attendees,
-    deleteAttendee,
+    deleteAttendance,
     createAttendee,
-    updateAttendee,
-    fetchAttendees
+    updateAttendance,
+    fetchAttendees,
   } = useAsistencia();
 
-  // Obtener taskId de la URL
   const queryParams = new URLSearchParams(location.search);
-  const taskIdFromUrl = queryParams.get('taskId');
+  const taskIdFromUrl = queryParams.get("taskId");
 
-  // Estado local
   const [isModalOpen, setModalOpen] = useState(false);
   const [attendeeToEdit, setAttendeeToEdit] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
   const [filteredAttendees, setFilteredAttendees] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Cargar datos iniciales
+  const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [attendeeToDelete, setAttendeeToDelete] = useState(null);
+
   useEffect(() => {
-     const loadData = async () => {
+    const loadInitialData = async () => {
       try {
-        await getTasks(); // Cargar las tareas primero
-        if (taskIdFromUrl) {
-          const task = tasks.find(t => t._id === taskIdFromUrl);
-          setSelectedTask(task);
-          
-          if (task) {
-            await fetchAttendees(taskIdFromUrl);
-            const filtered = attendees.filter(a => a.task === taskIdFromUrl);
-            setFilteredAttendees(filtered);
-          }
-        }
+        await getTasks();
       } catch (error) {
-        console.error("Error loading data:", error);
-        toast.error("Error al cargar los datos");
+        console.error("Error loading tasks:", error);
+        toast.error("Error al cargar las actividades");
       } finally {
         setIsLoading(false);
       }
     };
+    loadInitialData();
+  }, []);
 
-    loadData();
-  }, [taskIdFromUrl, tasks, fetchAttendees]);
 
-  // Handlers
+ useEffect(() => {
+  if (!taskIdFromUrl) {
+    setFilteredAttendees([]);
+    return;
+  }
+  
+  const task = tasks.find((t) => t._id === taskIdFromUrl);
+  if (task) {
+    setSelectedTask(task);
+    fetchAttendees(taskIdFromUrl);
+  }
+}, [taskIdFromUrl, tasks]);
+
+useEffect(() => {
+  if (taskIdFromUrl) {
+    const filtered = attendees.filter((a) => a.task === taskIdFromUrl);
+    setFilteredAttendees(filtered);
+  }
+}, [attendees, taskIdFromUrl]);
+
+
+
   const handleEdit = (id) => {
     const found = filteredAttendees.find((a) => a._id === id);
     setAttendeeToEdit(found);
     setModalOpen(true);
   };
 
-  const handleDelete = (id) => {
-    deleteAttendee(id);
-    toast.success('Participante eliminado');
-  };
+
+const handleDeleteClick = (id) => {
+  const found = filteredAttendees.find((a) => a._id === id);
+  setAttendeeToDelete(found);
+  setConfirmModalOpen(true);
+};
+
+const handleConfirmDelete = async () => {
+  try {
+    await deleteAttendance(attendeeToDelete._id);
+    toast.success("Participante eliminado");
+    fetchAttendees(taskIdFromUrl);
+    setConfirmModalOpen(false);
+  } catch (error) {
+    toast.error("Error al eliminar participante");
+    console.error("Delete error:", error);
+  }
+};
+
+const handleCancelDelete = () => {
+  setConfirmModalOpen(false);
+  setAttendeeToDelete(null);
+};
+
 
   const handleAdd = () => {
     setAttendeeToEdit(null);
     setModalOpen(true);
   };
 
-  const handleSave = async (data) => {
-    try {
-      if (attendeeToEdit) {
-        await updateAttendee(attendeeToEdit._id, data);
-        toast.success('Participante actualizado');
-      } else {
-        // Asegurarse de asociar el asistente con la tarea actual
-        await createAttendee({
-          ...data,
-          task: taskIdFromUrl
-        });
-        toast.success('Participante agregado');
-      }
-      setModalOpen(false);
-    } catch (err) {
-      toast.error('Error al guardar participante');
+ const handleSave = async (data) => {
+  try {
+    if (attendeeToEdit) {
+      await updateAttendance(attendeeToEdit._id, data);
+      toast.success("Participante actualizado correctamente");
+      // Actualizar el estado local inmediatamente
+      setFilteredAttendees(prev => 
+        prev.map(a => 
+          a._id === attendeeToEdit._id ? { ...a, ...data } : a
+        )
+      );
+    } else {
+      const newAttendee = await createAttendee({ ...data, task: taskIdFromUrl });
+      toast.success("Participante agregado correctamente");
+      // Agregar al estado local
+      setFilteredAttendees(prev => [...prev, newAttendee]);
     }
-  };
-
+    setModalOpen(false);
+  } catch (err) {
+    console.error("Save error:", err);
+    toast.error(
+      err.response?.data?.message || "Error al guardar participante"
+    );
+       if (attendeeToEdit) {
+      fetchAttendees(taskIdFromUrl);
+  }
+  }
+};
   const handleExport = () => {
     if (!filteredAttendees.length) {
-      toast.error('No hay participantes para exportar');
+      toast.error("No hay participantes para exportar");
       return;
     }
 
-    const csv = Papa.unparse(filteredAttendees.map(({ name, email }) => ({ 
-      Nombre: name, 
-      Correo: email 
-    })));
+    const csv = Papa.unparse(
+      filteredAttendees.map(({ name, email }) => ({
+        Nombre: name,
+        Correo: email,
+      }))
+    );
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.setAttribute('download', `asistentes-${selectedTask?.title || 'actividad'}.csv`);
+    link.setAttribute(
+      "download",
+      `asistentes-${selectedTask?.title || "actividad"}.csv`
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  const handleTaskChange = (e) => {
-    const newTaskId = e.target.value;
-    if (newTaskId) {
-      navigate(`/gestion-asistencia?taskId=${newTaskId}`);
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="p-6 bg-white min-h-screen text-black flex items-center justify-center">
+        <p>Cargando...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-white min-h-screen text-black relative">
-     
       <div className="flex justify-between items-start mb-6">
         <div>
           <h1 className="text-xl font-semibold text-green-700 mb-2">
@@ -203,14 +275,14 @@ export function GestionarAsistencia() {
           </h1>
           {selectedTask && (
             <h2 className="text-lg font-medium">
-              Actividad: <span className="text-green-600">{selectedTask.title}</span>
+              Actividad:{" "}
+              <span className="text-green-600">{selectedTask.title}</span>
             </h2>
           )}
         </div>
 
-        {/* Selector de actividad */}
-        <select 
-          value={taskIdFromUrl || ''}
+        <select
+          value={taskIdFromUrl || ""}
           onChange={(e) => {
             const newTaskId = e.target.value;
             if (newTaskId) {
@@ -220,14 +292,13 @@ export function GestionarAsistencia() {
           className="border p-2 rounded"
         >
           <option value="">Seleccionar otra actividad</option>
-          {tasks.map(task => (
+          {tasks.map((task) => (
             <option key={task._id} value={task._id}>
               {task.title}
             </option>
           ))}
         </select>
       </div>
-
 
       <div className="bg-white shadow-xl p-4 rounded-md border-2">
         <div className="flex justify-between items-center mb-4">
@@ -254,16 +325,16 @@ export function GestionarAsistencia() {
                 <tr key={attendee._id} className="border-b">
                   <td className="py-2 px-4">{attendee.name}</td>
                   <td className="py-2 px-4">{attendee.email}</td>
-                  <td className="py-2 px-4">
-                    <button 
-                      onClick={() => handleEdit(attendee._id)} 
-                      className="text-blue-600 mr-4 hover:underline"
+                  <td className="py-2 px-4" >
+                    <button
+                      onClick={() => handleEdit(attendee._id)}
+                      className="mr-3 px-4 py-1 rounded border border-yellow-500 text-yellow-500 font-semibold hover:bg-yellow-100 transition"
                     >
                       Editar
                     </button>
-                    <button 
-                      onClick={() => handleDelete(attendee._id)} 
-                      className="text-red-600 hover:underline"
+                    <button
+                      onClick={() => handleDeleteClick(attendee._id)}
+                      className="px-4 py-1 rounded border border-red-600 text-red-600 font-semibold hover:bg-red-100 transition"
                     >
                       Eliminar
                     </button>
@@ -284,9 +355,16 @@ export function GestionarAsistencia() {
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
         attendeeToEdit={attendeeToEdit}
-        existingEmails={filteredAttendees.map(a => a.email)}
-        existingNames={filteredAttendees.map(a => a.name)}
+        existingEmails={filteredAttendees.map((a) => a.email)}
+        existingNames={filteredAttendees.map((a) => a.name)}
       />
+
+      <ConfirmModal
+      isOpen={isConfirmModalOpen}
+      onClose={handleCancelDelete}
+      onConfirm={handleConfirmDelete}
+      message={`¿Estás seguro que deseas eliminar a ${attendeeToDelete?.name}?`}
+    />
     </div>
   );
 }

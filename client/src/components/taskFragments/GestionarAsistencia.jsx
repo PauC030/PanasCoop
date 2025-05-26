@@ -203,35 +203,27 @@ const handleCancelDelete = () => {
     setAttendeeToEdit(null);
     setModalOpen(true);
   };
-
- const handleSave = async (data) => {
+  
+const handleSave = async (data) => {
   try {
     if (attendeeToEdit) {
       await updateAttendance(attendeeToEdit._id, data);
       toast.success("Participante actualizado correctamente");
-      // Actualizar el estado local inmediatamente
-      setFilteredAttendees(prev => 
-        prev.map(a => 
-          a._id === attendeeToEdit._id ? { ...a, ...data } : a
-        )
-      );
     } else {
-      const newAttendee = await createAttendee({ ...data, task: taskIdFromUrl });
+      await createAttendee({ ...data, task: taskIdFromUrl });
       toast.success("Participante agregado correctamente");
-      // Agregar al estado local
-      setFilteredAttendees(prev => [...prev, newAttendee]);
     }
+
+    await fetchAttendees(taskIdFromUrl); // Cargar lista actualizada
     setModalOpen(false);
   } catch (err) {
     console.error("Save error:", err);
     toast.error(
       err.response?.data?.message || "Error al guardar participante"
     );
-       if (attendeeToEdit) {
-      fetchAttendees(taskIdFromUrl);
-  }
   }
 };
+
   const handleExport = () => {
     if (!filteredAttendees.length) {
       toast.error("No hay participantes para exportar");

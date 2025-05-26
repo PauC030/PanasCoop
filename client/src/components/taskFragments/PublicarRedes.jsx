@@ -2,7 +2,7 @@
   import { FaFacebookF, FaInstagram } from "react-icons/fa";
   import { Button } from "../ui";
 
-  export function PublicarRedes() {
+  export function PublicarRedes() { 
     const [descripcion, setDescripcion] = useState("");
     const [enlace, setEnlace] = useState("");
     const [redSocial, setRedSocial] = useState("");

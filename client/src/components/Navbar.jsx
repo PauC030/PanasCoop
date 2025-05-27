@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 import { ButtonLink } from "./ui/ButtonLink";
 import { useState, useRef, useEffect } from "react";
+import panaLogo from "../assets/coop.png";
 
 export function Navbar() {
   const { isAuthenticated, logout, user } = useAuth();
@@ -24,17 +25,24 @@ export function Navbar() {
   }, []);
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#002326] text-white p-2 shadow-md">
+    <nav className="sticky top-0 z-50 bg-[#002326] text-white p-2 shadow-md h-16">
       <div className="w-full flex justify-between items-center">
         <h1 className="text-xl p-2 font-bold  ">
-          <Link
-            to={isAuthenticated ? "/tasks" : "/"}
-            className="hover:text-gray-300 transition-colors"
-          >
-            PanascOOP
-          </Link>
-        </h1>
 
+<Link
+  to={isAuthenticated ? "/tasks" : "/"}
+  className="hover:opacity-80 transition-opacity flex items-center"
+>
+  <img 
+    src={panaLogo} 
+    alt="PanascOOP" 
+    className="h-[45px] w-auto -my-2" // ← esto es la clave 💡
+  />
+</Link>
+
+
+
+</h1>
         <div className="flex items-center gap-4">
           {isAuthenticated ? (
             <>

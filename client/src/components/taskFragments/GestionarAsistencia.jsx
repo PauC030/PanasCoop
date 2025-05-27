@@ -318,18 +318,18 @@ const handleSave = async (data) => {
                   <td className="py-2 px-4">{attendee.name}</td>
                   <td className="py-2 px-4">{attendee.email}</td>
                   <td className="py-2 px-4" >
-                    <button
-                      onClick={() => handleEdit(attendee._id)}
-                      className="mr-3 px-4 py-1 rounded border border-yellow-500 text-yellow-500 font-semibold hover:bg-yellow-100 transition"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(attendee._id)}
-                      className="px-4 py-1 rounded border border-red-600 text-red-600 font-semibold hover:bg-red-100 transition"
-                    >
-                      Eliminar
-                    </button>
+                   <div className="flex gap-2">
+            <button
+            onClick={() => handleEdit(attendee._id)}
+            className="w-24 px-2 py-1 rounded bg-yellow-500 text-white text-sm font-semibold hover:bg-yellow-600 transition"
+             >  Editar  </button>
+
+             <button  onClick={() => handleDeleteClick(attendee._id)}
+            className="w-24 px-2 py-1 rounded bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition"
+           >  Eliminar
+           </button>
+            </div>
+
                   </td>
                 </tr>
               ))}

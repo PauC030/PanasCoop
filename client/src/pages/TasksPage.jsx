@@ -39,55 +39,52 @@ export function TasksPage() {
  return (
   <div className="flex min-h-screen bg-white-100 ">
     {/* Sidebar izquierda - visible en todos los tamaños */}
-    <div className="  bg-[#004D37] p-4 max-md:p-3 max-sm:p-2">
-    <aside className=" w-36 sm:w-44 md:w-52 max-md:w-36 max-sm:w-32 text-white">
+     <div className="mt-16 fixed top-0 left-0 h-screen bg-[#004D37] p-4 max-md:p-3 max-sm:p-2 z-50">
+ <aside className="w-28 sm:w-32 md:w-36 max-md:w-28 max-sm:w-24 text-white">
+  <h1 className="text-sm max-md:text-xs max-sm:text-[10px] font-bold mb-6 max-md:mb-5 max-sm:mb-4">
+    Actividades solidarias
+  </h1>
 
+  <div className="mb-4 max-md:mb-3 max-sm:mb-2">
+    <ul className="space-y-1">
+      <li>
+        <Link to="lista" className="block hover:bg-[#003529] p-2 max-md:p-1 max-sm:p-1 rounded text-[11px] sm:text-xs max-sm:text-[9px]">
+          Lista de Actividades
+        </Link>
+      </li>
+      <li>
+        <Link to="buscar" className="block hover:bg-[#003529] p-2 max-md:p-1 max-sm:p-1 rounded text-[11px] sm:text-xs max-sm:text-[9px] whitespace-nowrap">
+          Buscar y Filtrar Actividad
+        </Link>
+      </li>
+      <li>
+        <Link to="promocionadas" className="block hover:bg-[#003529] p-2 max-md:p-1 max-sm:p-1 rounded text-[11px] sm:text-xs max-sm:text-[9px] whitespace-nowrap">
+         Promocionadas
+        </Link>
+      </li>
+      <li>
+        <Link to="notificaciones" className="block hover:bg-[#003529] p-2 max-md:p-1 max-sm:p-1 rounded text-[11px] sm:text-xs max-sm:text-[9px] whitespace-nowrap">
+          Configurar Notificaciones
+        </Link>
+      </li>
+      <li>
+        <Link to="publicar" className="block hover:bg-[#003529] p-2 max-md:p-1 max-sm:p-1 rounded text-[11px] sm:text-xs max-sm:text-[9px] ">
+          Publicar Actividad
+        </Link>
+      </li>
+      <li>
+        <Link to="asistencia" className="block hover:bg-[#003529] p-2 max-md:p-1 max-sm:p-1 rounded text-[11px] sm:text-xs max-sm:text-[9px]">
+          Gestionar Asistencia
+        </Link>
+      </li>
+    </ul>
+  </div>
+</aside>
 
-
-        <h1 className="text-base max-md:text-sm max-sm:text-xs font-bold mb-6 max-md:mb-5 max-sm:mb-4">
-          Actividades solidarias
-        </h1>
-
-        <div className="mb-4 max-md:mb-3 max-sm:mb-2">
-          <ul className="space-y-1">
-              <li>
-              <Link to="lista" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
-                Lista de Actividades
-              </Link>
-            </li>
-            <li>
-              <Link to="buscar" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
-                Buscar y Filtrar Actividad
-              </Link>
-            </li>
-          
-            <li>
-              <Link to="promocionadas" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
-                Actividades Promocionadas
-              </Link>
-            </li>
-            <li>
-              <Link to="notificaciones" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
-                Configurar Notificaciones
-              </Link>
-            </li>
-            <li>
-              <Link to="publicar" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
-                Publicar en Redes Sociales
-              </Link>
-            </li>
-            <li>
-              <Link to="asistencia" className="block hover:bg-[#003529] p-3 max-md:p-2 max-sm:p-1 rounded text-xs sm:text-sm max-sm:text-[10px]">
-                Gestionar Asistencia
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </aside>
     </div>
 
     {/* Contenido principal */}
-    <main className="flex-1 p-4">
+    <main className=" flex-1 p-4 ml-28 sm:ml-32 md:ml-36 max-md:ml-28 max-sm:ml-24">
       <Outlet />
      
         {isBaseRoute && (
@@ -105,7 +102,7 @@ export function TasksPage() {
               <div>
                 {/* Sección actividades futuras */}
                 {sortedTasks.future.length > 0 && (
-                  <div className="mb-64">
+                  <div className="mb-44">
                     <div className="text-black y grid md:grid-cols-2 lg:grid-cols-3 gap-2">
                       {sortedTasks.future.map((task) => (
                         <TaskCard task={task} key={task._id} isPast={false} />
@@ -123,7 +120,7 @@ export function TasksPage() {
                 {sortedTasks.past.length > 0 && (
                   <div>
                     <h2 className="text-xl font-semibold mb-8 text-gray-500">
-                    ⌛ Actividades Pasadas
+                   .      .              ⌛ Actividades Pasadas
                     </h2>
                     <div className=" text-black grid md:grid-cols-2 lg:grid-cols-3 gap-2 opacity-80">
                       {sortedTasks.past.map((task) => (

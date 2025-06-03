@@ -2,8 +2,12 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 import { ButtonLink } from "./ui/ButtonLink";
 import { useState, useRef, useEffect } from "react";
+<<<<<<< HEAD
 import { FaUserCircle, FaTasks } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
+=======
+import panaLogo from "../assets/coop.png";
+>>>>>>> 5ceae93351d7ff37bc53017b930dbad4fb9f803e
 
 export function Navbar() {
   const { isAuthenticated, logout, user } = useAuth();
@@ -26,6 +30,7 @@ export function Navbar() {
   }, []);
 
   return (
+<<<<<<< HEAD
     <nav className="bg-[#002828] py-4 px-6">
       <div className="w-full flex justify-between items-center">
         {/* Logo a la izquierda */}
@@ -40,6 +45,27 @@ export function Navbar() {
 
         {/* Botones a la derecha */}
         <div className="flex items-center space-x-4">
+=======
+    <nav className="sticky top-0 z-50 bg-[#002326] text-white p-2 shadow-md h-16">
+      <div className="w-full flex justify-between items-center">
+        <h1 className="text-xl p-2 font-bold  ">
+
+<Link
+  to={isAuthenticated ? "/tasks" : "/"}
+  className="hover:opacity-80 transition-opacity flex items-center"
+>
+  <img 
+    src={panaLogo} 
+    alt="PanascOOP" 
+    className="h-[45px] w-auto -my-2" // ← esto es la clave 💡
+  />
+</Link>
+
+
+
+</h1>
+        <div className="flex items-center gap-4">
+>>>>>>> 5ceae93351d7ff37bc53017b930dbad4fb9f803e
           {isAuthenticated ? (
             <>
               <Link

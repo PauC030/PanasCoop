@@ -2,12 +2,11 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 import { ButtonLink } from "./ui/ButtonLink";
 import { useState, useRef, useEffect } from "react";
-<<<<<<< HEAD
+
 import { FaUserCircle, FaTasks } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
-=======
+
 import panaLogo from "../assets/coop.png";
->>>>>>> 5ceae93351d7ff37bc53017b930dbad4fb9f803e
 
 export function Navbar() {
   const { isAuthenticated, logout, user } = useAuth();
@@ -30,53 +29,35 @@ export function Navbar() {
   }, []);
 
   return (
-<<<<<<< HEAD
-    <nav className="bg-[#002828] py-4 px-6">
+    <nav className="sticky top-0 z-50 bg-[#002326] text-white p-2 shadow-md h-16">
       <div className="w-full flex justify-between items-center">
-        {/* Logo a la izquierda */}
-        <h1 className="text-white font-bold text-base sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl whitespace-nowrap">
+        {/* Logo */}
+        <h1 className="text-xl p-2 font-bold">
           <Link
             to={isAuthenticated ? "/tasks" : "/"}
-            className="hover:text-gray-300 transition-colors"
+            className="hover:opacity-80 transition-opacity flex items-center"
           >
-            PanascOOP
+            <img
+              src={panaLogo}
+              alt="PanascOOP"
+              className="h-[45px] w-auto -my-2"
+            />
           </Link>
         </h1>
 
-        {/* Botones a la derecha */}
-        <div className="flex items-center space-x-4">
-=======
-    <nav className="sticky top-0 z-50 bg-[#002326] text-white p-2 shadow-md h-16">
-      <div className="w-full flex justify-between items-center">
-        <h1 className="text-xl p-2 font-bold  ">
-
-<Link
-  to={isAuthenticated ? "/tasks" : "/"}
-  className="hover:opacity-80 transition-opacity flex items-center"
->
-  <img 
-    src={panaLogo} 
-    alt="PanascOOP" 
-    className="h-[45px] w-auto -my-2" // ← esto es la clave 💡
-  />
-</Link>
-
-
-
-</h1>
+        {/* Right side */}
         <div className="flex items-center gap-4">
->>>>>>> 5ceae93351d7ff37bc53017b930dbad4fb9f803e
           {isAuthenticated ? (
             <>
               <Link
                 to="/tasks"
-                className="text-white text-sm sm:text-xs md:text-sm hover:text-gray-300 transition-colors underline underline-offset-4 decoration-[1px] decoration-gray-300"
+                className="text-white text-sm hover:text-gray-300 transition-colors underline underline-offset-4 decoration-[1px] decoration-gray-300"
               >
                 Mis actividades
               </Link>
               <ButtonLink
                 to="/add-task"
-                className="bg-[#03683E] hover:bg-[#028a4b] transition-colors px-4 py-2 rounded-md font-medium text-sm sm:text-xs md:text-sm"
+                className="bg-[#03683E] hover:bg-[#028a4b] transition-colors px-4 py-2 rounded-md font-medium text-sm"
               >
                 Crear nueva Actividad
               </ButtonLink>
@@ -112,7 +93,7 @@ export function Navbar() {
                         {user.username}
                       </p>
                     </div>
-                   
+
                     <button
                       onClick={() => {
                         logout();
@@ -144,13 +125,13 @@ export function Navbar() {
             <>
               <Link
                 to="/login"
-                className="text-sm sm:text-xs md:text-sm text-white hover:text-gray-300 transition-colors"
+                className="text-sm text-white hover:text-gray-300 transition-colors"
               >
                 Iniciar sesión
               </Link>
               <Link
                 to="/register"
-                className="text-sm sm:text-xs md:text-sm text-white hover:text-gray-300 transition-colors"
+                className="text-sm text-white hover:text-gray-300 transition-colors"
               >
                 Registrarse
               </Link>

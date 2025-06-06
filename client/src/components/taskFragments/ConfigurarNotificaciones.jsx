@@ -51,7 +51,7 @@ export function ConfigurarNotificaciones() {
   };
 
   return (
-    <div className="bg-white p-6 min-h-screen">
+    <div className="bg-white p-6 min-h-screen mt-16">
       <h2 className="text-[#03673E] font-semibold text-lg mb-6">
        ⚙️ Notificaciones de Actividades Sociales
       </h2>

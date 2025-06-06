@@ -259,7 +259,7 @@ const handleSave = async (data) => {
   }
 
   return (
-    <div className="p-6 bg-white min-h-screen text-black relative">
+    <div className="p-6 bg-white min-h-screen text-black relative mt-16">
       <div className="flex justify-between items-start mb-6">
         <div>
           <h1 className="text-xl font-semibold text-green-700 mb-2">

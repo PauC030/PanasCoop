@@ -10,7 +10,7 @@ export function ListaActividades() {
 
   return (
     <div className="text-black p-4">
-      <h2 className="text-[#03673E] font-semibold text-lg mb-6">
+      <h2 className="text-[#03673E] font-semibold text-lg mb-6 ">
         📋 Lista de Actividades
       </h2>
 

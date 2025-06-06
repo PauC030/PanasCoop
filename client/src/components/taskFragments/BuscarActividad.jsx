@@ -22,7 +22,7 @@ export function BuscarActividad() {
 
   return (
     <div className="text-black bg-white p-6 min-h-screen">
-      <div className="border-2 rounded-md p-6 shadow-lg mt-16">
+      <div className="border-2 rounded-md p-6 shadow-lg">
         <div className="mb-6">
           <label className="block text-gray-700 mb-2 text-left">
             Buscar por palabra clave (título o descripción)

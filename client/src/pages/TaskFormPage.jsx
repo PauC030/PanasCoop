@@ -63,7 +63,7 @@ export function TaskFormPage() {
   }, []);
 
   return (
-    <div className=" flex items-center justify-center min-h-[90vh]">
+    <div className=" flex items-center justify-center min-h-[90vh]  mt-16 ">
     <Card className="w-full max-w-2xl mx-4">
     <h1 className="text-2xl font-bold text-[#165a4c] text-center mb-6">Crear Nueva Actividad</h1>
       <form onSubmit={handleSubmit(onSubmit)}>

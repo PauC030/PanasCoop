@@ -10,8 +10,8 @@ export function ActividadesPromocionadas() {
   }, []);
 
   return (
-    <div className="text-black p-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-16">
+    <div className="text-black p-4 ">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
         {promotedTasks.length === 0 ? (
           <div className="text-gray-500 italic col-span-full text-center py-6 ">
             No hay actividades promocionadas en este momento

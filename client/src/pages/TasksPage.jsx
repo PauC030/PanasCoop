@@ -37,15 +37,15 @@ export function TasksPage() {
   const isBaseRoute = location.pathname === "/tasks";
  // #003529//
  return (
-  <div className="flex min-h-screen bg-white-100 ">
+  <div className="flex min-h-screen bg-white-100   mt-16  ">
     {/* Sidebar izquierda - visible en todos los tamaños */}
-     <div className="mt-16 fixed top-0 left-0 h-screen bg-[#004D37] p-4 max-md:p-3 max-sm:p-2 z-50">
+     <div className="mt-16 fixed top-0 left-0 h-screen bg-[#004D37] p-4 max-md:p-3 max-sm:p-2 z-50 ">
  <aside className="w-28 sm:w-32 md:w-36 max-md:w-28 max-sm:w-24 text-white">
   <h1 className="text-sm max-md:text-xs max-sm:text-[10px] font-bold mb-6 max-md:mb-5 max-sm:mb-4">
     Actividades solidarias
   </h1>
 
-  <div className="mb-4 max-md:mb-3 max-sm:mb-2">
+  <div className="mb-4 max-md:mb-3 max-sm:mb-2 ">
     <ul className="space-y-1">
       <li>
         <Link to="lista" className="block hover:bg-[#003529] p-2 max-md:p-1 max-sm:p-1 rounded text-[11px] sm:text-xs max-sm:text-[9px]">
@@ -90,7 +90,7 @@ export function TasksPage() {
         {isBaseRoute && (
           <>
             {tasks.length === 0 ? (
-              <div className="flex justify-center items-center p-10">
+              <div className="flex justify-center items-center p-10 ">
                 <div>
                   <ImFileEmpty className="text-6xl text-gray-400 m-auto my-2" />
                   <h1 className="font-bold text-xl text-gray-400">

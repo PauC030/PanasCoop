@@ -26,7 +26,7 @@ function Register() {
   }, [isAuthenticated]);
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="h-screen flex items-center justify-center bg-gray-100 p-4  mt-16 ">
       <div className="flex rounded-xl overflow-hidden shadow-2xl w-full max-w-6xl h-[70vh] min-h-[550px] -mt-14">
         
         {/* Imagen a la izquierda */}

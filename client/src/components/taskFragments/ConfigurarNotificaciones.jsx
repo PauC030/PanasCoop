@@ -86,7 +86,6 @@ export function ConfigurarNotificaciones() {
 };
 
   return (
-
     <div className="bg-white p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-[#03673E] font-semibold text-lg">
@@ -115,8 +114,6 @@ export function ConfigurarNotificaciones() {
           </p>
         </div>
       )}
-
-
 
       <div className="border-2 rounded-md p-6 shadow-lg grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Próximas actividades configuradas */}

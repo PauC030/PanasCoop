@@ -11,6 +11,9 @@ import { ConfigurarNotificaciones } from "./components/taskFragments/ConfigurarN
 import { PublicarRedes } from "./components/taskFragments/PublicarRedes";
 import { GestionarAsistencia } from "./components/taskFragments/GestionarAsistencia";
 
+
+
+
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import { TaskFormPage } from "./pages/TaskFormPage";
@@ -18,14 +21,16 @@ import { LoginPage } from "./pages/LoginPage";
 import { TasksPage } from "./pages/TasksPage";
 import { TaskProvider } from "./context/tasksContext";
 import { AsistenciaProvider } from "./context/asistenciaContext"; // importa tu nuevo provider
-
+import { NotificationsProvider } from "./context/NotificationsContext"; // Ajusta según tu estructura
 
 import { Toaster } from 'react-hot-toast'; // <-- Importante
 
 function App() {
   return (
+     
     <AuthProvider>
   <TaskProvider>
+    <NotificationsProvider>
     <AsistenciaProvider> 
       <SearchProvider>
         <BrowserRouter>
@@ -56,8 +61,10 @@ function App() {
         </BrowserRouter>
       </SearchProvider>
     </AsistenciaProvider>
+    </NotificationsProvider>
   </TaskProvider>
 </AuthProvider>
+
   )
 };
 

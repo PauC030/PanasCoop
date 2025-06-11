@@ -10,6 +10,8 @@ export default function CreateAdminForm() {
     confirmPassword: ""
   });
 
+  const [successMessage, setSuccessMessage] = useState("");
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -32,7 +34,14 @@ export default function CreateAdminForm() {
         email: formData.email,
         password: formData.password
       });
+
       
+  setSuccessMessage("✅ Administrador creado correctamente");
+
+        // Ocultar mensaje después de 3 segundos
+      setTimeout(() => setSuccessMessage(""), 3000);
+
+   
       // Reset form on success
       setFormData({
         username: "",
@@ -52,6 +61,13 @@ export default function CreateAdminForm() {
         <p className="text-gray-600">Complete el formulario para registrar un nuevo administrador</p>
       </div>
       
+   {/* Mensaje de éxito */}
+      {successMessage && (
+        <div className="mb-4 text-green-600 font-semibold bg-green-100 p-3 rounded-lg border border-green-400">
+          {successMessage}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-6 text-gray-700">
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-700 mb-1">

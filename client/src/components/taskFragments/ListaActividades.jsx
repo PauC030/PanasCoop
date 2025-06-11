@@ -10,9 +10,6 @@ export function ListaActividades() {
 
   return (
     <div className="text-black p-4">
-      <h2 className="text-[#03673E] font-semibold text-lg mb-6 ">
-        📋 Lista de Actividades
-      </h2>
 
       {othersTasks.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -23,6 +23,7 @@ import { TaskProvider } from "./context/tasksContext";
 import { AsistenciaProvider } from "./context/asistenciaContext"; // importa tu nuevo provider
 import { NotificationsProvider } from "./context/NotificationsContext"; // Ajusta según tu estructura
 
+
 import { Toaster } from 'react-hot-toast'; // <-- Importante
 
 function App() {
@@ -49,7 +50,6 @@ function App() {
               <Route path="promocionadas" element={<ActividadesPromocionadas />} />
               <Route path="notificaciones" element={<ConfigurarNotificaciones />} />
               <Route path="publicar" element={<PublicarRedes />} />
-            {/* Cambia el nombre de la ruta para que sea consistente */}
               <Route path="asistencia" element={<GestionarAsistencia />} />
              </Route>
                 <Route path="/add-task" element={<TaskFormPage />} />

@@ -11,6 +11,8 @@ import toast from "react-hot-toast";
 import { useAttendance } from "../../hooks/useAttendance"
 import { useNavigate } from 'react-router-dom';
 import { Button } from "../ui/Button";
+import  config  from "../../assets/config.png" 
+
 
 export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = false }) {
   const navigate = useNavigate();
@@ -29,6 +31,12 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
   // Actualizar para usar el hook mejorado
   const [isAttending, setIsAttending, isLoadingAttendance] = useAttendance(task._id);
   const [isLoading, setIsLoading] = useState(false);
+
+   // Nueva función para ir a configuración de notificaciones
+  const handleGoToNotifications = () => {
+  navigate(`/tasks/notificaciones?taskId=${task._id}`);
+};
+
 
   useEffect(() => {
     fetchAttendees(task._id);
@@ -143,11 +151,22 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
           </div>
         )}
 
+       {/* ICONO CAMPANA SOLO SI ASISTE */}
+         {showAttendanceButton && isAttending && (
+           <button
+            onClick={handleGoToNotifications}
+             className="absolute top-2 right-2 z-20 bg-white rounded-full p-1 shadow hover:bg-gray-100 transition"
+              title="Configurar notificación"
+          >  <img src={config} alt="Notificar" className="w-6 h-6" />
+       </button>
+          )} 
+
+
         <header className="relative">
           <div className="flex justify-between items-start gap-2">
-            <h1 className="text-lg font-semibold break-words overflow-hidden text-ellipsis whitespace-nowrap flex-1">
-              {task.title}
-            </h1>
+            <h1 className={`text-lg font-semibold break-words overflow-hidden text-ellipsis whitespace-nowrap flex-1 ${showAttendanceButton && isAttending ? 'mr-16' : ''}`}>
+  {task.title}
+</h1>
 
             {task.isOwner && (
               <div className="flex items-center gap-2">
@@ -198,6 +217,8 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
           )}
         </header>
 
+
+
         <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2 w-full">
           <Button
             onClick={() => setShowDetailsModal(true)}
@@ -226,6 +247,7 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
                 >
                   Cancelar Asistencia
                 </button>
+
               )}
             </>
           )}
@@ -250,7 +272,7 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
         </div>
       </CardActivi>
 
-      {/* Aquí van todos los modales... (igual que antes) */}
+    
       {/* Modal de Detalles */}
       {showDetailsModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-30">

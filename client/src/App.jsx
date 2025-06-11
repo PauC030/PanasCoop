@@ -10,21 +10,31 @@ import { ActividadesPromocionadas } from "./components/taskFragments/Actividades
 import { ConfigurarNotificaciones } from "./components/taskFragments/ConfigurarNotificaciones";
 import { GestionarAsistencia } from "./components/taskFragments/GestionarAsistencia";
 
+
+
+
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import { TaskFormPage } from "./pages/TaskFormPage";
 import { LoginPage } from "./pages/LoginPage";
 import { TasksPage } from "./pages/TasksPage";
 import { TaskProvider } from "./context/tasksContext";
+<<<<<<< HEAD
 import { AsistenciaProvider } from "./context/asistenciaContext";
 import { AdminProvider } from "./context/adminContext";
 import AdminDashboard from "./pages/AdminDashboard";
+=======
+import { AsistenciaProvider } from "./context/asistenciaContext"; // importa tu nuevo provider
+import { NotificationsProvider } from "./context/NotificationsContext"; // Ajusta según tu estructura
+>>>>>>> f5cebfe1c826f6576d7c6326477298e28aa2abed
 
 import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
+     
     <AuthProvider>
+<<<<<<< HEAD
       <TaskProvider>
         <AsistenciaProvider> 
           <AdminProvider>
@@ -44,6 +54,45 @@ function App() {
                         <Route path="lista" element={<ListaActividades />} />
                         <Route path="promocionadas" element={<ActividadesPromocionadas />} />
                         <Route path="notificaciones" element={<ConfigurarNotificaciones />} />
+=======
+  <TaskProvider>
+    <NotificationsProvider>
+    <AsistenciaProvider> 
+      <SearchProvider>
+        <BrowserRouter>
+          <main className="content-container mx-auto md:px-0">
+            <Navbar />
+            <Toaster position="top-center" reverseOrder={false} />
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+
+              <Route element={<ProtectedRoute />}>
+              <Route path="/tasks" element={<TasksPage />}>
+              <Route path="buscar" element={<BuscarActividad />} />
+              <Route path="lista" element={<ListaActividades />} />
+              <Route path="promocionadas" element={<ActividadesPromocionadas />} />
+              <Route path="notificaciones" element={<ConfigurarNotificaciones />} />
+              <Route path="publicar" element={<PublicarRedes />} />
+              <Route path="asistencia" element={<GestionarAsistencia />} />
+             </Route>
+                <Route path="/add-task" element={<TaskFormPage />} />
+                <Route path="/tasks/:id" element={<TaskFormPage />} />
+                <Route path="/profile" element={<h1>Profile</h1>} />
+              </Route>
+            </Routes>
+          </main>
+        </BrowserRouter>
+      </SearchProvider>
+    </AsistenciaProvider>
+    </NotificationsProvider>
+  </TaskProvider>
+</AuthProvider>
+
+  )
+};
+>>>>>>> f5cebfe1c826f6576d7c6326477298e28aa2abed
 
                         <Route path="asistencia" element={<GestionarAsistencia />} />
                       </Route>

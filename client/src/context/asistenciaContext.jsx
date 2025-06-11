@@ -5,6 +5,7 @@ import {
   getAttendanceRequest,
   updateAttendanceRequest,
   deleteAttendanceRequest,
+  getUserAttendancesRequest
 } from '../api/attendanceApi';
  
 
@@ -14,10 +15,23 @@ export const AsistenciaProvider = ({ children }) => {
   const [attendees, setAttendees] = useState([]);
   const [error, setError] = useState(null);      // Estado para errores
   const [forbidden, setForbidden] = useState(false); // Estado para 403 Forbidden
- 
+  const [userAttendances, setUserAttendances] = useState([]);
+  const [loadingAttendances, setLoadingAttendances] = useState(false);
+
+ const loadUserAttendances = async () => {
+    setLoadingAttendances(true);
+    try {
+      const res = await getUserAttendancesRequest();
+      setUserAttendances(res.data);
+    } catch (error) {
+      console.error("Error al cargar asistencias del usuario:", error);
+    } finally {
+      setLoadingAttendances(false);
+    }
+  };
+
 
   // 🔄 Cargar asistentes de una tarea
- 
 const fetchAttendees = async (taskId) => {
   try {
     const res = await getAttendanceRequest(taskId);
@@ -188,6 +202,9 @@ const updateAttendance = async (id, updatedData) => {
         attendees,
         error,
         forbidden,
+        userAttendances,
+        loadingAttendances,
+        loadUserAttendances,
         checkUserAttendance, // Nueva función
         fetchAttendees,
         confirmAttendance,

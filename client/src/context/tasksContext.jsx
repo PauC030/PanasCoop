@@ -7,7 +7,8 @@ import {
   updateTaskRequest,
   getOthersTasksRequest,
   togglePromotionRequest,
-  getPromotedTasksRequest 
+  getPromotedTasksRequest,
+  createTaskWithImageRequest // Importar la nueva función
 } from "../api/tasks";
 
 const TaskContext = createContext();
@@ -61,35 +62,30 @@ export function TaskProvider({ children }) {
       throw error;
     }
   };
-  
 
-const getOthersTasks = async () => {
-  try {
-    const res = await getOthersTasksRequest(); // Llama al API
-  const currentDate = new Date();                                                    
-    const filtered = res.data?.filter(task => new Date(task.date) >= currentDate) || [];     
-    setOthersTasks(filtered);
-  } catch (error) {
-    console.error("Error al obtener tareas de otros usuarios:", error);
-  }
-};
-useEffect(() => {
-  getOthersTasks(); // Llamamos la función cuando se carga la app
-}, []);
+  const getOthersTasks = async () => {
+    try {
+      const res = await getOthersTasksRequest();
+      const currentDate = new Date();                                                    
+      const filtered = res.data?.filter(task => new Date(task.date) >= currentDate) || [];     
+      setOthersTasks(filtered);
+    } catch (error) {
+      console.error("Error al obtener tareas de otros usuarios:", error);
+    }
+  };
 
-const getTasks = async () => {
-  try {
-    const res = await getTasksRequest();
-    const tasksConPropiedad = res.data.map(task => ({
-      ...task,
-      isOwner: true, // Agregar propiedad a tareas propias
-    }));
-    setTasks(tasksConPropiedad);
-  } catch (error) {
-    console.error("Error al obtener tareas:", error);
-  }
-};
-
+  const getTasks = async () => {
+    try {
+      const res = await getTasksRequest();
+      const tasksConPropiedad = res.data.map(task => ({
+        ...task,
+        isOwner: true, // Agregar propiedad a tareas propias
+      }));
+      setTasks(tasksConPropiedad);
+    } catch (error) {
+      console.error("Error al obtener tareas:", error);
+    }
+  };
 
   const deleteTask = async (id) => {
     try {
@@ -102,13 +98,39 @@ const getTasks = async () => {
 
   const createTask = async (task) => {
     try {
-      const res = await createTaskRequest(task);
-      // Agregar la nueva tarea al estado
-      setTasks([...tasks, res.data]);
-      return res.data; // Devolver la tarea creada
+      let res;
+      
+      // Si hay imagen, usar FormData
+      if (task.image) {
+        const formData = new FormData();
+        
+        // Agregar todos los campos al FormData
+        formData.append('title', task.title);
+        formData.append('description', task.description || '');
+        formData.append('place', task.place || '');
+        formData.append('date', task.date || '');
+        
+        // Para el array de responsables, convertir a JSON string
+        if (task.responsible && task.responsible.length > 0) {
+          formData.append('responsible', JSON.stringify(task.responsible));
+        }
+        
+        // Agregar la imagen
+        formData.append('image', task.image);
+        
+        res = await createTaskWithImageRequest(formData);
+      } else {
+        // Si no hay imagen, usar la función original
+        res = await createTaskRequest(task);
+      }
+      
+      // Agregar la nueva tarea al estado con la propiedad isOwner
+      const newTaskWithOwner = { ...res.data, isOwner: true };
+      setTasks([...tasks, newTaskWithOwner]);
+      return newTaskWithOwner;
     } catch (error) {
-      console.log(error);
-      throw error; // Lanzar el error para manejarlo en el componente
+      console.error('Error al crear tarea:', error);
+      throw error;
     }
   };
 
@@ -123,16 +145,42 @@ const getTasks = async () => {
 
   const updateTask = async (id, task) => {
     try {
-      const res = await updateTaskRequest(id, task);
+      let res;
+      
+      // Si hay imagen nueva, usar FormData
+      if (task.image && typeof task.image === 'object') {
+        const formData = new FormData();
+        
+        // Agregar todos los campos al FormData
+        formData.append('title', task.title);
+        formData.append('description', task.description || '');
+        formData.append('place', task.place || '');
+        formData.append('date', task.date || '');
+        
+        // Para el array de responsables
+        if (task.responsible && task.responsible.length > 0) {
+          formData.append('responsible', JSON.stringify(task.responsible));
+        }
+        
+        // Agregar la imagen nueva
+        formData.append('image', task.image);
+        
+        // Necesitarías crear una función updateTaskWithImageRequest
+        // res = await updateTaskWithImageRequest(id, formData);
+        res = await updateTaskRequest(id, formData);
+      } else {
+        // Si no hay imagen nueva, usar la función original
+        res = await updateTaskRequest(id, task);
+      }
+      
       // Actualizar la tarea en el estado
-      setTasks(tasks.map(t => t._id === id ? res.data : t));
-      return res.data; // Devolver la tarea actualizada
+      setTasks(tasks.map(t => t._id === id ? { ...res.data, isOwner: true } : t));
+      return res.data;
     } catch (error) {
-      console.error(error);
+      console.error('Error al actualizar tarea:', error);
       throw error;
     }
   };
-
 
   return (
     <TaskContext.Provider

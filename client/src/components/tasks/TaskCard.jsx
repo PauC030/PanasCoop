@@ -161,6 +161,19 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
        </button>
           )} 
 
+        {/* IMAGEN DE LA TAREA SI EXISTE */}
+        {task.image && (
+          <div className="mb-4">
+            <img 
+              src={task.image} 
+              alt={task.title}
+              className="w-full h-48 object-cover rounded-lg shadow-sm"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          </div>
+        )}
 
         <header className="relative">
           <div className="flex justify-between items-start gap-2">
@@ -280,6 +293,20 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
             <h2 className="text-3xl font-bold mb-4 text-center text-gray-800 break-words whitespace-normal">
               {task.title}
             </h2>
+
+            {/* IMAGEN EN EL MODAL DE DETALLES */}
+            {task.image && (
+              <div className="mb-4 flex justify-center">
+                <img 
+                  src={task.image} 
+                  alt={task.title}
+                  className="max-w-full max-h-64 object-contain rounded-lg shadow-sm"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
 
             <div className="space-y-4">
               <p className="text-gray-600">

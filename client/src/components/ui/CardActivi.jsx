@@ -1,7 +1,27 @@
 export function CardActivi({ children, className = "" }) {
   return (
-    <div className={`bg-white shadow-md w-full max-w-[390px] p-4 rounded-md overflow-hidden break-words border-2 border-[#EAB308] hover:border-[rgb(231,182,117)] hover:bg-[rgb(251,254,200)] hover:shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-1 mx-auto my-1 ${className}`}>
+    <div
+      className={`
+        w-[95%] sm:w-[90%] md:w-[90%] lg:w-[85%] xl:w-[80%]
+        ml-[60px]          // margen izquierdo mayor
+        mr-[6px]          // margen derecho menor
+        px-4
+        bg-white
+        shadow-md
+        p-4
+        rounded-lg
+        border-2
+        border-[#EAB308]
+        hover:border-amber-300
+        hover:bg-amber-50
+        hover:shadow-lg
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        min-w-[280px]
+        ${className}
+      `}
+    >
       {children}
     </div>
-  );
-}
+  );}

@@ -22,8 +22,9 @@ export const togglePromotionRequest = async (id, data) => axios.patch(`/tasks/${
 export const getPromotedTasksRequest = async () =>  axios.get("/tasks/promoted");
 
 
+//API DE LA IMAGEN 
 
 
-
-
-
+export const createTaskWithImageRequest = async (formData) => {
+  return axios.post("/tasks", formData);
+};

@@ -21,17 +21,9 @@ export function BuscarActividad() {
   };
 
   return (
-<<<<<<< HEAD
-    <div className="text-black bg-white p-6 min-h-screen w-full max-w-screen mx-auto">
-      <h2 className="text-[#03673E] font-semibold text-lg mb-6">
-      🔍 Buscar y Filtrar Actividades
-      </h2>
-
-=======
-    <div className="text-black bg-white p-6 min-h-screen">
->>>>>>> 642f52966db194449c4b739324a657ec3f26bd0a
-      <div className="border-2 rounded-md p-6 shadow-lg">
-        <div className="mb-6">
+<div className="text-black bg-white min-h-screen px-6">
+  <div className="border-2 rounded-md p-6 shadow-lg ml-8">
+    <div className="mb-6">
           <label className="block text-gray-700 mb-2 text-left">
             Buscar por palabra clave (título o descripción)
           </label>

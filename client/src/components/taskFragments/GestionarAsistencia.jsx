@@ -47,7 +47,7 @@ function ParticipantModal({ isOpen, onClose, onSave, attendeeToEdit, existingEma
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-md shadow-lg w-[300px]">
+      <div className="bg-white p-6 rounded-md shadow-lg w-[300px] ">
         <h2 className="text-lg font-semibold mb-4">
           {attendeeToEdit ? 'Editar Participante' : 'Agregar Participante'}
         </h2>
@@ -292,7 +292,7 @@ const handleSave = async (data) => {
         </select>
       </div>
 
-      <div className="bg-white shadow-xl p-4 rounded-md border-2">
+     <div className="bg-white shadow-xl p-4 rounded-md border-2 ml-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="font-semibold text-lg">
             Lista de Participantes ({filteredAttendees.length})

@@ -106,7 +106,6 @@ const cancelAttendance = async ({ taskId, email }) => {
   }
 };
 
-
   // ✏️ Editar asistencia
   
 const updateAttendance = async (id, updatedData) => {

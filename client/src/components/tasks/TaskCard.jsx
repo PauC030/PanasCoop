@@ -26,25 +26,13 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
   const [email, setEmail] = useState(() => localStorage.getItem("userEmail") || "");
   const [name, setName] = useState(() => localStorage.getItem("userName") || "");
 
-  const [isAttending, setIsAttending] = useAttendance(task._id);
+  // Actualizar para usar el hook mejorado
+  const [isAttending, setIsAttending, isLoadingAttendance] = useAttendance(task._id);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchAttendees(task._id);
   }, [task._id]);
-
-
-useEffect(() => {
-  const savedEmail = localStorage.getItem("userEmail")?.trim().toLowerCase();
-  if (savedEmail) {
-    const userAttendances = JSON.parse(
-      localStorage.getItem(`userAttendances_${savedEmail}`) || '[]'
-    );
-    setIsAttending(userAttendances.includes(task._id));
-  }
-}, [task._id]);
- 
-            
 
   const handleDelete = () => {
     deleteTask(task._id);
@@ -65,87 +53,85 @@ useEffect(() => {
     }
   };
 
-
-
   const handleConfirmAttend = async () => {
-  if (!name?.trim() || !email) {
-    toast.error("Completa todos los campos");
-    return;
-  }
-  setIsLoading(true);
-  try {
-    const normalizedEmail = email.trim().toLowerCase();
-    
-    // 1. Actualizar estado local primero (optimistic update)
-    setIsAttending(true);
-    
-    // 2. Confirmar en backend
-    await confirmAttendance({
-      taskId: task._id,
-      email: normalizedEmail,
-      name: name.trim()
-    });
-
-    // 3. Guardar en localStorage
-    localStorage.setItem("userEmail", normalizedEmail);
-    localStorage.setItem("userName", name.trim());
-    
-    // 4. Actualizar lista de asistencias del usuario
-    const userAttendances = JSON.parse(
-      localStorage.getItem(`userAttendances_${normalizedEmail}`) || '[]'
-    );
-    if (!userAttendances.includes(task._id)) {
-      localStorage.setItem(
-        `userAttendances_${normalizedEmail}`,
-        JSON.stringify([...userAttendances, task._id])
-      );
+    if (!name?.trim() || !email) {
+      toast.error("Completa todos los campos");
+      return;
     }
-    setShowAttendModal(false);
-    toast.success("Asistencia confirmada correctamente!");
-  } catch (error) {
-    setIsAttending(false); // Revertir si hay error
-    toast.error(error.response?.data?.message || "Error al confirmar asistencia");
-  } finally {
-    setIsLoading(false);
-  }
-};
+    setIsLoading(true);
+    try {
+      const normalizedEmail = email.trim().toLowerCase();
+      
+      // 1. Actualizar estado local primero (optimistic update)
+      setIsAttending(true);
+      
+      // 2. Confirmar en backend
+      await confirmAttendance({
+        taskId: task._id,
+        email: normalizedEmail,
+        name: name.trim()
+      });
 
-   const handleCancel = async () => {
-  setIsLoading(true);
-  try {
-    const userEmail = email.trim().toLowerCase();
-    
-    // 1. Actualización optimista
-    setIsAttending(false);
-    
-    // 2. Cancelar en el backend
-    await cancelAttendance({ 
-      taskId: task._id, 
-      email: userEmail 
-    });
-    
-    // 3. Actualizar localStorage
-    const userAttendances = JSON.parse(
-      localStorage.getItem(`userAttendances_${userEmail}`) || '[]'
-    );
-    const updatedAttendances = userAttendances.filter(id => id !== task._id);
-    localStorage.setItem(
-      `userAttendances_${userEmail}`,
-      JSON.stringify(updatedAttendances)
-    );
-    // 4. Forzar recarga de asistentes
-    await fetchAttendees(task._id);
-    setShowCancelModal(false);
-    toast.success("Asistencia cancelada correctamente ❌");
-  } catch (err) {
-    console.error("Error al cancelar asistencia:", err);
-    setIsAttending(true); // Revertir en caso de error
-    toast.error(err.response?.data?.message || "Error al cancelar asistencia");
-  } finally {
-    setIsLoading(false);
-  }
-};
-       
+      // 3. Guardar en localStorage
+      localStorage.setItem("userEmail", normalizedEmail);
+      localStorage.setItem("userName", name.trim());
+      
+      // 4. Actualizar lista de asistencias del usuario
+      const userAttendances = JSON.parse(
+        localStorage.getItem(`userAttendances_${normalizedEmail}`) || '[]'
+      );
+      if (!userAttendances.includes(task._id)) {
+        localStorage.setItem(
+          `userAttendances_${normalizedEmail}`,
+          JSON.stringify([...userAttendances, task._id])
+        );
+      }
+      setShowAttendModal(false);
+      toast.success("Asistencia confirmada correctamente!");
+    } catch (error) {
+      setIsAttending(false); // Revertir si hay error
+      toast.error(error.response?.data?.message || "Error al confirmar asistencia");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    setIsLoading(true);
+    try {
+      const userEmail = email.trim().toLowerCase();
+      
+      // 1. Actualización optimista
+      setIsAttending(false);
+      
+      // 2. Cancelar en el backend
+      await cancelAttendance({ 
+        taskId: task._id, 
+        email: userEmail 
+      });
+      
+      // 3. Actualizar localStorage
+      const userAttendances = JSON.parse(
+        localStorage.getItem(`userAttendances_${userEmail}`) || '[]'
+      );
+      const updatedAttendances = userAttendances.filter(id => id !== task._id);
+      localStorage.setItem(
+        `userAttendances_${userEmail}`,
+        JSON.stringify(updatedAttendances)
+      );
+      
+      // 4. Forzar recarga de asistentes
+      await fetchAttendees(task._id);
+      setShowCancelModal(false);
+      toast.success("Asistencia cancelada correctamente ❌");
+    } catch (err) {
+      console.error("Error al cancelar asistencia:", err);
+      setIsAttending(true); // Revertir en caso de error
+      toast.error(err.response?.data?.message || "Error al cancelar asistencia");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -212,57 +198,59 @@ useEffect(() => {
           )}
         </header>
 
+        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2 w-full">
+          <Button
+            onClick={() => setShowDetailsModal(true)}
+            className="w-full sm:w-auto px-4 sm:px-4 py-1 bg-[#22C55E] text-white rounded hover:bg-green-600 transition-colors text-sm sm:text-base whitespace-nowrap"
+          >
+            Ver Detalles
+          </Button>
 
-       <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2 w-full">
-      <Button
-    onClick={() => setShowDetailsModal(true)}
-    className="w-full sm:w-auto px-4 sm:px-4 py-1 bg-[#22C55E] text-white rounded hover:bg-green-600 transition-colors text-sm sm:text-base whitespace-nowrap"
-  >
-    Ver Detalles
-  </Button>
-
-  {showAttendanceButton && (
-    !isAttending ? (
-      <button
-        onClick={() => setShowAttendModal(true)}
-        className="w-full sm:w-auto px-3 sm:px-4 py-1 border border-green-500 text-green-700 rounded hover:bg-green-100 transition-colors text-sm sm:text-base whitespace-nowrap"
-      >
-        Asistir a actividad
-      </button>
-    ) : (
-      <button
-        onClick={() => setShowCancelModal(true)} // px-4 py-1 rounded border border-red-600 text-red-600 font-semibold hover:bg-red-100 transition"
-        className="w-full sm:w-auto px-3 sm:px-4  py-1 rounded border border-red-600 text-red-600 font-semibold hover:bg-red-100 transition text-sm sm:text-base whitespace-nowrap"
-      >
-        Cancelar Asistencia
-      </button>
-    )
-  )}
-
+          {showAttendanceButton && (
+            <>
+              {isLoadingAttendance ? (
+                <div className="w-full sm:w-auto px-3 sm:px-4 py-1 border border-gray-300 text-gray-500 rounded text-sm sm:text-base whitespace-nowrap">
+                  Verificando...
+                </div>
+              ) : !isAttending ? (
+                <button
+                  onClick={() => setShowAttendModal(true)}
+                  className="w-full sm:w-auto px-3 sm:px-4 py-1 border border-green-500 text-green-700 rounded hover:bg-green-100 transition-colors text-sm sm:text-base whitespace-nowrap"
+                >
+                  Asistir a actividad
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowCancelModal(true)}
+                  className="w-full sm:w-auto px-3 sm:px-4 py-1 rounded border border-red-600 text-red-600 font-semibold hover:bg-red-100 transition text-sm sm:text-base whitespace-nowrap"
+                >
+                  Cancelar Asistencia
+                </button>
+              )}
+            </>
+          )}
        
           {task.isOwner && (
-    <div className="flex gap-x-1 items-center ml-4">
-      {/* Botón de Asistencia */}
-      <button
-        onClick={() => navigate(`/tasks/asistencia?taskId=${task._id}`)}
-        className="text-sm text-blue-600 hover:text-blue-800 hover:underline mr-2"
-      > Asistencia
-      </button>
-      
-      {/* Botones existentes de editar/eliminar */}
-      <ButtonIcon onClick={() => setShowModal(true)}>
-        <img src={deleteImage} alt="Eliminar" className="h-6 w-6 hover:scale-110" />
-      </ButtonIcon>
-      <ButtonLinkIcon to={`/tasks/${task._id}`}>
-        <img src={editImage} alt="Editar" className="h-6 w-6 hover:scale-110" />
-      </ButtonLinkIcon>
-    </div>
-         
+            <div className="flex gap-x-1 items-center ml-4">
+              <button
+                onClick={() => navigate(`/tasks/asistencia?taskId=${task._id}`)}
+                className="text-sm text-blue-600 hover:text-blue-800 hover:underline mr-2"
+              > 
+                Asistencia
+              </button>
+              
+              <ButtonIcon onClick={() => setShowModal(true)}>
+                <img src={deleteImage} alt="Eliminar" className="h-6 w-6 hover:scale-110" />
+              </ButtonIcon>
+              <ButtonLinkIcon to={`/tasks/${task._id}`}>
+                <img src={editImage} alt="Editar" className="h-6 w-6 hover:scale-110" />
+              </ButtonLinkIcon>
+            </div>
           )}
         </div>
       </CardActivi>
 
-
+      {/* Aquí van todos los modales... (igual que antes) */}
       {/* Modal de Detalles */}
       {showDetailsModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-30">

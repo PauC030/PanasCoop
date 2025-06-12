@@ -21,7 +21,7 @@ export function BuscarActividad() {
   };
 
   return (
-    <div className="text-black bg-white p-6 min-h-screen">
+    <div className="text-black bg-white p-6 min-h-screen w-full max-w-screen mx-auto">
       <h2 className="text-[#03673E] font-semibold text-lg mb-6">
       🔍 Buscar y Filtrar Actividades
       </h2>

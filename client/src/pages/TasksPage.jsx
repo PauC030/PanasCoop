@@ -39,46 +39,48 @@ export function TasksPage() {
  return (
   <div className="flex min-h-screen bg-white-100 ">
     {/* Sidebar izquierda - visible en todos los tamaños */}
-     <div className="mt-16 fixed top-0 left-0 h-screen bg-[#004D37] p-4 max-md:p-3 max-sm:p-2 z-50">
- <aside className="w-28 sm:w-32 md:w-36 max-md:w-28 max-sm:w-24 text-white">
+  <div className="mt-16 fixed top-0 left-0 h-screen w-fit z-50 bg-gradient-to-b from-[#002615] to-[#056e51] p-4 max-md:p-3 max-sm:p-2">
+  <aside className="w-28 sm:w-32 md:w-36 max-md:w-28 max-sm:w-24 text-white mr-6">
+
   <h1 className="text-sm max-md:text-xs max-sm:text-[10px] font-bold mb-6 max-md:mb-5 max-sm:mb-4">
     Actividades solidarias
   </h1>
 
-  <div className="mb-4 max-md:mb-3 max-sm:mb-2">
-    <ul className="space-y-1">
-      <li>
-        <Link to="lista" className="block hover:bg-[#003529] p-2 max-md:p-1 max-sm:p-1 rounded text-[11px] sm:text-xs max-sm:text-[9px]">
-          Lista de Actividades
-        </Link>
-      </li>
-      <li>
-        <Link to="buscar" className="block hover:bg-[#003529] p-2 max-md:p-1 max-sm:p-1 rounded text-[11px] sm:text-xs max-sm:text-[9px] whitespace-nowrap">
-          Buscar y Filtrar Actividad
-        </Link>
-      </li>
-      <li>
-        <Link to="promocionadas" className="block hover:bg-[#003529] p-2 max-md:p-1 max-sm:p-1 rounded text-[11px] sm:text-xs max-sm:text-[9px] whitespace-nowrap">
-         Promocionadas
-        </Link>
-      </li>
-      <li>
-        <Link to="notificaciones" className="block hover:bg-[#003529] p-2 max-md:p-1 max-sm:p-1 rounded text-[11px] sm:text-xs max-sm:text-[9px] whitespace-nowrap">
-          Configurar Notificaciones
-        </Link>
-      </li>
-      <li>
-        <Link to="publicar" className="block hover:bg-[#003529] p-2 max-md:p-1 max-sm:p-1 rounded text-[11px] sm:text-xs max-sm:text-[9px] ">
-          Publicar Actividad
-        </Link>
-      </li>
-      <li>
-        <Link to="asistencia" className="block hover:bg-[#003529] p-2 max-md:p-1 max-sm:p-1 rounded text-[11px] sm:text-xs max-sm:text-[9px]">
-          Gestionar Asistencia
-        </Link>
-      </li>
-    </ul>
-  </div>
+<div className="mb-4 max-md:mb-3 max-sm:mb-2">
+  <ul className="space-y-1">
+    <li>
+      <Link to="lista" className="block hover:bg-[#056e51] p-2 max-md:p-1 max-sm:p-1 rounded text-sm sm:text-xs max-sm:text-xs">
+        Lista de Actividades
+      </Link>
+    </li>
+    <li>
+      <Link to="buscar" className="block hover:bg-[#056e51] p-2 max-md:p-1 max-sm:p-1 rounded text-sm sm:text-xs max-sm:text-xs whitespace-nowrap">
+        Buscar y Filtrar Actividad
+      </Link>
+    </li>
+    <li>
+      <Link to="promocionadas" className="block hover:bg-[#056e51] p-2 max-md:p-1 max-sm:p-1 rounded text-sm sm:text-xs max-sm:text-xs whitespace-nowrap">
+        Promocionadas
+      </Link>
+    </li>
+    <li>
+      <Link to="notificaciones" className="block hover:bg-[#056e51] p-2 max-md:p-1 max-sm:p-1 rounded text-sm sm:text-xs max-sm:text-xs whitespace-nowrap">
+        Configurar Notificaciones
+      </Link>
+    </li>
+    <li>
+      <Link to="publicar" className="block hover:bg-[#056e51] p-2 max-md:p-1 max-sm:p-1 rounded text-sm sm:text-xs max-sm:text-xs">
+        Publicar Actividad
+      </Link>
+    </li>
+    <li>
+      <Link to="asistencia" className="block hover:bg-[#056e51] p-2 max-md:p-1 max-sm:p-1 rounded text-sm sm:text-xs max-sm:text-xs">
+        Gestionar Asistencia
+      </Link>
+    </li>
+  </ul>
+</div>
+
 </aside>
 
     </div>

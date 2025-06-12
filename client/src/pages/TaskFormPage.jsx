@@ -61,41 +61,52 @@ export function TaskFormPage() {
     if (fileInput) fileInput.value = '';
   };
 
-  const onSubmit = async (data) => {
-    setIsSubmitting(true);
-    try {
-      // Preparar los datos
-      const processedData = {
+  
+const onSubmit = async (data) => {
+  setIsSubmitting(true);
+  try {
+    let payload;
+    // Si hay imagen, usa FormData
+    if (selectedImage) {
+      payload = new FormData();
+      payload.append("title", data.title);
+      payload.append("description", data.description || '');
+      payload.append("place", data.place || '');
+      payload.append("date", data.date ? dayjs.utc(data.date).format() : '');
+      // Responsable como array o string JSON
+      const responsables = data.responsible
+        ? data.responsible.split(',').map(r => r.trim()).filter(r => r !== '')
+        : [];
+      payload.append("responsible", JSON.stringify(responsables));
+      payload.append("image", selectedImage);
+    } else {
+      // Si no hay imagen, envía objeto normal
+      payload = {
         title: data.title,
         description: data.description || '',
         place: data.place || '',
-        date: data.date ? dayjs.utc(data.date).format() : null,
-        responsible: data.responsible 
+        date: data.date ? dayjs.utc(data.date).format() : '',
+        responsible: data.responsible
           ? data.responsible.split(',').map(r => r.trim()).filter(r => r !== '')
           : [],
       };
-
-      // Agregar imagen si se seleccionó una
-      if (selectedImage) {
-        processedData.image = selectedImage;
-      }
-
-      console.log('Datos a enviar:', processedData); // Para debug
-
-      if (params.id) {
-        await updateTask(params.id, processedData);
-      } else {
-        await createTask(processedData);
-      }
-
-      navigate("/tasks");
-    } catch (error) {
-      console.error('Error al guardar:', error);
-      alert('Error al guardar la actividad. Por favor intenta de nuevo.');
-    } finally {
-      setIsSubmitting(false);
     }
-  };
+
+    if (params.id) {
+      await updateTask(params.id, payload);
+    } else {
+      await createTask(payload);
+    }
+
+    navigate("/tasks");
+  } catch (error) {
+    console.error('Error al guardar:', error);
+    alert('Error al guardar la actividad. Por favor intenta de nuevo.');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   useEffect(() => {
     const loadTask = async () => {

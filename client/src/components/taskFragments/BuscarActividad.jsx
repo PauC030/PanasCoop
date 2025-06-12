@@ -91,28 +91,32 @@ export function BuscarActividad() {
 <div className="mt-6">
   {loading && <p>Buscando actividades...</p>}
   
-  {!loading && (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-      {results.length === 0 ? (
-        <div className="col-span-full text-center text-gray-500">
-          No se encontraron actividades
-        </div>
-      ) : (
-        results.map((task) => {
-          const showPromoBadge = task.estado === "promocionadas";
-          return (
-            <TaskCard
-              key={task._id}
-              task={task}
-              showPromoBadge={showPromoBadge}
-            />
-          );
-        })
-      )}
-    </div>
-  )}
-</div>
+{!loading && (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+    {results.length === 0 ? (
+      <div className="col-span-full text-center text-gray-500">
+        No se encontraron actividades
+      </div>
+    ) : (
+      results.map((task) => {
+        const showPromoBadge = task.estado === "promocionadas";
+         
+        const isPast = task.date && new Date(task.date) < new Date();
+         
+        return (
+          <TaskCard
+            key={task._id}
+            task={task}
+            showPromoBadge={showPromoBadge}
+            showAttendanceButton={!isPast}   // <-- Integrado aquí
+          />
+        );
+      })
+    )}
+  </div>
+)}
 
+</div>
     </div>
   );
 }

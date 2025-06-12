@@ -151,15 +151,16 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
           </div>
         )}
 
-       {/* ICONO CAMPANA SOLO SI ASISTE */}
-         {showAttendanceButton && isAttending && (
-           <button
-            onClick={handleGoToNotifications}
-             className="absolute top-2 right-2 z-20 bg-white rounded-full p-1 shadow hover:bg-gray-100 transition"
-              title="Configurar notificación"
-          >  <img src={config} alt="Notificar" className="w-6 h-6" />
-       </button>
-          )} 
+      {/* ICONO CAMPANA SOLO SI ASISTE */}
+{showAttendanceButton && isAttending && (
+  <button
+    onClick={handleGoToNotifications}
+    className={`absolute ${showPromoBadge ? 'top-6' : 'top-2'} right-2 z-20 bg-white rounded-full p-1 shadow hover:bg-gray-100 transition`}
+    title="Configurar notificación"
+  >
+    <img src={config} alt="Notificar" className={showPromoBadge ? "w-5 h-5" : "w-6 h-6"} />
+  </button>
+)}
 
         {/* IMAGEN DE LA TAREA SI EXISTE */}
         {task.image && (
@@ -178,8 +179,8 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
         <header className="relative">
           <div className="flex justify-between items-start gap-2">
             <h1 className={`text-lg font-semibold break-words overflow-hidden text-ellipsis whitespace-nowrap flex-1 ${showAttendanceButton && isAttending ? 'mr-16' : ''}`}>
-  {task.title}
-</h1>
+            {task.title}
+            </h1>
 
             {task.isOwner && (
               <div className="flex items-center gap-2">

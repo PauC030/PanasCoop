@@ -3,9 +3,6 @@ import { useAuth } from "../context/authContext";
 import { ButtonLink } from "./ui/ButtonLink";
 import { useState, useRef, useEffect } from "react";
 
-import { FaUserCircle, FaTasks } from "react-icons/fa";
-import { IoMdAdd } from "react-icons/io";
-
 import panaLogo from "../assets/coop.png";
 
 export function Navbar() {
@@ -45,7 +42,7 @@ export function Navbar() {
           </Link>
         </h1>
 
-        {/* Right side */}
+        {/* Right side options */}
         <div className="flex items-center gap-4">
           {isAuthenticated ? (
             <>
@@ -55,12 +52,14 @@ export function Navbar() {
               >
                 Mis actividades
               </Link>
+
               <ButtonLink
                 to="/add-task"
                 className="bg-[#03683E] hover:bg-[#028a4b] transition-colors px-4 py-2 rounded-md font-medium text-sm"
               >
                 Crear nueva Actividad
               </ButtonLink>
+
               <div className="relative" ref={profileRef}>
                 <button
                   onClick={toggleProfile}
@@ -142,3 +141,4 @@ export function Navbar() {
     </nav>
   );
 }
+

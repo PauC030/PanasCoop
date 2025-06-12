@@ -28,7 +28,7 @@ export function LoginPage() {
 
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="h-screen flex items-center justify-center bg-gray-100 p-4  mt-16 ">
       <div className="flex rounded-xl overflow-hidden shadow-2xl w-full max-w-6xl h-[70vh] min-h-[550px] -mt-14">
         {/* Sección del formulario (mitad izquierda) */}
         <Card className="p-10 w-1/2 rounded-none shadow-none flex flex-col justify-center">

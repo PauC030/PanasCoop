@@ -237,7 +237,7 @@ export function ConfigurarNotificaciones() {
      <div className="flex items-center gap-3 mb-6">
   <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
   <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-    ⚙️ Configurar Notificaciones
+    🔔 Configurar Notificaciones
   </h2>
   <div className="flex-1 h-px bg-gradient-to-r from-green-200 to-transparent"></div>
 </div>

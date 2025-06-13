@@ -14,10 +14,10 @@ export function ListaActividades() {
     <div className="text-black p-4 relative">
     <div className="flex items-center gap-3 mb-6">
   <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
-  <h2 className="text-2xl font-extrabold text-gray-800 flex items-center">
+  <h2 className="text-2xl font-bold text-gray-800 flex items-center">
     <span className="mr-2">📋</span>
     Lista de Actividades
-    <span className="ml-2 text-2xl font-extrabold text-gray-800">
+    <span className="ml-2 text-2xl font-bold text-gray-800">
       ({othersTasks.length})
     </span>
   </h2>

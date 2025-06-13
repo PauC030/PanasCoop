@@ -11,8 +11,6 @@ import { ConfigurarNotificaciones } from "./components/taskFragments/ConfigurarN
 import { GestionarAsistencia } from "./components/taskFragments/GestionarAsistencia";
 
 
-
-
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import { TaskFormPage } from "./pages/TaskFormPage";

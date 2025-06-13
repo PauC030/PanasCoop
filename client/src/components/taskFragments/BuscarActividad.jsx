@@ -117,7 +117,8 @@ export function BuscarActividad() {
             key={task._id}
             task={task}
             showPromoBadge={showPromoBadge}
-            showAttendanceButton={!isPast}   // <-- Integrado aquí
+            showAttendanceButton={!isPast} 
+            refreshSearch={handleBuscar}  
           />
         );
       })

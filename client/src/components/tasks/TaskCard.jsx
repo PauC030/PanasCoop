@@ -241,30 +241,29 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
             Ver Detalles
           </Button>
 
-          {showAttendanceButton && (
-            <>
-              {isLoadingAttendance ? (
-                <div className="w-full sm:w-auto px-3 sm:px-4 py-1 border border-gray-300 text-gray-500 rounded text-sm sm:text-base whitespace-nowrap">
-                  Verificando...
-                </div>
-              ) : !isAttending ? (
-                <button
-                  onClick={() => setShowAttendModal(true)}
-                  className="w-full sm:w-auto px-3 sm:px-4 py-1 border border-green-500 text-green-700 rounded hover:bg-green-100 transition-colors text-sm sm:text-base whitespace-nowrap"
-                >
-                  Asistir a actividad
-                </button>
-              ) : (
-                <button
-                  onClick={() => setShowCancelModal(true)}
-                  className="w-full sm:w-auto px-3 sm:px-4 py-1 rounded border border-red-600 text-red-600 font-semibold hover:bg-red-100 transition text-sm sm:text-base whitespace-nowrap"
-                >
-                  Cancelar Asistencia
-                </button>
-
-              )}
-            </>
-          )}
+          {showAttendanceButton && !task.isOwner && (
+               <>
+             {isLoadingAttendance ? (
+      <div className="w-full sm:w-auto px-3 sm:px-4 py-1 border border-gray-300 text-gray-500 rounded text-sm sm:text-base whitespace-nowrap">
+        Verificando...
+      </div>
+    ) : !isAttending ? (
+      <button
+        onClick={() => setShowAttendModal(true)}
+        className="w-full sm:w-auto px-3 sm:px-4 py-1 border border-green-500 text-green-700 rounded hover:bg-green-100 transition-colors text-sm sm:text-base whitespace-nowrap"
+      >
+        Asistir a actividad
+      </button>
+    ) : (
+      <button
+        onClick={() => setShowCancelModal(true)}
+        className="w-full sm:w-auto px-3 sm:px-4 py-1 rounded border border-red-600 text-red-600 font-semibold hover:bg-red-100 transition text-sm sm:text-base whitespace-nowrap"
+      >
+        Cancelar Asistencia
+      </button>
+    )}
+  </>
+)}
        
           {task.isOwner && (
             <div className="flex gap-x-1 items-center ml-4">

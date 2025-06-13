@@ -21,7 +21,16 @@ export function BuscarActividad() {
   };
 
   return (
+    
+
     <div className="text-black bg-white p-6 min-h-screen">
+      <div className="flex items-center gap-3 mb-6">
+  <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
+  <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+    🔍 Buscar Actividad
+  </h2>
+  <div className="flex-1 h-px bg-gradient-to-r from-green-200 to-transparent"></div>
+</div>
       <div className="border-2 rounded-md p-6 shadow-lg">
         <div className="mb-6">
           <label className="block text-gray-700 mb-2 text-left">

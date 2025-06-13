@@ -262,9 +262,13 @@ const handleSave = async (data) => {
     <div className="p-6 bg-white min-h-screen text-black relative ">
       <div className="flex justify-between items-start mb-6">
         <div>
-          <h1 className="text-xl font-semibold text-green-700 mb-2">
-            ✅ Gestión de asistencia
-          </h1>
+          <div className="flex items-center gap-3 mb-6">
+           <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
+            <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+              ✅ Gestión de asistencia
+             </h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-green-200 to-transparent"></div>
+           </div>
           {selectedTask && (
             <h2 className="text-lg font-medium">
               Actividad:{" "}

@@ -151,22 +151,36 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
           </div>
         )}
 
-       {/* ICONO CAMPANA SOLO SI ASISTE */}
-         {showAttendanceButton && isAttending && (
-           <button
-            onClick={handleGoToNotifications}
-             className="absolute top-2 right-2 z-20 bg-white rounded-full p-1 shadow hover:bg-gray-100 transition"
-              title="Configurar notificación"
-          >  <img src={config} alt="Notificar" className="w-6 h-6" />
-       </button>
-          )} 
+      {/* ICONO CAMPANA SOLO SI ASISTE */}
+{showAttendanceButton && isAttending && (
+  <button
+    onClick={handleGoToNotifications}
+    className={`absolute ${showPromoBadge ? 'top-6' : 'top-2'} right-2 z-20 bg-white rounded-full p-1 shadow hover:bg-gray-100 transition`}
+    title="Configurar notificación"
+  >
+    <img src={config} alt="Notificar" className={showPromoBadge ? "w-5 h-5" : "w-6 h-6"} />
+  </button>
+)}
 
+        {/* IMAGEN DE LA TAREA SI EXISTE */}
+        {task.image && (
+          <div className="mb-4">
+            <img 
+              src={task.image} 
+              alt={task.title}
+              className="w-full h-48 object-cover rounded-lg shadow-sm"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          </div>
+        )}
 
         <header className="relative">
           <div className="flex justify-between items-start gap-2">
             <h1 className={`text-lg font-semibold break-words overflow-hidden text-ellipsis whitespace-nowrap flex-1 ${showAttendanceButton && isAttending ? 'mr-16' : ''}`}>
-  {task.title}
-</h1>
+            {task.title}
+            </h1>
 
             {task.isOwner && (
               <div className="flex items-center gap-2">
@@ -227,30 +241,29 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
             Ver Detalles
           </Button>
 
-          {showAttendanceButton && (
-            <>
-              {isLoadingAttendance ? (
-                <div className="w-full sm:w-auto px-3 sm:px-4 py-1 border border-gray-300 text-gray-500 rounded text-sm sm:text-base whitespace-nowrap">
-                  Verificando...
-                </div>
-              ) : !isAttending ? (
-                <button
-                  onClick={() => setShowAttendModal(true)}
-                  className="w-full sm:w-auto px-3 sm:px-4 py-1 border border-green-500 text-green-700 rounded hover:bg-green-100 transition-colors text-sm sm:text-base whitespace-nowrap"
-                >
-                  Asistir a actividad
-                </button>
-              ) : (
-                <button
-                  onClick={() => setShowCancelModal(true)}
-                  className="w-full sm:w-auto px-3 sm:px-4 py-1 rounded border border-red-600 text-red-600 font-semibold hover:bg-red-100 transition text-sm sm:text-base whitespace-nowrap"
-                >
-                  Cancelar Asistencia
-                </button>
-
-              )}
-            </>
-          )}
+          {showAttendanceButton && !task.isOwner && (
+               <>
+             {isLoadingAttendance ? (
+      <div className="w-full sm:w-auto px-3 sm:px-4 py-1 border border-gray-300 text-gray-500 rounded text-sm sm:text-base whitespace-nowrap">
+        Verificando...
+      </div>
+    ) : !isAttending ? (
+      <button
+        onClick={() => setShowAttendModal(true)}
+        className="w-full sm:w-auto px-3 sm:px-4 py-1 border border-green-500 text-green-700 rounded hover:bg-green-100 transition-colors text-sm sm:text-base whitespace-nowrap"
+      >
+        Asistir a actividad
+      </button>
+    ) : (
+      <button
+        onClick={() => setShowCancelModal(true)}
+        className="w-full sm:w-auto px-3 sm:px-4 py-1 rounded border border-red-600 text-red-600 font-semibold hover:bg-red-100 transition text-sm sm:text-base whitespace-nowrap"
+      >
+        Cancelar Asistencia
+      </button>
+    )}
+  </>
+)}
        
           {task.isOwner && (
             <div className="flex gap-x-1 items-center ml-4">
@@ -280,6 +293,20 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
             <h2 className="text-3xl font-bold mb-4 text-center text-gray-800 break-words whitespace-normal">
               {task.title}
             </h2>
+
+            {/* IMAGEN EN EL MODAL DE DETALLES */}
+            {task.image && (
+              <div className="mb-4 flex justify-center">
+                <img 
+                  src={task.image} 
+                  alt={task.title}
+                  className="max-w-full max-h-64 object-contain rounded-lg shadow-sm"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
 
             <div className="space-y-4">
               <p className="text-gray-600">

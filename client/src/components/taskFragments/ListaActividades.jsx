@@ -13,8 +13,7 @@ export function ListaActividades() {
   return (
 
     <div className="text-black p-4 relative">
-      <h2 className="text-[#03673E] font-semibold text-lg mb-6 flex items-center justify-between">
-        <span>📋 Lista de Actividades</span>
+  
         <button
           onClick={() => navigate("/tasks/buscar")}
           className="ml-2 p-2 rounded-full hover:bg-gray-200 transition"
@@ -22,7 +21,7 @@ export function ListaActividades() {
         >
           <Search className="w-6 h-6 text-[#03673E]" />
         </button>
-      </h2>
+  
 
 
       {othersTasks.length > 0 ? (

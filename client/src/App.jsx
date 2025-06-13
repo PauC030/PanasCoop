@@ -66,14 +66,21 @@ function App() {
           </main>
         </BrowserRouter>
       </SearchProvider>
-            </AdminProvider>
+
+      </AdminProvider>
+
+
     </AsistenciaProvider>
     </NotificationsProvider>
   </TaskProvider>
 </AuthProvider>
 
+
   )
 };
+
+
+
 
 
 

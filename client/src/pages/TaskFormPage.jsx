@@ -63,6 +63,14 @@ export function TaskFormPage() {
 
   
 const onSubmit = async (data) => {
+    const selectedDate = dayjs(data.date).startOf("day");
+    const today = dayjs().startOf("day");
+
+    if (selectedDate.isBefore(today)) {
+      alert("No puedes seleccionar una fecha pasada.");
+      return;
+    }
+
   setIsSubmitting(true);
   try {
     let payload;

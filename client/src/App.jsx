@@ -34,7 +34,6 @@ function App() {
   return (
      
     <AuthProvider>
-
       <TaskProvider>
         <NotificationsProvider>
         <AsistenciaProvider> 
@@ -67,15 +66,12 @@ function App() {
             </Routes>
           </main>
         </BrowserRouter>
-      </SearchProvider>
-
+    </SearchProvider>
       </AdminProvider>
-
-
-    </AsistenciaProvider>
-    </NotificationsProvider>
-  </TaskProvider>
-</AuthProvider>
+       </AsistenciaProvider>
+        </NotificationsProvider>
+         </TaskProvider> 
+          </AuthProvider>
 
 
   )
@@ -87,3 +83,18 @@ function App() {
 
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+     
+    
+
+

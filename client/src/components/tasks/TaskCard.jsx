@@ -14,7 +14,7 @@ import { Button } from "../ui/Button";
 import  config  from "../../assets/config.png" 
 
 
-export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = false, refreshSearch}) {
+export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = false, refreshSearch, }) {
   const navigate = useNavigate();
 
   const { togglePromotion, deleteTask } = useTasks();
@@ -29,9 +29,9 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
   const [name, setName] = useState(() => localStorage.getItem("userName") || "");
 
   // Actualizar para usar el hook mejorado
-  const [isAttending, setIsAttending, isLoadingAttendance] = useAttendance(task._id);
+  const [isAttending, setIsAttending] = useAttendance(task._id);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [isPromoted, setIsPromoted] = useState(task.isPromoted);
    // Nueva función para ir a configuración de notificaciones
   const handleGoToNotifications = () => {
   navigate(`/tasks/notificaciones?taskId=${task._id}`);
@@ -42,27 +42,44 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
     fetchAttendees(task._id);
   }, [task._id]);
 
-  const handleDelete = () => {
-    deleteTask(task._id);
+  const handleDelete = async () => {
+  try {
+    await deleteTask(task._id);
     setShowModal(false);
-  };
-
-  const handleTogglePromotion = async () => {
-    try {
-      await togglePromotion(task._id, {
-        isPromoted: !task.isPromoted,
-        promotion: {
-          startDate: new Date().toISOString(),
-          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-        }
-      });
-      if (typeof refreshSearch === "function") {
-        refreshSearch(); // <-- refresca la búsqueda al instante
-      }
-    } catch (error) {
-      console.error("Error al cambiar promoción:", error);
+    // Refrescar automáticamente después de eliminar
+    if (typeof refreshSearch === "function") {
+      refreshSearch();
     }
-  };
+  } catch (error) {
+    console.error("Error al eliminar tarea:", error);
+    toast.error("Error al eliminar la actividad");
+  }
+};
+
+ const handleTogglePromotion = async () => {
+  // Actualización optimista - cambiar UI inmediatamente
+  const newPromotedState = !isPromoted;
+  setIsPromoted(newPromotedState);
+  
+  try {
+    await togglePromotion(task._id, {
+      isPromoted: newPromotedState,
+      promotion: {
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+      }
+    });
+    
+    if (typeof refreshSearch === "function") {
+      refreshSearch();
+    }
+  } catch (error) {
+    // Si hay error, revertir el cambio
+    setIsPromoted(!newPromotedState);
+    console.error("Error al cambiar promoción:", error);
+    toast.error("Error al cambiar promoción");
+  }
+};
 
   const handleConfirmAttend = async () => {
     if (!name?.trim() || !email) {
@@ -179,19 +196,19 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
         )}
 
         {/* ICONO CAMPANA POSICIONADO CORRECTAMENTE */}
-        {showAttendanceButton && isAttending && (
-          <button
-            onClick={handleGoToNotifications}
-            className={`absolute z-20 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 transition-all duration-200 hover:shadow-lg ${
-              showPromoBadge 
-                ? 'top-10 right-2' // Si hay promoción, posicionar debajo (más cerca)
-                : 'top-0 right-2'  // Si no hay promoción, posicionar arriba
-            }`}
-            title="Configurar notificación"
-          >
-            <img src={config} alt="Notificar" className="w-8 h-8" />
-          </button>
-        )}
+     {showAttendanceButton && !task.isOwner && isAttending && (
+       <button
+        onClick={handleGoToNotifications}
+        className={`absolute z-20 bg-white rounded-full p-1.5 shadow-md hover:bg-gray-100 transition-all duration-200 hover:shadow-lg ${
+        showPromoBadge 
+        ? 'top-10 right-1' // Si hay promoción, más cerca del borde
+        : 'top-1 right-0'  // Si no hay promoción, en la esquina
+         }`}
+       title="Configurar notificación"
+     >
+       <img src={config} alt="Notificar" className="w-7 h-7" />
+         </button>
+      )}    
 
         {/* IMAGEN DE LA TAREA SI EXISTE */}
         {task.image && (
@@ -209,7 +226,7 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
 
         <header className="relative">
           <div className="flex justify-between items-start gap-2">
-            <h1 className={`text-lg font-semibold break-words overflow-hidden text-ellipsis whitespace-nowrap flex-1 ${
+            <h1 className={`text-black text-lg font-semibold break-words overflow-hidden text-ellipsis whitespace-nowrap flex-1 ${
               showPromoBadge ? 'pr-16' : '' // Espacio para la etiqueta de promo
             } ${
               showAttendanceButton && isAttending ? 'mr-12' : ''
@@ -297,10 +314,10 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
         </header>
 
         <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-3 w-full">
-          {/* Botón Ver Detalles con gradiente y icono - MÁS DELGADO */}
+          {/* Botón Ver Detalles con gradiente y icono - AJUSTADO EL PADDING */}
           <button
-            onClick={() => setShowDetailsModal(true)}
-            className="w-full sm:w-auto px-4 py-0.5 bg-gradient-to-r from-[#064349] to-[#03683E] text-white rounded-lg font-medium hover:from-[#075a61] hover:to-[#048447] transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 group"
+              onClick={() => setShowDetailsModal(true)}
+            className="w-full sm:w-auto px-2 py-0.2 bg-gradient-to-r from-[#064349] to-[#03683E] text-white rounded-lg font-medium hover:from-[#075a61] hover:to-[#048447] transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 group"
           >
             <svg 
               className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" 
@@ -313,44 +330,40 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
             <span className="text-sm sm:text-base">Ver Detalles</span>
           </button>
 
-          {showAttendanceButton && !task.isOwner && (
-            <>
-              {isLoadingAttendance ? (
-                <div className="w-full sm:w-auto px-4 py-0.5 bg-gray-100 text-gray-500 rounded-lg font-medium flex items-center justify-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-400 border-t-transparent"></div>
-                  <span className="text-sm sm:text-base">Verificando...</span>
-                </div>
-              ) : !isAttending ? (
-                <button
-                  onClick={() => setShowAttendModal(true)}
-                  className="w-full sm:w-auto px-4 py-0.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-medium hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 group"
-                >
-                  <svg 
-                    className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" 
-                    fill="currentColor" 
-                    viewBox="0 0 20 20"
-                  >
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-sm sm:text-base">Asistir a actividad</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => setShowCancelModal(true)}
-                  className="w-full sm:w-auto px-4 py-0.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-medium hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 group"
-                >
-                  <svg 
-                    className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" 
-                    fill="currentColor" 
-                    viewBox="0 0 20 20"
-                  >
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-sm sm:text-base">Cancelar Asistencia</span>
-                </button>
-              )}
-            </>
-          )}
+      {showAttendanceButton && !task.isOwner && (
+        <>
+        {!isAttending ? (
+       <button
+         onClick={() => setShowAttendModal(true)}
+         className="w-full sm:w-auto px-2 py-0.2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-medium hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 group"
+       >
+        <svg 
+          className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" 
+          fill="currentColor" 
+          viewBox="0 0 20 20"
+        >
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+        <span className="text-sm sm:text-base">Asistir a actividad</span>
+      </button>
+    ) : (
+      <button
+       onClick={() => setShowCancelModal(true)}
+        className="w-full sm:w-auto px-2 py-0.2 bg-gradient-to-r from-red-400 to-red-400 text-white rounded-lg font-medium hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 group"
+       >
+        <svg 
+          className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" 
+          fill="currentColor" 
+          viewBox="0 0 20 20"
+        >
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+        </svg>
+        <span className="text-sm sm:text-base">Cancelar Asistencia</span>
+      </button>
+    )}
+  </>
+)}
+          
        
           {task.isOwner && (
             <div className="flex gap-x-2 items-center">
@@ -468,7 +481,7 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
             <h2 className="text-xl font-semibold text-gray-800">Confirmar asistencia</h2>
             <p className="text-gray-600">Completa tus datos para asistir a esta actividad.</p>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 text-black">
               <input
                 type="text"
                 placeholder="Nombre"

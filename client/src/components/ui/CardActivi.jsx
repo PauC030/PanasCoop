@@ -3,46 +3,49 @@ export function CardActivi({ children, className = "", isPromoted = false }) {
     <div
       className={`
         w-full
-        max-w-md
-        sm:max-w-lg
-        md:max-w-2xl
-        lg:max-w-4xl
-        xl:max-w-5xl
-        ml-6
-        sm:ml-8
-        md:ml-10
-        lg:ml-12
+        max-w-xs
+        sm:max-w-sm
+        md:max-w-md
+        lg:max-w-lg
+        xl:max-w-xl
+        ml-4
+        sm:ml-6
+        md:ml-8
+        lg:ml-10
         mr-4
         sm:mr-6
         md:mr-8
         bg-white
         shadow-lg
-        hover:shadow-2xl
-        px-6
-        py-4
-        sm:px-8
-        sm:py-5
-        md:px-10
-        md:py-6
-        rounded-2xl
+        hover:shadow-xl
+        px-4
+        py-3
+        sm:px-6
+        sm:py-4
+        md:px-8
+        md:py-5
+        lg:px-10
+        lg:py-6
+        rounded-xl
         border-2
         ${isPromoted 
-          ? 'border-yellow-400 hover:border-yellow-500 hover:bg-gradient-to-br hover:from-white hover:to-yellow-50' 
-          : 'border-yellow-400 hover:border-yellow-500 hover:bg-gradient-to-br hover:from-white hover:to-yellow-50'
+          ? 'border-yellow-400 hover:border-yellow-500 hover:bg-gradient-to-r hover:from-white hover:to-yellow-50' 
+          : 'border-yellow-400 hover:border-yellow-500 hover:bg-gradient-to-r hover:from-white hover:to-yellow-50'
         }
         transition-all
         duration-300
         hover:-translate-y-1
-        hover:scale-[1.01]
-        min-h-[180px]
-        sm:min-h-[200px]
-        md:min-h-[220px]
+        hover:scale-[1.02]
+        min-h-[120px]
+        sm:min-h-[140px]
+        md:min-h-[160px]
+        lg:min-h-[180px]
         relative
         overflow-hidden
         group
-        mb-4
-        sm:mb-5
-        md:mb-6
+        mb-3
+        sm:mb-4
+        md:mb-5
         ${className}
       `}
     >
@@ -53,13 +56,18 @@ export function CardActivi({ children, className = "", isPromoted = false }) {
           : 'bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600' 
       } opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
       
-      {/* Contenido con más espacio */}
-      <div className="relative z-10 h-full flex flex-col justify-between space-y-4 sm:space-y-5 md:space-y-6">
+      {/* Contenido optimizado para formato horizontal */}
+      <div className="relative z-10 h-full flex flex-col justify-center space-y-2 sm:space-y-3 md:space-y-4">
         {children}
       </div>
       
-      {/* Efecto de brillo sutil */}
-      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+      {/* Efecto de brillo sutil horizontal */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+      
+      {/* Indicador de promoción si aplica */}
+      {isPromoted && (
+        <div className="absolute top-2 right-2 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+      )}
     </div>
   );
 }

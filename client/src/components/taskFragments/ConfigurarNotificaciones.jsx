@@ -1,4 +1,4 @@
-// ConfigurarNotificaciones.jsx - Versión mejorada
+// ConfigurarNotificaciones.jsx - Versión corregida
 import { useState, useEffect } from "react";
 import { Button } from "../ui";
 import { useNotifications } from "../../context/NotificationsContext";
@@ -6,6 +6,8 @@ import axios from "../../api/axios";
 import { useLocation } from "react-router-dom";
 
 export function ConfigurarNotificaciones() {
+  console.log("MONTANDO COMPONENTE ConfigurarNotificaciones");
+  
   const [selectedActivity, setSelectedActivity] = useState("");
   const [anticipationDays, setAnticipationDays] = useState("");
   const [mensaje, setMensaje] = useState("");
@@ -13,7 +15,7 @@ export function ConfigurarNotificaciones() {
   const [loadingTasks, setLoadingTasks] = useState(true);
   const location = useLocation();
 
-   // Leer taskId de la URL y seleccionarlo por defecto
+  // Leer taskId de la URL y seleccionarlo por defecto
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const taskId = params.get("taskId");
@@ -21,45 +23,45 @@ export function ConfigurarNotificaciones() {
   }, [location.search]);
 
   const {
-    notifications,
-    loading,
+    notifications = [], // Valor por defecto
+    loading = false,
     error,
     saveNotificationConfig,
     setError,
-  } = useNotifications();
+  } = useNotifications() || {}; // Verificación adicional
+
+  console.log("notifications:", notifications, "loading:", loading, "error:", error);
 
   // Función auxiliar para verificar si una tarea es seleccionable (futura)
   const isTaskSelectable = (taskDate) => {
     if (!taskDate) return false;
     
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const taskDateOnly = new Date(taskDate);
-    taskDateOnly.setHours(0, 0, 0, 0);
-    
-    return taskDateOnly > today;
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const taskDateOnly = new Date(taskDate);
+      taskDateOnly.setHours(0, 0, 0, 0);
+      
+      return taskDateOnly > today;
+    } catch (error) {
+      console.error("Error al verificar fecha:", error);
+      return false;
+    }
   };
 
   useEffect(() => {
     const fetchConfirmedTasks = async () => {
       setLoadingTasks(true);
-      setError(null);
+      if (setError) setError(null);
       setMensaje("");
       
       try {
         console.log("🔄 Iniciando petición al backend...");
         
-        // Agregar timestamp para evitar cache
         const timestamp = new Date().getTime();
         const response = await axios.get(`/attendances/mis-asistencias?t=${timestamp}`);
-        
-        console.log("📡 Respuesta del backend:", {
-          status: response.status,
-          dataType: typeof response.data,
-          isArray: Array.isArray(response.data),
-          length: response.data?.length
-        });
-
+        console.log("Respuesta de /attendances/mis-asistencias:", response.data);
+      
         // Verificar que tenemos datos válidos
         if (!response.data) {
           throw new Error("No se recibieron datos del servidor");
@@ -82,18 +84,12 @@ export function ConfigurarNotificaciones() {
             taskDate: attendance?.task?.date
           });
           
-          const isValid = attendance && 
-                         attendance._id && 
-                         attendance.task && 
-                         attendance.task._id &&
-                         attendance.task.title &&
-                         attendance.task.date; // Verificar que tenga fecha
-          
-          if (!isValid) {
-            console.warn(`⚠️ Asistencia ${index + 1} inválida:`, attendance);
-          }
-          
-          return isValid;
+          return attendance && 
+                 attendance._id && 
+                 attendance.task && 
+                 attendance.task._id &&
+                 attendance.task.title &&
+                 attendance.task.date;
         });
 
         console.log(`✅ Asistencias válidas: ${validAttendances.length}`);
@@ -104,11 +100,11 @@ export function ConfigurarNotificaciones() {
           return;
         }
 
-        // Mapear las tareas con mejor estructura
-        const tasksWithAttendance = validAttendances.map((attendance, index) => {
+        // Mapear las tareas con mejor manejo de errores
+        const tasksWithAttendance = validAttendances.map((attendance) => {
           const task = {
             _id: attendance.task._id,
-            title: attendance.task.title,
+            title: attendance.task.title || "Sin título",
             description: attendance.task.description || "Sin descripción",
             date: attendance.task.date,
             location: attendance.task.location || "Sin ubicación",
@@ -116,7 +112,7 @@ export function ConfigurarNotificaciones() {
             _confirmedAt: attendance.createdAt
           };
           
-          console.log(`📝 Tarea ${index + 1} mapeada:`, {
+          console.log(`📝 Tarea mapeada:`, {
             id: task._id,
             title: task.title,
             date: task.date,
@@ -134,18 +130,19 @@ export function ConfigurarNotificaciones() {
           if (!seenIds.has(task._id)) {
             seenIds.add(task._id);
             uniqueTasks.push(task);
-          } else {
-            console.log(`Tarea duplicada omitida: ${task.title}`);
           }
         });
 
-        console.log(`🎯 Tareas únicas: ${uniqueTasks.length}`);
-
-        // Ordenar por fecha (más próximas primero)
+        // Ordenar por fecha
         const sortedTasks = uniqueTasks.sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          return dateA - dateB;
+          try {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return dateA - dateB;
+          } catch (error) {
+            console.error("Error al ordenar fechas:", error);
+            return 0;
+          }
         });
 
         setConfirmedTasks(sortedTasks);
@@ -154,8 +151,6 @@ export function ConfigurarNotificaciones() {
         const totalTasks = sortedTasks.length;
         const futureTasks = sortedTasks.filter(task => isTaskSelectable(task.date));
         const pastTasks = totalTasks - futureTasks.length;
-        
-        console.log(`📈 Estadísticas: ${totalTasks} total, ${futureTasks.length} futuras, ${pastTasks} pasadas`);
 
         if (totalTasks === 0) {
           setMensaje("No tienes actividades confirmadas");
@@ -168,14 +163,13 @@ export function ConfigurarNotificaciones() {
 
       } catch (err) {
         console.error("❌ Error completo:", err);
-        console.error("📡 Error response:", err.response?.data);
         
         const errorMessage = err.response?.data?.message || 
                            err.response?.data?.error || 
                            err.message || 
                            "Error desconocido al cargar actividades";
         
-        setError(`Error al cargar actividades: ${errorMessage}`);
+        if (setError) setError(`Error al cargar actividades: ${errorMessage}`);
         setMensaje(`❌ Error: ${errorMessage}`);
         setConfirmedTasks([]);
       } finally {
@@ -205,10 +199,14 @@ export function ConfigurarNotificaciones() {
     }
 
     try {
-      await saveNotificationConfig(selectedActivity, anticipationValue);
-      setMensaje("✅ Configuración guardada correctamente.");
-      setSelectedActivity("");
-      setAnticipationDays("");
+      if (saveNotificationConfig) {
+        await saveNotificationConfig(selectedActivity, anticipationValue);
+        setMensaje("✅ Configuración guardada correctamente.");
+        setSelectedActivity("");
+        setAnticipationDays("");
+      } else {
+        throw new Error("saveNotificationConfig no está disponible");
+      }
     } catch (error) {
       console.error("❌ Error al guardar:", error);
       setMensaje("❌ Error al guardar configuración: " + (error.message || "Error desconocido"));
@@ -220,6 +218,8 @@ export function ConfigurarNotificaciones() {
     
     try {
       const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "Fecha inválida";
+      
       return date.toLocaleDateString('es-ES', {
         weekday: 'short',
         year: 'numeric',
@@ -232,15 +232,31 @@ export function ConfigurarNotificaciones() {
     }
   };
 
+  // Verificar si el contexto está disponible
+  if (!useNotifications) {
+    return (
+      <div className="bg-white p-6 min-h-screen text-gray-800">
+        <div className="bg-red-100 text-red-800 px-4 py-2 rounded mb-4">
+          <strong>Error:</strong> El contexto de notificaciones no está disponible.
+        </div>
+      </div>
+    );
+  }
+
+  console.log("RENDER - confirmedTasks:", confirmedTasks);
+  console.log("RENDER - notifications:", notifications);
+  console.log("RENDER - mensaje:", mensaje);
+  console.log("RENDER - error:", error);
+
   return (
     <div className="bg-white p-6 min-h-screen text-gray-800">
-     <div className="flex items-center gap-3 mb-6">
-  <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
-  <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-    🔔 Configurar Notificaciones
-  </h2>
-  <div className="flex-1 h-px bg-gradient-to-r from-green-200 to-transparent"></div>
-</div>
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
+        <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+          🔔 Configurar Notificaciones
+        </h2>
+        <div className="flex-1 h-px bg-gradient-to-r from-green-200 to-transparent"></div>
+      </div>
 
       {error && (
         <div className="bg-red-100 text-red-800 px-4 py-2 rounded mb-4">
@@ -264,14 +280,17 @@ export function ConfigurarNotificaciones() {
         <div>
           <h3 className="font-bold mb-2">🔔 Notificaciones Activas</h3>
           {loading ? (
-            <p>Cargando notificaciones...</p>
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#03673E]"></div>
+              <p>Cargando notificaciones...</p>
+            </div>
           ) : notifications.length === 0 ? (
             <p className="text-gray-600">No tienes notificaciones configuradas.</p>
           ) : (
             notifications.map((n) => (
               <div key={n._id} className="mb-2 p-3 border rounded bg-white">
-                <p className="font-semibold">{n.task.title}</p>
-                <p>📅 {formatDate(n.task.date)}</p>
+                <p className="font-semibold">{n.task?.title || "Sin título"}</p>
+                <p>📅 {formatDate(n.task?.date)}</p>
                 <p className="text-sm text-gray-600">
                   🔔 Notificar {n.daysBefore} días antes
                 </p>
@@ -281,7 +300,7 @@ export function ConfigurarNotificaciones() {
         </div>
 
         <div>
-          <h3 className="font-bold mb-2"> Nueva Configuración</h3>
+          <h3 className="font-bold mb-2">➕ Nueva Configuración</h3>
           
           {loadingTasks ? (
             <div className="flex items-center space-x-2">
@@ -291,7 +310,7 @@ export function ConfigurarNotificaciones() {
           ) : (
             <>
               <label className="block mb-2 font-medium">
-                 Actividad confirmada ({confirmedTasks.length} encontradas):
+                📋 Actividad confirmada ({confirmedTasks.length} encontradas):
               </label>
               
               <select
@@ -342,12 +361,23 @@ export function ConfigurarNotificaciones() {
                 disabled={!selectedActivity || !anticipationDays || loadingTasks}
                 className="w-full bg-[#03673E] hover:bg-[#024d2e] disabled:bg-gray-400"
               >
-                {loadingTasks ? "Cargando..." : " Guardar Configuración"}
+                {loadingTasks ? "Cargando..." : "💾 Guardar Configuración"}
               </Button>
             </>
           )}
         </div>
       </div>
+
+      {/* Panel de debug (solo en desarrollo) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mt-6 p-4 bg-gray-100 rounded text-sm">
+          <h4 className="font-bold mb-2">Debug Info:</h4>
+          <p>Confirmed Tasks: {confirmedTasks.length}</p>
+          <p>Notifications: {notifications.length}</p>
+          <p>Loading Tasks: {loadingTasks.toString()}</p>
+          <p>Loading Notifications: {loading.toString()}</p>
+        </div>
+      )}
     </div>
   );
 }

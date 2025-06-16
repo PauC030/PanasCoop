@@ -36,7 +36,7 @@ export function TasksPage() {
   return (
     <div className="flex min-h-screen bg-white mt-16">
       {/* Sidebar izquierdo */}
-      <aside className="fixed top-0 left-0 h-screen z-40 w-fit bg-gradient-to-b from-[#002615] to-[#056e51] p-4 text-white max-sm:p-2 max-md:p-3">
+      <aside className="fixed top-0 left-0 h-screen z-40 w-fit bg-gradient-to-b from-[#002615] to-[#208d6e] p-4 text-white max-sm:p-2 max-md:p-3">
         <div className="w-28 sm:w-32 md:w-36 text-white">
           <h1 className="text-sm font-bold mb-6 max-md:mb-5 max-sm:mb-4 max-md:text-xs max-sm:text-[10px]">
             Actividades solidarias
@@ -44,14 +44,14 @@ export function TasksPage() {
 
           <ul className="space-y-1 text-[11px] sm:text-xs max-sm:text-[9px]">
             <li>
-              <Link to="lista" className="block hover:bg-[#003529] p-2 rounded">
+              <Link to="lista" className="block hover:bg-[#208d6e] p-2 rounded">
                 Lista de Actividades
               </Link>
             </li>
             <li>
               <Link
                 to="buscar"
-                className="block hover:bg-[#003529] p-2 rounded whitespace-nowrap"
+                className="block hover:bg-[#208d6e] p-2 rounded whitespace-nowrap"
               >
                 Buscar y Filtrar Actividad
               </Link>
@@ -59,7 +59,7 @@ export function TasksPage() {
             <li>
               <Link
                 to="promocionadas"
-                className="block hover:bg-[#003529] p-2 rounded whitespace-nowrap"
+                className="block hover:bg-[#208d6e] p-2 rounded whitespace-nowrap"
               >
                 Promocionadas
               </Link>
@@ -67,7 +67,7 @@ export function TasksPage() {
             <li>
               <Link
                 to="notificaciones"
-                className="block hover:bg-[#003529] p-2 rounded whitespace-nowrap"
+                className="block hover:bg-[#208d6e] p-2 rounded whitespace-nowrap"
               >
                 Configurar Notificaciones
               </Link>
@@ -75,7 +75,7 @@ export function TasksPage() {
             <li>
               <Link
                 to="publicar"
-                className="block hover:bg-[#003529] p-2 rounded"
+                className="block hover:bg-[#208d6e] p-2 rounded"
               >
                 Publicar Actividad
               </Link>
@@ -83,7 +83,7 @@ export function TasksPage() {
             <li>
               <Link
                 to="asistencia"
-                className="block hover:bg-[#003529] p-2 rounded"
+                className="block hover:bg-[#208d6e] p-2 rounded"
               >
                 Gestionar Asistencia
               </Link>
@@ -92,7 +92,7 @@ export function TasksPage() {
 
           {/* Panel admin solo para superadmin */}
           {user?.role === "superadmin" && (
-            <div className="mt-6 border-t border-[#003529] pt-4">
+            <div className="mt-6 border-t border-[#208d6e] pt-4">
               <h2 className="text-xs font-bold mb-2 opacity-80">Administración</h2>
               <ButtonLink
                 to="/admin-dashboard"

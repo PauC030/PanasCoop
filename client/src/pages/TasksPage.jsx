@@ -114,57 +114,84 @@ export function TasksPage() {
 </aside>
     </div>
 
-    {/* Contenido principal */}
-    <main className=" flex-1 p-4 ml-28 sm:ml-32 md:ml-36 max-md:ml-28 max-sm:ml-24">
-      <Outlet />
-     
-        {isBaseRoute && (
-          <>
-            {tasks.length === 0 ? (
-              <div className="flex justify-center items-center p-10 ">
-                <div>
-                  <ImFileEmpty className="text-6xl text-gray-400 m-auto my-2" />
-                  <h1 className="font-bold text-xl text-gray-400">
-                    No hay tareas aún, Porfavor agregue una nueva tarea
-                  </h1>
-                </div>
+   <main className="flex-1 p-4 ml-28 sm:ml-32 md:ml-36 max-md:ml-28 max-sm:ml-24 mr-4">
+  <Outlet />
+  
+  {isBaseRoute && (
+    <>
+      {tasks.length === 0 ? (
+        <div className="flex justify-center items-center p-10">
+          <div>
+            <ImFileEmpty className="text-6xl text-gray-400 m-auto my-2" />
+            <h1 className="font-bold text-xl text-gray-400">
+              No hay tareas aún, Porfavor agregue una nueva tarea
+            </h1>
+          </div>
+        </div>
+      ) : (                                                             
+        <div className="max-w-7xl mx-auto">
+          {/* Sección actividades futuras */}
+          {sortedTasks.future.length > 0 && (
+            <div className="mb-12">
+              {/* Header opcional para actividades futuras */}
+              <div className="flex items-center gap-3 mb-6">
+                  <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+                  Mis Actividades 
+                  <span className="ml-2 text-2xl font-bold text-gray-800">
+                    ({sortedTasks.future.length})
+                  </span>
+                </h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-blue-200 to-transparent"></div>
               </div>
-            ) : (                                                             
-              <div>
-                {/* Sección actividades futuras */}
-                {sortedTasks.future.length > 0 && (
-                  <div className="mb-44">
-                    <div className="text-black y grid md:grid-cols-2 lg:grid-cols-3 gap-2">
-                      {sortedTasks.future.map((task) => (
-                        <TaskCard task={task} key={task._id} isPast={false} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Línea separadora */}
-                {sortedTasks.future.length > 0 && sortedTasks.past.length > 0 && (
-                  <hr className=" text-black border-t-2 border-[#000000] opacity-20 my-8" />
-                )}
-
-                {/* Sección actividades pasadas */}
-                {sortedTasks.past.length > 0 && (
-                  <div>
-                    <h2 className="text-xl font-semibold mb-8 text-gray-500">
-                   .      .              ⌛ Actividades Pasadas
-                    </h2>
-                    <div className=" text-black grid md:grid-cols-2 lg:grid-cols-3 gap-2 opacity-80">
-                      {sortedTasks.past.map((task) => (
-                        <TaskCard task={task} key={task._id}  isPast={true}/>
-                      ))}
-                    </div>
-                  </div>
-                )}
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {sortedTasks.future.map((task) => (
+                  <TaskCard task={task} key={task._id} isPast={false} />
+                ))}
               </div>
-            )}
-          </>
-        )}
-      </main>
+            </div>
+          )}
+
+          {/* Línea separadora mejorada */}
+          {sortedTasks.future.length > 0 && sortedTasks.past.length > 0 && (
+            <div className="relative my-8">
+              <hr className="border-t-2 border-gray-300 opacity-50" />
+              <div className="absolute inset-0 flex justify-center items-center">
+                <span className="bg-white px-4 text-gray-500 font-medium">
+                  ⏳ Historial
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Sección actividades pasadas */}
+          {sortedTasks.past.length > 0 && (
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-1 h-8 bg-gradient-to-b from-gray-400 to-gray-500 rounded-full"></div>
+                <h2 className="text-xl font-semibold text-gray-500 flex items-center">
+                  <span className="mr-2">⌛</span>
+                  Actividades Pasadas
+                  <span className="ml-2 text-xl font-semibold text-gray-500">
+                    ({sortedTasks.past.length})
+                  </span>
+                </h2>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 opacity-80">
+                {sortedTasks.past.map((task) => (
+                  <TaskCard task={task} key={task._id} isPast={true}/>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  )}
+</main>
     </div>
   );
 }

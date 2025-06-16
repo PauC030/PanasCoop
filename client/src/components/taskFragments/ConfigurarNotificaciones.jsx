@@ -1,4 +1,4 @@
-// ConfigurarNotificaciones.jsx - Versión corregida
+// ConfigurarNotificaciones.jsx - Versión mejorada
 import { useState, useEffect } from "react";
 import { Button } from "../ui";
 import { useNotifications } from "../../context/NotificationsContext";
@@ -156,7 +156,7 @@ export function ConfigurarNotificaciones() {
           setMensaje("No tienes actividades confirmadas");
         } else {
           setMensaje(
-            `✅ Encontradas ${totalTasks} actividades confirmadas: ` +
+            `Encontradas ${totalTasks} actividades confirmadas: ` +
             `${futureTasks.length} futuras, ${pastTasks} pasadas`
           );
         }
@@ -170,7 +170,7 @@ export function ConfigurarNotificaciones() {
                            "Error desconocido al cargar actividades";
         
         if (setError) setError(`Error al cargar actividades: ${errorMessage}`);
-        setMensaje(`❌ Error: ${errorMessage}`);
+        setMensaje(`Error: ${errorMessage}`);
         setConfirmedTasks([]);
       } finally {
         setLoadingTasks(false);
@@ -182,26 +182,26 @@ export function ConfigurarNotificaciones() {
 
   const guardarConfiguracion = async () => {
     if (!selectedActivity || !anticipationDays) {
-      setMensaje("⚠️ Por favor completa todos los campos.");
+      setMensaje("Por favor completa todos los campos.");
       return;
     }
 
     const anticipationValue = parseInt(anticipationDays);
     if (anticipationValue < 1 || anticipationValue > 30) {
-      setMensaje("⚠️ Los días de anticipación deben estar entre 1 y 30.");
+      setMensaje("Los días de anticipación deben estar entre 1 y 30.");
       return;
     }
 
     // Verificar si la actividad seleccionada es del pasado
     const selectedTask = confirmedTasks.find(task => task._id === selectedActivity);
     if (selectedTask && !isTaskSelectable(selectedTask.date)) {
-      setMensaje("⚠️ Advertencia: Esta actividad ya pasó, la notificación no se enviará.");
+      setMensaje("Advertencia: Esta actividad ya pasó, la notificación no se enviará.");
     }
 
     try {
       if (saveNotificationConfig) {
         await saveNotificationConfig(selectedActivity, anticipationValue);
-        setMensaje("✅ Configuración guardada correctamente.");
+        setMensaje("Configuración guardada correctamente.");
         setSelectedActivity("");
         setAnticipationDays("");
       } else {
@@ -209,7 +209,7 @@ export function ConfigurarNotificaciones() {
       }
     } catch (error) {
       console.error("❌ Error al guardar:", error);
-      setMensaje("❌ Error al guardar configuración: " + (error.message || "Error desconocido"));
+      setMensaje("Error al guardar configuración: " + (error.message || "Error desconocido"));
     }
   };
 
@@ -235,149 +235,260 @@ export function ConfigurarNotificaciones() {
   // Verificar si el contexto está disponible
   if (!useNotifications) {
     return (
-      <div className="bg-white p-6 min-h-screen text-gray-800">
-        <div className="bg-red-100 text-red-800 px-4 py-2 rounded mb-4">
-          <strong>Error:</strong> El contexto de notificaciones no está disponible.
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full mx-4">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-red-600 text-2xl">⚠️</span>
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Error del Sistema</h2>
+            <p className="text-gray-600">El contexto de notificaciones no está disponible.</p>
+          </div>
         </div>
       </div>
     );
   }
 
-  console.log("RENDER - confirmedTasks:", confirmedTasks);
-  console.log("RENDER - notifications:", notifications);
-  console.log("RENDER - mensaje:", mensaje);
-  console.log("RENDER - error:", error);
-
   return (
-    <div className="bg-white p-6 min-h-screen text-gray-800">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
-        <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-          🔔 Configurar Notificaciones
-        </h2>
-        <div className="flex-1 h-px bg-gradient-to-r from-green-200 to-transparent"></div>
-      </div>
-
-      {error && (
-        <div className="bg-red-100 text-red-800 px-4 py-2 rounded mb-4">
-          <strong>Error:</strong> {error}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900">
+      <div className="p-6 max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
+            <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+              🔔 Configurar Notificaciones
+            </h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-green-200 to-transparent"></div>
+          </div>
+          <p className="text-gray-600 ml-4">Configura recordatorios para tus actividades confirmadas</p>
         </div>
-      )}
-      
-      {mensaje && (
-        <div className={`px-4 py-2 rounded mb-4 ${
-          mensaje.includes("Error") || mensaje.includes("❌")
-            ? "bg-red-100 text-red-800" 
-            : mensaje.includes("No tienes") || mensaje.includes("⚠️")
-            ? "bg-yellow-100 text-yellow-800" 
-            : "bg-green-100 text-green-800"
-        }`}>
-          {mensaje}
-        </div>
-      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border p-4 rounded bg-gray-50">
-        <div>
-          <h3 className="font-bold mb-2">🔔 Notificaciones Activas</h3>
-          {loading ? (
-            <div className="flex items-center space-x-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#03673E]"></div>
-              <p>Cargando notificaciones...</p>
-            </div>
-          ) : notifications.length === 0 ? (
-            <p className="text-gray-600">No tienes notificaciones configuradas.</p>
-          ) : (
-            notifications.map((n) => (
-              <div key={n._id} className="mb-2 p-3 border rounded bg-white">
-                <p className="font-semibold">{n.task?.title || "Sin título"}</p>
-                <p>📅 {formatDate(n.task?.date)}</p>
-                <p className="text-sm text-gray-600">
-                  🔔 Notificar {n.daysBefore} días antes
-                </p>
+        {/* Alert Messages */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-2xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                <span className="text-red-600 text-sm">⚠️</span>
               </div>
-            ))
-          )}
-        </div>
-
-        <div>
-          <h3 className="font-bold mb-2">➕ Nueva Configuración</h3>
-          
-          {loadingTasks ? (
-            <div className="flex items-center space-x-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#03673E]"></div>
-              <p>Cargando actividades...</p>
+              <div>
+                <h3 className="font-semibold text-red-800">Error</h3>
+                <p className="text-red-700">{error}</p>
+              </div>
             </div>
-          ) : (
-            <>
-              <label className="block mb-2 font-medium">
-                📋 Actividad confirmada ({confirmedTasks.length} encontradas):
-              </label>
-              
-              <select
-                value={selectedActivity}
-                onChange={(e) => setSelectedActivity(e.target.value)}
-                className="w-full border px-3 py-2 rounded mb-4 bg-white focus:border-[#03673E] focus:outline-none"
-              >
-                <option value="">-- Selecciona una actividad --</option>
-                {confirmedTasks.length === 0 ? (
-                  <option disabled>No hay actividades disponibles</option>
-                ) : (
-                  confirmedTasks.map((task) => {
-                    const isSelectable = isTaskSelectable(task.date);
+          </div>
+        )}
+        
+        {mensaje && (
+          <div className={`mb-6 border rounded-2xl p-4 ${
+            mensaje.includes("Error") 
+              ? "bg-red-50 border-red-200" 
+              : mensaje.includes("No tienes") || mensaje.includes("Advertencia")
+              ? "bg-yellow-50 border-yellow-200" 
+              : "bg-green-50 border-green-200"
+          }`}>
+            <div className="flex items-center gap-3">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                mensaje.includes("Error") 
+                  ? "bg-red-100" 
+                  : mensaje.includes("No tienes") || mensaje.includes("Advertencia")
+                  ? "bg-yellow-100" 
+                  : "bg-green-100"
+              }`}>
+                <span className={`text-sm ${
+                  mensaje.includes("Error") 
+                    ? "text-red-600" 
+                    : mensaje.includes("No tienes") || mensaje.includes("Advertencia")
+                    ? "text-yellow-600" 
+                    : "text-green-600"
+                }`}>
+                  {mensaje.includes("Error") ? "❌" : 
+                   mensaje.includes("No tienes") || mensaje.includes("Advertencia") ? "⚠️" : "✅"}
+                </span>
+              </div>
+              <p className={`${
+                mensaje.includes("Error") 
+                  ? "text-red-800" 
+                  : mensaje.includes("No tienes") || mensaje.includes("Advertencia")
+                  ? "text-yellow-800" 
+                  : "text-green-800"
+              }`}>
+                {mensaje}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Notificaciones Activas */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <span className="text-blue-600 text-lg">🔔</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Notificaciones Activas</h3>
+                  <p className="text-sm text-gray-600">
+                    {notifications.length} configuración{notifications.length !== 1 ? 'es' : ''} activa{notifications.length !== 1 ? 's' : ''}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-600">Cargando notificaciones...</p>
+                  </div>
+                </div>
+              ) : notifications.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-gray-400 text-2xl">🔕</span>
+                  </div>
+                  <h4 className="text-lg font-medium text-gray-900 mb-2">Sin notificaciones</h4>
+                  <p className="text-gray-500">No tienes notificaciones configuradas aún</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {notifications.map((n) => (
+                    <div key={n._id} className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:bg-gray-100 transition-colors duration-200">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <span className="text-blue-600 text-sm">📋</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-gray-900 truncate">
+                            {n.task?.title || "Sin título"}
+                          </h4>
+                          <p className="text-sm text-gray-600 flex items-center gap-1 mt-1">
+                            <span>📅</span>
+                            {formatDate(n.task?.date)}
+                          </p>
+                          <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                            <span>🔔</span>
+                            Notificar {n.daysBefore} día{n.daysBefore !== 1 ? 's' : ''} antes
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Nueva Configuración */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                  <span className="text-green-600 text-lg">➕</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Nueva Configuración</h3>
+                  <p className="text-sm text-gray-600">Agrega un nuevo recordatorio</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {loadingTasks ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-600">Cargando actividades...</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Selector de Actividad */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <span className="text-blue-600">📋</span>
+                      Actividad confirmada
+                      <span className="text-xs text-gray-500 font-normal">
+                        ({confirmedTasks.length} encontradas)
+                      </span>
+                    </label>
                     
-                    return (
-                      <option
-                        key={task._id}
-                        value={task._id}
-                        style={{ 
-                          color: isSelectable ? 'black' : 'gray',
-                          fontStyle: isSelectable ? 'normal' : 'italic'
-                        }}
-                      >
-                        {task.title} - {formatDate(task.date)} 
-                        {!isSelectable ? " (Pasada)" : ""}
-                      </option>
-                    );
-                  })
-                )}
-              </select>
+                    <select
+                      value={selectedActivity}
+                      onChange={(e) => setSelectedActivity(e.target.value)}
+                      className="w-full border border-gray-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 outline-none bg-white"
+                    >
+                      <option value="">-- Selecciona una actividad --</option>
+                      {confirmedTasks.length === 0 ? (
+                        <option disabled>No hay actividades disponibles</option>
+                      ) : (
+                        confirmedTasks.map((task) => {
+                          const isSelectable = isTaskSelectable(task.date);
+                          
+                          return (
+                            <option
+                              key={task._id}
+                              value={task._id}
+                              style={{ 
+                                color: isSelectable ? 'black' : 'gray',
+                                fontStyle: isSelectable ? 'normal' : 'italic'
+                              }}
+                            >
+                              {task.title} - {formatDate(task.date)} 
+                              {!isSelectable ? " (Pasada)" : ""}
+                            </option>
+                          );
+                        })
+                      )}
+                    </select>
+                  </div>
 
-              <label className="block mb-2 font-medium">
-                ⏰ Días de anticipación (1-30):
-              </label>
-              <input
-                type="number"
-                min="1"
-                max="30"
-                value={anticipationDays}
-                onChange={(e) => setAnticipationDays(e.target.value)}
-                className="w-full border px-3 py-2 rounded mb-4 focus:border-[#03673E] focus:outline-none"
-                disabled={!selectedActivity}
-                placeholder="Ej: 3"
-              />
+                  {/* Días de Anticipación */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <span className="text-orange-600">⏰</span>
+                      Días de anticipación
+                      <span className="text-xs text-gray-500 font-normal">(1-30 días)</span>
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="30"
+                      value={anticipationDays}
+                      onChange={(e) => setAnticipationDays(e.target.value)}
+                      className="w-full border border-gray-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 outline-none"
+                      disabled={!selectedActivity}
+                      placeholder="Ej: 3"
+                    />
+                  </div>
 
-              <Button 
-                onClick={guardarConfiguracion}
-                disabled={!selectedActivity || !anticipationDays || loadingTasks}
-                className="w-full bg-[#03673E] hover:bg-[#024d2e] disabled:bg-gray-400"
-              >
-                {loadingTasks ? "Cargando..." : "💾 Guardar Configuración"}
-              </Button>
-            </>
-          )}
+                  {/* Botón de Guardar */}
+                  <button
+                    onClick={guardarConfiguracion}
+                    disabled={!selectedActivity || !anticipationDays || loadingTasks}
+                    className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    {loadingTasks ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Cargando...
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
+                        <span>💾</span>
+                        Guardar Configuración
+                      </span>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Panel de debug (solo en desarrollo) */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="mt-6 p-4 bg-gray-100 rounded text-sm">
-          <h4 className="font-bold mb-2">Debug Info:</h4>
-          <p>Confirmed Tasks: {confirmedTasks.length}</p>
-          <p>Notifications: {notifications.length}</p>
-          <p>Loading Tasks: {loadingTasks.toString()}</p>
-          <p>Loading Notifications: {loading.toString()}</p>
-        </div>
-      )}
     </div>
   );
 }

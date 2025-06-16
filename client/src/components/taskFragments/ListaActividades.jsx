@@ -1,12 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTasks } from "../../context/tasksContext";
 import { TaskCard } from "../tasks/TaskCard";
 import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export function ListaActividades() {
-  const { othersTasks } = useTasks();
+  const { othersTasks, getOthersTasks } = useTasks();
   const navigate = useNavigate();
+
+  // Cargar actividades automáticamente cuando el componente se monta
+  useEffect(() => {
+    if (getOthersTasks) {
+      getOthersTasks();
+    }
+  }, [getOthersTasks]);
 
   if (!othersTasks) return <p className="text-gray-500">Cargando actividades...</p>;
 
@@ -30,7 +37,6 @@ export function ListaActividades() {
     <Search className="w-6 h-6 text-[#03673E]" />
   </button>
 </div>
-
 
       {othersTasks.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

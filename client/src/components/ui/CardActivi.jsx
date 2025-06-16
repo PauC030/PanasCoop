@@ -3,29 +3,18 @@ export function CardActivi({ children, className = "", isPromoted = false }) {
     <div
       className={`
         w-full
-        max-w-xs
-        sm:max-w-sm
-        md:max-w-md
-        lg:max-w-lg
-        xl:max-w-xl
-        ml-4
-        sm:ml-6
-        md:ml-8
-        lg:ml-10
-        mr-4
-        sm:mr-6
-        md:mr-8
         bg-white
         shadow-lg
         hover:shadow-xl
-        px-4
+        px-2
         py-3
-        sm:px-6
+        sm:px-3
         sm:py-4
-        md:px-8
+        md:px-4
         md:py-5
-        lg:px-10
+        lg:px-5
         lg:py-6
+        ml-2 sm:ml-3 md:ml-4 lg:ml-5
         rounded-xl
         border-2
         ${isPromoted 

@@ -227,9 +227,9 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
         <header className="relative">
           <div className="flex justify-between items-start gap-2">
             <h1 className={`text-black text-lg font-semibold break-words overflow-hidden text-ellipsis whitespace-nowrap flex-1 ${
-              showPromoBadge ? 'pr-16' : '' // Espacio para la etiqueta de promo
+              showPromoBadge ? 'pr-8' : '' // Espacio para la etiqueta de promo
             } ${
-              showAttendanceButton && isAttending ? 'mr-12' : ''
+              showAttendanceButton && isAttending ? 'mr-8' : ''
             }`}>
               {task.title}
             </h1>
@@ -313,11 +313,11 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
           )}
         </header>
 
-        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-3 w-full">
+        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2 w-full">
           {/* Botón Ver Detalles con gradiente y icono - AJUSTADO EL PADDING */}
           <button
               onClick={() => setShowDetailsModal(true)}
-            className="w-full sm:w-auto px-2 py-0.2 bg-gradient-to-r from-[#064349] to-[#03683E] text-white rounded-lg font-medium hover:from-[#075a61] hover:to-[#048447] transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 group"
+            className="w-full sm:w-auto px-3 py-0.2 bg-gradient-to-r from-[#064349] to-[#03683E] text-white rounded-lg font-medium hover:from-[#075a61] hover:to-[#048447] transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 group"
           >
             <svg 
               className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" 
@@ -335,7 +335,7 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
         {!isAttending ? (
        <button
          onClick={() => setShowAttendModal(true)}
-         className="w-full sm:w-auto px-2 py-0.2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-medium hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 group"
+         className="w-full sm:w-auto px-3 py-0.2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-medium hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 group"
        >
         <svg 
           className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" 

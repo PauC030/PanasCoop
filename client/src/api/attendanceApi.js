@@ -30,12 +30,18 @@ export const deleteAttendanceRequest = (id) =>
 export const exportAttendanceRequest = (taskId) =>
   axios.get(`/attendances/export/${taskId}`, { responseType: 'blob' });
 
+// Obtener asistencias del usuario autenticado
+export const getUserAttendancesRequest = () =>
+  axios.get('/attendances/mis-asistencias');
+
+
 export default {
   confirmAttendanceRequest,
   cancelAttendanceRequest,
-  checkAttendanceRequest, // Nueva función
+  checkAttendanceRequest, 
   getAttendanceRequest,
   updateAttendanceRequest,
   deleteAttendanceRequest,
   exportAttendanceRequest,
+  getUserAttendancesRequest
 };

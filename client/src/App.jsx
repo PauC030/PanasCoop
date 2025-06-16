@@ -10,22 +10,31 @@ import { ActividadesPromocionadas } from "./components/taskFragments/Actividades
 import { ConfigurarNotificaciones } from "./components/taskFragments/ConfigurarNotificaciones";
 import { GestionarAsistencia } from "./components/taskFragments/GestionarAsistencia";
 
+
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import { TaskFormPage } from "./pages/TaskFormPage";
 import { LoginPage } from "./pages/LoginPage";
 import { TasksPage } from "./pages/TasksPage";
 import { TaskProvider } from "./context/tasksContext";
-import { AsistenciaProvider } from "./context/asistenciaContext";
+
+
 import { AdminProvider } from "./context/adminContext";
 import AdminDashboard from "./pages/AdminDashboard";
+
+import { AsistenciaProvider } from "./context/asistenciaContext"; // importa tu nuevo provider
+import { NotificationsProvider } from "./context/NotificationsContext"; // Ajusta según tu estructura
+
 
 import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
+     
     <AuthProvider>
+
       <TaskProvider>
+        <NotificationsProvider>
         <AsistenciaProvider> 
           <AdminProvider>
             <SearchProvider>
@@ -44,26 +53,35 @@ function App() {
                         <Route path="lista" element={<ListaActividades />} />
                         <Route path="promocionadas" element={<ActividadesPromocionadas />} />
                         <Route path="notificaciones" element={<ConfigurarNotificaciones />} />
-
                         <Route path="asistencia" element={<GestionarAsistencia />} />
-                      </Route>
-                      <Route path="/add-task" element={<TaskFormPage />} />
-                      <Route path="/tasks/:id" element={<TaskFormPage />} />
-                      <Route path="/profile" element={<h1>Profile</h1>} />
-                    </Route>
+             </Route>
+                <Route path="/add-task" element={<TaskFormPage />} />
+                <Route path="/tasks/:id" element={<TaskFormPage />} />
+                <Route path="/profile" element={<h1>Profile</h1>} />
+               </Route>
+                <Route element={<ProtectedRoute allowedRoles={["superadmin"]} />}>
+                <Route path="/admin-dashboard" element={<AdminDashboard />} />
+             </Route>
+            </Routes>
+          </main>
+        </BrowserRouter>
+      </SearchProvider>
 
-                    <Route element={<ProtectedRoute allowedRoles={["superadmin"]} />}>
-                      <Route path="/admin-dashboard" element={<AdminDashboard />} />
-                    </Route>
-                  </Routes>
-                </main>
-              </BrowserRouter>
-            </SearchProvider>
-          </AdminProvider>
-        </AsistenciaProvider>
-      </TaskProvider>
-    </AuthProvider>
-  );
-}
+      </AdminProvider>
+
+
+    </AsistenciaProvider>
+    </NotificationsProvider>
+  </TaskProvider>
+</AuthProvider>
+
+
+  )
+};
+
+
+
+
+
 
 export default App;

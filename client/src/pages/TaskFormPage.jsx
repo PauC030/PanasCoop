@@ -63,54 +63,44 @@ export function TaskFormPage() {
   };
 
   const onSubmit = async (data) => {
-    const selectedDate = dayjs(data.date).startOf("day");
-    const today = dayjs().startOf("day");
+  const selectedDate = dayjs(data.date).startOf("day");
+  const today = dayjs().startOf("day");
 
-    if (selectedDate.isBefore(today)) {
-       toast.error("No puedes seleccionar una fecha pasada.");
-      return;
+  if (selectedDate.isBefore(today)) {
+    toast.error("No puedes seleccionar una fecha pasada.");
+    return;
+  }
+
+  setIsSubmitting(true);
+  try {
+    // Enviar como objeto, no como FormData
+    const payload = {
+      title: data.title,
+      description: data.description || '',
+      place: data.place || '',
+      date: data.date ? dayjs.utc(data.date).format() : '',
+      responsible: data.responsible
+        ? data.responsible.split(',').map(r => r.trim()).filter(r => r !== '')
+        : [],
+      image: selectedImage // <-- Agregar la imagen como propiedad
+    };
+
+    console.log("Payload a enviar:", payload);
+
+    if (params.id) {
+      await updateTask(params.id, payload);
+    } else {
+      await createTask(payload);
     }
 
-    setIsSubmitting(true);
-    try {
-      let payload;
-      if (selectedImage) {
-        payload = new FormData();
-        payload.append("title", data.title);
-        payload.append("description", data.description || '');
-        payload.append("place", data.place || '');
-        payload.append("date", data.date ? dayjs.utc(data.date).format() : '');
-        const responsables = data.responsible
-          ? data.responsible.split(',').map(r => r.trim()).filter(r => r !== '')
-          : [];
-        payload.append("responsible", JSON.stringify(responsables));
-        payload.append("image", selectedImage);
-      } else {
-        payload = {
-          title: data.title,
-          description: data.description || '',
-          place: data.place || '',
-          date: data.date ? dayjs.utc(data.date).format() : '',
-          responsible: data.responsible
-            ? data.responsible.split(',').map(r => r.trim()).filter(r => r !== '')
-            : [],
-        };
-      }
-
-      if (params.id) {
-        await updateTask(params.id, payload);
-      } else {
-        await createTask(payload);
-      }
-
-      navigate("/tasks");
-    } catch (error) {
-      console.error('Error al guardar:', error);
-      toast.error ('Error al guardar la actividad. Por favor intenta de nuevo.')
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    navigate("/tasks");
+  } catch (error) {
+    console.error('Error al guardar:', error);
+    toast.error('Error al guardar la actividad. Por favor intenta de nuevo.');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   useEffect(() => {
     const loadTask = async () => {
@@ -142,11 +132,7 @@ export function TaskFormPage() {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 mt-10">
-          <div className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-r from-teal-600 to-green-600 rounded-full mb-2">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-            </svg>
-          </div>
+          
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
             {params.id ? "Editar Actividad" : "Nueva Actividad"}
           </h1>
@@ -155,15 +141,13 @@ export function TaskFormPage() {
           </p>
         </div>
 
-        {/* Form Card */}
-        <Card className="bg-white shadow-xl border-0 rounded-2xl overflow-hidden justify-self-center">
-          
-        <h2 className="text-xl font-semibold text-green-900 border-b border-gray-300 pb-2">
-        Detalles de la Actividad:
-        </h2>
-          
-  
-          <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-6">
+       
+        
+        <form onSubmit={handleSubmit(onSubmit)} 
+          className="p-8 space-y-0 bg-gray-100 rounded-xl shadow-xl">
+            <h2 className="text-xl font-semibold text-green-900 border-b border-gray-300 pb-2 px-8 pt-6">
+           Detalles de la Actividad:
+          </h2>
             {/* Título */}
             <div className="space-y-2">
               <Label htmlFor="title" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
@@ -364,7 +348,7 @@ export function TaskFormPage() {
               </Button>
             </div>
           </form>
-        </Card>
+       
       </div>
     </div>
   );

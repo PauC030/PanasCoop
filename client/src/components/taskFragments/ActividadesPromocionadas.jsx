@@ -52,12 +52,12 @@ export function ActividadesPromocionadas() {
     <div className="text-black p-4">
       {/* Sección: Actividades Promocionadas de Otros - ARRIBA */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
-          <h2 className="text-2xl font-bold text-gray-800">
+        <div className="flex items-center mb-6">
+          <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full mr-3"></div>
+          <h2 className="text-2xl font-bold text-gray-800 mr-3">
             ⭐ Actividades Promocionadas ({finalOthersTasks.length})
           </h2>
-          <div className="flex-1 h-px bg-gradient-to-r from-green-200 to-transparent"></div>
+          <div className="flex-grow h-px bg-gradient-to-r from-green-200 to-transparent"></div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -87,12 +87,12 @@ export function ActividadesPromocionadas() {
       {/* Sección: Mis Actividades Promocionadas - ABAJO */}
       {finalMyTasks.length > 0 && (
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
-            <h2 className="text-2xl font-bold text-gray-800">
-             ⭐ Mis Actividades Promocionadas ({finalMyTasks.length})
+          <div className="flex items-center mb-6">
+            <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full mr-3"></div>
+            <h2 className="text-2xl font-bold text-gray-800 mr-3">
+              ⭐ Mis Actividades Promocionadas ({finalMyTasks.length})
             </h2>
-            <div className="flex-1 h-px bg-gradient-to-r from-blue-200 to-transparent"></div>
+            <div className="flex-grow h-px bg-gradient-to-r from-blue-200 to-transparent"></div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -104,23 +104,6 @@ export function ActividadesPromocionadas() {
                 showAttendanceButton={false} // Sin botones de asistencia para mis actividades
               />
             ))}
-          </div>
-        </div>
-      )}
-
-      {/* Mensaje cuando no hay actividades promocionadas en absoluto */}
-      {promotedTasks.length === 0 && (
-        <div className="text-center py-12">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center">
-              <span className="text-4xl">⭐</span>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-700">
-              No hay actividades promocionadas
-            </h3>
-            <p className="text-gray-500 max-w-md">
-              Cuando haya actividades promocionadas, aparecerán aquí organizadas por categorías
-            </p>
           </div>
         </div>
       )}

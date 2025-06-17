@@ -313,17 +313,19 @@ export function GestionarAsistencia() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900">
-      <div className="p-6 max-w-7xl mx-auto">
-        {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-              👥 Gestión de Asistencia
-            </h2>
-            <div className="flex-1 h-px bg-gradient-to-r from-green-200 to-transparent"></div>
-          </div>
-          <p className="text-gray-600 ml-4">Administra los participantes de tus actividades</p>
+  <div className="p-6 max-w-3xl mx-auto sm:max-w-[90vw] sm:ml-10 sm:mr-10">
+    {/* Header Section */}
+    <div className="mb-8">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
+        <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+          👥 Gestión de Asistencia
+        </h2>
+        <div className="flex-1 h-px bg-gradient-to-r from-green-200 to-transparent"></div>
+      </div>
+      <p className="text-gray-600 ml-4">
+        Administra los participantes de tus actividades
+      </p>
 
           {/* Task Selection and Info */}
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">

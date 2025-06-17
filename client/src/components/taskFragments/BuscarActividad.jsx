@@ -105,8 +105,8 @@ export function BuscarActividad() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4 flex flex-col">
+  <div className="w-full flex-grow">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
@@ -123,7 +123,7 @@ export function BuscarActividad() {
         </div>
 
         {/* Search Form Card - Más delicado */}
-        <div className="bg-white shadow-lg border border-gray-100 rounded-2xl overflow-hidden mx-auto mb-8 max-w-5xl">
+      <div className="bg-white shadow-lg border border-gray-100 rounded-2xl overflow-hidden mb-8 max-w-5xl sm:max-w-[95vw] sm:ml-10 sm:mr-0">
           <div className="bg-gray-200 px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-700 text-center flex items-center justify-center gap-2">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

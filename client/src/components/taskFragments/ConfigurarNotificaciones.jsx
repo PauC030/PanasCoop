@@ -1,4 +1,4 @@
-// ConfigurarNotificaciones.jsx - Versión mejorada
+
 import { useState, useEffect } from "react";
 import { Button } from "../ui";
 import { useNotifications } from "../../context/NotificationsContext";

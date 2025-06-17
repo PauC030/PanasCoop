@@ -95,78 +95,63 @@ export function TaskProvider({ children }) {
     }
   };
 
-  const createTask = async (task) => {
-    try {
-      console.log('Creando tarea con datos:', task);
-      
-      let dataToSend;
-      
-      // Si hay imagen, crear FormData
-      if (task.image && task.image instanceof File) {
-        console.log('Preparando FormData para imagen:', {
-          name: task.image.name,
-          size: task.image.size,
-          type: task.image.type
-        });
-        
-        const formData = new FormData();
-        
-        // Agregar campos obligatorios
-        formData.append('title', task.title || '');
-        formData.append('description', task.description || '');
-        formData.append('place', task.place || '');
-        formData.append('date', task.date || '');
-        
-        // Para el array de responsables - manejar mejor los arrays vacíos
-        if (task.responsible && Array.isArray(task.responsible) && task.responsible.length > 0) {
-          // Filtrar elementos vacíos antes de convertir a JSON
-          const cleanResponsible = task.responsible.filter(r => r && r.trim() !== '');
-          if (cleanResponsible.length > 0) {
-            formData.append('responsible', JSON.stringify(cleanResponsible));
-          }
-        }
-        
-        // Agregar la imagen al final
-        formData.append('image', task.image);
-        
-        dataToSend = formData;
-        
-        // Debug: mostrar contenido del FormData
-        console.log('Contenido del FormData:');
-        for (let pair of formData.entries()) {
-          console.log(`${pair[0]}:`, pair[1]);
-        }
-      } else {
-        // Si no hay imagen, enviar como objeto normal
-        console.log('Enviando datos sin imagen');
-        dataToSend = {
-          ...task,
-          // Asegurar que responsible sea un array válido
-          responsible: task.responsible && Array.isArray(task.responsible) 
-            ? task.responsible.filter(r => r && r.trim() !== '')
-            : []
-        };
-      }
-      
-      // Realizar la petición
-      const res = await createTaskRequest(dataToSend);
-      console.log('Respuesta del servidor:', res.data);
-      
-      // Agregar la nueva tarea al estado con la propiedad isOwner
-      const newTaskWithOwner = { ...res.data, isOwner: true };
-      setTasks(prev => [...prev, newTaskWithOwner]);
-      
-      return newTaskWithOwner;
-    } catch (error) {
-      console.error('Error detallado al crear tarea:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        config: error.config
-      });
-      throw error;
+  
+     const createTask = async (task) => {
+      try {
+  
+    const formData = new FormData();
+
+    // Agregar campos obligatorios con validación
+    if (!task.title || task.title.trim() === '') {
+      throw new Error('El título es requerido');
     }
-  };
+    
+    if (!task.date) {
+      throw new Error('La fecha es requerida');
+    }
+
+    formData.append('title', task.title.trim());
+    formData.append('description', task.description || '');
+    formData.append('place', task.place || '');
+    formData.append('date', task.date);
+
+
+
+    // Agregar responsables si existen
+    if (task.responsible && Array.isArray(task.responsible)) {
+      const cleanResponsible = task.responsible.filter(r => r && r.trim() !== '');
+      if (cleanResponsible.length > 0) {
+        formData.append('responsible', JSON.stringify(cleanResponsible));
+       
+      }
+    }
+
+    // Agregar imagen si existe
+    if (task.image && task.image instanceof File) {
+      formData.append('image', task.image);
+      console.log('Imagen agregada:', {
+        name: task.image.name,
+        size: task.image.size,
+        type: task.image.type
+      });
+    }
+
+    // Debug FormData contents
+   
+    for (let pair of formData.entries()) {
+      
+    }
+
+    const res = await createTaskRequest(formData);
+    const newTaskWithOwner = { ...res.data.task, isOwner: true };
+
+    setTasks(prev => [...prev, newTaskWithOwner]);
+    return newTaskWithOwner;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
   const getTask = async (id) => {
     try {

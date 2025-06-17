@@ -62,7 +62,7 @@ export function TaskFormPage() {
     if (fileInput) fileInput.value = '';
   };
 
-  const onSubmit = async (data) => {
+const onSubmit = async (data) => {
   const selectedDate = dayjs(data.date).startOf("day");
   const today = dayjs().startOf("day");
 
@@ -72,25 +72,34 @@ export function TaskFormPage() {
   }
 
   setIsSubmitting(true);
-  try {
-    // Enviar como objeto, no como FormData
-    const payload = {
-      title: data.title,
+  try { 
+    const taskData = {
+      title: data.title || '',
       description: data.description || '',
       place: data.place || '',
       date: data.date ? dayjs.utc(data.date).format() : '',
-      responsible: data.responsible
-        ? data.responsible.split(',').map(r => r.trim()).filter(r => r !== '')
-        : [],
-      image: selectedImage // <-- Agregar la imagen como propiedad
     };
+    
+    // Responsables
+    const responsibleList = data.responsible
+      ? data.responsible.split(',').map(r => r.trim()).filter(r => r !== '')
+      : [];
+    
+    if (responsibleList.length > 0) {
+      taskData.responsible = responsibleList;
+    }
+    
+    // Imagen (solo si existe)
+    if (selectedImage) {
+      taskData.image = selectedImage;
+    }
 
-    console.log("Payload a enviar:", payload);
+    console.log("Datos a enviar:", taskData);
 
     if (params.id) {
-      await updateTask(params.id, payload);
+      await updateTask(params.id, taskData);
     } else {
-      await createTask(payload);
+      await createTask(taskData);
     }
 
     navigate("/tasks");

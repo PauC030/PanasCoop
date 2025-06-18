@@ -51,7 +51,7 @@ export default function AdminDashboard() {
       getAllAdmins();
     }
     
-    if (user?.role === "admin" || user?.role === "superadmin") {
+    if (user?.role === "admin") {
       fetchUsers();
       fetchActivities();
       fetchAttendances();
@@ -126,7 +126,11 @@ export default function AdminDashboard() {
                 </button>
               </>
             )}
+
+
             
+        {user.role === "admin" && (
+           <>
             <button
               onClick={() => setActiveTab("users")}
               className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
@@ -159,6 +163,7 @@ export default function AdminDashboard() {
             >
               Asistencias
             </button>
+                </>)}
           </nav>
         </div>
 
@@ -204,14 +209,20 @@ export default function AdminDashboard() {
           )}
           
           <div className="px-4 py-5 sm:p-6">
-            {activeTab === "stats" && (
-              <div className="space-y-8">
-                {user.role === "superadmin" && <AdminStats stats={stats} />}
-                <UserStats />
-                <ActivityStats />
-                <AttendanceStats />
-              </div>
-            )}
+           {activeTab === "stats" && (
+         <div className="space-y-8">
+    {/* Mostrar solo las estadísticas correspondientes a cada rol */}
+        {user.role === "superadmin" ? (
+         <AdminStats stats={stats} />
+        ) : (
+        <>
+        <UserStats />
+        <ActivityStats />
+        <AttendanceStats />
+      </>
+       )}
+    </div>
+    )}
             
             {activeTab === "admins" && user.role === "superadmin" && <AdminList admins={admins} />}
             {activeTab === "create" && user.role === "superadmin" && <CreateAdminForm />}

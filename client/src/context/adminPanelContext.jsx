@@ -82,25 +82,38 @@ export const AdminPanelProvider = ({ children }) => {
       setUsers(users.map(u => u._id === id ? res.data.user : u));
       return res.data;
     } catch (error) {
-      setErrors(error.response?.data?.message || ["Error al cambiar estado del usuario"]);
+  const errorMessage = error.response?.data?.message || "Error al cambiar estado del usuario";
+    setErrors(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
+    
+    // Limpiar el error después de 3 segundos
+    setTimeout(() => {
+      setErrors([]);
+    }, 3000);
+
       throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  const deleteUser = async (id) => {
-    try {
-      setLoading(true);
-      await deleteUserRequest(id);
-      setUsers(users.filter(u => u._id !== id));
-    } catch (error) {
-      setErrors(error.response?.data?.message || ["Error al eliminar usuario"]);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+ const deleteUser = async (id) => {
+  try {
+    setLoading(true);
+    await deleteUserRequest(id);
+    setUsers(users.filter(u => u._id !== id));
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || "Error al eliminar usuario";
+    setErrors(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
+       // Limpiar el error después de 3 segundos
+    setTimeout(() => {
+      setErrors([]);
+    }, 3000);
+
+    throw error;
+  } finally {
+    setLoading(false);
+  }
+};
 
   const fetchUserStats = async () => {
     try {

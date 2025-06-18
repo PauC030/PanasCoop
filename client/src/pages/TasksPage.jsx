@@ -106,9 +106,40 @@ export function TasksPage() {
                 </ButtonLink>
               </div>
             )}
-          </div>
-        </aside>
-      </div>
+      
+{/* Panel de administración */}
+{user?.role === "admin" && (
+  <div className="mb-4 border-t border-[#003529] pt-4">
+    <h2 className="text-xs font-bold mb-2 text-white opacity-80">
+      Administración
+    </h2>
+    <button
+      onClick={() => window.location.href = "/admin-dashboard"}
+      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs flex items-center justify-center gap-1"
+    >
+      <svg 
+        className="w-4 h-4" 
+        fill="none" 
+        stroke="currentColor" 
+        viewBox="0 0 24 24"
+      >
+        <path 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          strokeWidth={2} 
+          d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" 
+        />
+      </svg>
+      Panel de Administración
+    </button>
+  </div>
+)}
+
+
+  </div>
+</aside>
+    </div>
+
 
       <main className="flex-1 p-4 ml-28 sm:ml-32 md:ml-36 max-md:ml-28 max-sm:ml-24 mr-4">
         <Outlet />
@@ -187,7 +218,9 @@ export function TasksPage() {
             )}
           </>
         )}
+
       </main>
+
     </div>
   );
 }

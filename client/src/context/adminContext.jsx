@@ -70,7 +70,14 @@ export const AdminProvider = ({ children }) => {
       setAdmins(admins.map(a => a._id === id ? res.data.admin : a));
       return res.data;
     } catch (error) {
-      setErrors(error.response?.data?.message || ["Error al actualizar administrador"]);
+       const errorMessage = error.response?.data?.message || "Error al actualizar administrador";  
+          setErrors(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
+
+              // Limpia el error después de 3 segundos
+    setTimeout(() => {
+      setErrors([]);
+    }, 3000);
+
       throw error;
     } finally {
       setLoading(false);
@@ -84,7 +91,14 @@ export const AdminProvider = ({ children }) => {
       setAdmins(admins.map(a => a._id === id ? res.data.admin : a));
       return res.data;
     } catch (error) {
-      setErrors(error.response?.data?.message || ["Error al desactivar administrador"]);
+         const errorMessage = error.response?.data?.message || "Error al desactivar administrador";
+    setErrors(Array.isArray(errorMessage) ? errorMessage : [errorMessage]);
+      
+       // Limpia el error después de 3 segundos
+    setTimeout(() => {
+      setErrors([]);
+    }, 3000);
+
       throw error;
     } finally {
       setLoading(false);

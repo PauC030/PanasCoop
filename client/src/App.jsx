@@ -21,10 +21,9 @@ import { TaskProvider } from "./context/tasksContext";
 
 import { AdminProvider } from "./context/adminContext";
 import AdminDashboard from "./pages/AdminDashboard";
-
 import { AsistenciaProvider } from "./context/asistenciaContext"; // importa tu nuevo provider
 import { NotificationsProvider } from "./context/NotificationsContext"; // Ajusta según tu estructura
-
+import { AdminPanelProvider } from "./context/adminPanelContext";
 
 import { Toaster } from 'react-hot-toast';
 
@@ -32,11 +31,11 @@ function App() {
   return (
      
     <AuthProvider>
-
       <TaskProvider>
         <NotificationsProvider>
         <AsistenciaProvider> 
           <AdminProvider>
+            <AdminPanelProvider>
             <SearchProvider>
               <BrowserRouter>
                 <main className="content-container mx-auto md:px-0">
@@ -59,21 +58,20 @@ function App() {
                 <Route path="/tasks/:id" element={<TaskFormPage />} />
                 <Route path="/profile" element={<h1>Profile</h1>} />
                </Route>
-                <Route element={<ProtectedRoute allowedRoles={["superadmin"]} />}>
+                <Route element={<ProtectedRoute allowedRoles={["admin", "superadmin"]} />}>
                 <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          
              </Route>
             </Routes>
           </main>
-        </BrowserRouter>
-      </SearchProvider>
-
+      </BrowserRouter>
+    </SearchProvider>
+     </AdminPanelProvider>
       </AdminProvider>
-
-
-    </AsistenciaProvider>
-    </NotificationsProvider>
-  </TaskProvider>
-</AuthProvider>
+       </AsistenciaProvider>
+        </NotificationsProvider>
+         </TaskProvider> 
+          </AuthProvider>
 
 
   )
@@ -85,3 +83,18 @@ function App() {
 
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+     
+    
+
+

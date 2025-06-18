@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.3",
+    "@heroicons/react": "^1.0.6",
     "@hookform/resolvers": "^3.1.0",
     "axios": "^1.7.9",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.7",
     "dayjs-plugin-utc": "^0.1.2",
     "dotenv": "^16.5.0",

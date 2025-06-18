@@ -273,13 +273,13 @@ export function BuscarActividad() {
                     <div key={task._id} className="relative">
                       {/* Badge de "Finalizada" para actividades pasadas */}
                       {isPast && (
-                         <div className="absolute top-2 right-2 z-10 bg-gray-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-sm">
-                          FINALIZADA
+                         <div className="absolute top-2 right-2 z-20 bg-gray-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-lg">
+                          FINALIZADA 
                         </div>
                       )}
                       <TaskCard
                         task={task}
-                        showPromoBadge={task.isPromoted && !task.isOwner} // Solo mostrar si está promocionada Y no es mi tarea
+                        showPromoBadge={task.isPromoted && !task.isOwner} 
                         showAttendanceButton={!isPast} 
                         refreshSearch={handleBuscar}
                         // Props adicionales para actividades propias

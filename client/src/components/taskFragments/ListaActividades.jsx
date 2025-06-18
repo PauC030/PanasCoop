@@ -32,9 +32,10 @@ export function ListaActividades() {
   <button
     onClick={() => navigate("/tasks/buscar")}
     className="ml-2 p-2 rounded-full hover:bg-gray-200 transition"
-    title="Buscar actividad"
-  >
-    <Search className="w-6 h-6 text-[#03673E]" />
+    title="Buscar actividad">
+   <div className="w-9 h-9 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+       <Search className="w-6 h-6 text-white" />
+     </div>
   </button>
 </div>
 

@@ -65,7 +65,9 @@ export function ActividadesPromocionadas() {
             <div className="text-gray-500 italic col-span-full text-center py-8">
               <div className="flex flex-col items-center gap-3">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                  <span className="text-2xl">📋</span>
+                  <span className="text-2xl">⭐
+                    
+                  </span>
                 </div>
                 <p className="text-lg">No hay actividades promocionadas disponibles</p>
                 <p className="text-sm text-gray-400">Las actividades promocionadas de otros usuarios aparecerán aquí</p>

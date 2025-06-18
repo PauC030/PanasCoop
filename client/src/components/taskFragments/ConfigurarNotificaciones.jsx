@@ -323,9 +323,9 @@ export function ConfigurarNotificaciones() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Notificaciones Activas */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-            <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-100">
+            <div className="p-6 bg-gradient-to-r from-blue-100 to-indigo-50 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
                   <span className="text-blue-600 text-lg">🔔</span>
                 </div>
                 <div>
@@ -384,9 +384,9 @@ export function ConfigurarNotificaciones() {
 
           {/* Nueva Configuración */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-            <div className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-100">
+            <div className="p-6 bg-gradient-to-r from-green-100 to-emerald-50 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
                   <span className="text-green-600 text-lg">➕</span>
                 </div>
                 <div>

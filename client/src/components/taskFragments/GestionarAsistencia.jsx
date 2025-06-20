@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTasks } from '../../context/tasksContext';
 import Papa from 'papaparse';
+import { Bell, BellOff, Calendar, CheckCircle, X, Edit2, Trash2, Loader2, Plus, Clipboard, Save, Inbox } from 'lucide-react';
 
 function ParticipantModal({ isOpen, onClose, onSave, attendeeToEdit, existingEmails, existingNames }) {
   const [name, setName] = useState('');
@@ -334,7 +335,7 @@ export function GestionarAsistencia() {
                 {selectedTask ? (
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                      <span className="text-green-600 text-sm">📋</span>
+                     <Clipboard className="text-blue-600" size={16} />
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Actividad seleccionada</p>
@@ -398,7 +399,7 @@ export function GestionarAsistencia() {
                     onClick={handleExport}
                     className="flex items-center gap-2 bg-white text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 border border-gray-200 transition-all duration-200 shadow-sm"
                   >
-                    <span className="text-sm">📥</span>
+                   <Inbox className="text-blue-600" size={16} />
                     <span className="text-gray-700">Exportar Lista</span>
                   </button>
                 </div>

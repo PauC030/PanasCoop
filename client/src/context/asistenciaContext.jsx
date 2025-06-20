@@ -45,6 +45,7 @@ const fetchAttendees = async (taskId) => {
   // ✅ Confirmar asistencia
 const confirmAttendance = async (data) => {
 
+
   setError(null);
   setForbidden(false);
   

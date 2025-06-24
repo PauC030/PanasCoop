@@ -11,7 +11,7 @@ export const cancelAttendanceRequest = ({ taskId, email }) =>
 // Verificar si el usuario está registrado para una actividad específica
 export const checkAttendanceRequest = (taskId, email) => {
   const params = email ? { email } : {};
-  return axios.get(`/attendances/check/${taskId}`, { params });
+  return axios.get(`/attendances/check/${taskId}`, { params }); // ✅ Corregido
 };
 
 // Obtener lista de asistentes de una tarea (SOLO si el usuario es dueño)

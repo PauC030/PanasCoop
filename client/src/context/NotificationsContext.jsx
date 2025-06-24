@@ -1,5 +1,6 @@
-// context/notificationsContext.js
+// context/notificationsContext.js - CORREGIDO
 import { createContext, useContext, useState, useEffect } from "react";
+import { useAuth } from './authContext';
 import { 
   saveNotificationConfigRequest, 
   getUserNotificationsRequest,
@@ -18,12 +19,28 @@ export const useNotifications = () => {
 };
 
 export function NotificationsProvider({ children }) {
+  const { user, isAuthenticated } = useAuth();
+  
+  // Estado para configuraciones de notificaciones (correo)
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // Estado para notificaciones en tiempo real (frontend)
+  const [realtimeNotifications, setRealtimeNotifications] = useState([]);
+  const [hasNewNotifications, setHasNewNotifications] = useState(false);
+
+  // Solicitar permisos para notificaciones del navegador
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
 
   // Función para obtener notificaciones desde la API
   const fetchNotifications = async () => {
+    if (!isAuthenticated) return;
+    
     setLoading(true);
     setError(null);
     try {
@@ -43,6 +60,8 @@ export function NotificationsProvider({ children }) {
 
   // Obtener todas las configuraciones de notificaciones
   const getNotifications = async () => {
+    if (!isAuthenticated) return [];
+    
     try {
       setLoading(true);
       setError(null);
@@ -155,6 +174,58 @@ export function NotificationsProvider({ children }) {
     return notification?.daysBefore || 0;
   };
 
+  // Funciones para notificaciones en tiempo real
+  const addRealtimeNotification = (notification) => {
+    const newNotification = {
+      id: Date.now(),
+      ...notification,
+      timestamp: new Date(),
+      read: false
+    };
+    
+    setRealtimeNotifications(prev => [newNotification, ...prev]);
+    setHasNewNotifications(true);
+    
+    // Mostrar notificación del navegador si tiene permisos
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(notification.title, {
+        body: notification.message,
+        icon: '/favicon.ico',
+        tag: notification.taskId
+      });
+    }
+  };
+
+  const markAsRead = (id) => {
+    setRealtimeNotifications(prev =>
+      prev.map(notif =>
+        notif.id === id ? { ...notif, read: true } : notif
+      )
+    );
+    
+    // Si todas las notificaciones están leídas, quitar el indicador
+    setTimeout(() => {
+      setRealtimeNotifications(current => {
+        const unreadCount = current.filter(n => !n.read).length;
+        if (unreadCount === 0) {
+          setHasNewNotifications(false);
+        }
+        return current;
+      });
+    }, 100);
+  };
+
+  // Limpiar notificación específica
+  const clearNotification = (id) => {
+    setRealtimeNotifications(prev => prev.filter(notif => notif.id !== id));
+  };
+
+  // Limpiar todas las notificaciones
+  const clearAllNotifications = () => {
+    setRealtimeNotifications([]);
+    setHasNewNotifications(false);
+  };
+
   // Limpiar errores
   const clearError = () => {
     setError(null);
@@ -162,12 +233,15 @@ export function NotificationsProvider({ children }) {
 
   // Cargar notificaciones al inicializar
   useEffect(() => {
-    getNotifications();
-  }, []);
+    if (isAuthenticated) {
+      getNotifications();
+    }
+  }, [isAuthenticated]);
 
   return (
     <NotificationsContext.Provider
       value={{
+        // Configuraciones de notificaciones (correo)
         notifications,
         loading,
         error,
@@ -180,7 +254,15 @@ export function NotificationsProvider({ children }) {
         hasNotificationForTask,
         getDaysBeforeForTask,
         clearError,
-        setError
+        setError,
+        
+        // Notificaciones en tiempo real (frontend)
+        realtimeNotifications,
+        hasNewNotifications,
+        addRealtimeNotification,
+        markAsRead,
+        clearNotification,
+        clearAllNotifications
       }}
     >
       {children}

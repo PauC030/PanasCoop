@@ -1,6 +1,12 @@
 import { useEffect } from "react";
 import { createContext, useContext, useState } from "react";
-import { loginRequest, registerRequest, verifyTokenRequest } from "../api/auth";
+import { 
+  loginRequest, 
+  registerRequest, 
+  verifyTokenRequest, 
+  verifyEmailRequest,
+  resendVerificationEmailRequest 
+} from "../api/auth";
 import Cookies from "js-cookie";
 
 const AuthContext = createContext();
@@ -16,6 +22,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Limpiar errores después de 5 segundos
   useEffect(() => {
@@ -26,6 +33,16 @@ export const AuthProvider = ({ children }) => {
       return () => clearTimeout(timer);
     }
   }, [errors]);
+
+  // Limpiar mensajes de éxito después de 5 segundos
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   const cleanupLocalStorage = (email) => {
     if (email) {
@@ -38,34 +55,117 @@ export const AuthProvider = ({ children }) => {
   const setupLocalStorage = (userData) => {
     const normalizedEmail = userData.email.trim().toLowerCase();
     localStorage.setItem("userEmail", normalizedEmail);
-    localStorage.setItem("userName", userData.name || "");
+    localStorage.setItem("userName", userData.username || userData.name || "");
   };
 
   const signup = async (user) => {
     try {
+      setLoading(true);
       const res = await registerRequest(user);
-      if (res.status === 200) {
-        setUser(res.data);
-        setIsAuthenticated(true);
-        setupLocalStorage(res.data);
-      }
+      
+      // El registro NO autentica automáticamente
+      setSuccessMessage(res.data.message || "Usuario registrado. Revisa tu correo para verificar la cuenta.");
+      setErrors([]);
+      
     } catch (error) {
-      console.log(error.response.data);
-      setErrors(error.response.data.message);
+      console.error("Error en signup:", error);
+      setErrors(error.response?.data?.message || ["Error al registrar usuario"]);
+      setSuccessMessage("");
+    } finally {
+      setLoading(false);
     }
   };
 
   const signin = async (user) => {
     try {
+      setLoading(true);
       const res = await loginRequest(user);
+      
       setUser(res.data);
       setIsAuthenticated(true);
       setupLocalStorage(res.data);
+      setErrors([]);
+      setSuccessMessage("");
+      
     } catch (error) {
-      console.log(error);
-      setErrors(error.response.data.message);
-      // Limpiar localStorage en caso de error
+      console.error("Error en signin:", error);
+      setErrors(error.response?.data?.message || ["Error al iniciar sesión"]);
+      setSuccessMessage("");
       cleanupLocalStorage(user.email);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Función para verificar email
+  const verifyEmail = async (token) => {
+    try {
+      console.log('Verificando email con token:', token);
+      
+      const res = await verifyEmailRequest(token);
+      console.log('Respuesta de verificación:', res.data);
+      
+      if (res.data.success) {
+        // Actualizar el estado del usuario después de la verificación exitosa
+        setUser(res.data.user);
+        setIsAuthenticated(true);
+        setupLocalStorage(res.data.user);
+        
+        return {
+          success: true,
+          message: res.data.message,
+          user: res.data.user
+        };
+      } else {
+        return {
+          success: false,
+          message: res.data.message || 'Error al verificar email'
+        };
+      }
+      
+    } catch (error) {
+      console.error('Error en verifyEmail:', error);
+      
+      let errorMessage = 'Error de conexión al verificar email';
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      return {
+        success: false,
+        message: errorMessage
+      };
+    }
+  };
+
+  // NUEVA: Función para reenviar email de verificación
+  const resendVerificationEmail = async (email) => {
+    try {
+      setLoading(true);
+      const res = await resendVerificationEmailRequest(email);
+      
+      setSuccessMessage(res.data.message || "Email de verificación reenviado");
+      setErrors([]);
+      
+      return {
+        success: true,
+        message: res.data.message
+      };
+      
+    } catch (error) {
+      console.error("Error al reenviar email:", error);
+      const errorMessage = error.response?.data?.message || "Error al reenviar email";
+      setErrors([errorMessage]);
+      
+      return {
+        success: false,
+        message: errorMessage
+      };
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -75,6 +175,8 @@ export const AuthProvider = ({ children }) => {
     Cookies.remove("token");
     setUser(null);
     setIsAuthenticated(false);
+    setSuccessMessage("");
+    setErrors([]);
   };
 
   useEffect(() => {
@@ -88,23 +190,28 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const res = await verifyTokenRequest(cookies.token);
-        console.log(res);
+        console.log("Token verification response:", res);
+        
         if (!res.data) {
           setIsAuthenticated(false);
+          setLoading(false);
           return;
         }
         
         setIsAuthenticated(true);
         setUser(res.data);
-        // Sincronizar localStorage al verificar token
         setupLocalStorage(res.data);
-        setLoading(false);
+        
       } catch (error) {
+        console.error("Error verifying token:", error);
         cleanupLocalStorage(localStorage.getItem("userEmail"));
         setIsAuthenticated(false);
+        Cookies.remove("token");
+      } finally {
         setLoading(false);
       }
     };
+    
     checkLogin();
   }, []);
 
@@ -115,8 +222,11 @@ export const AuthProvider = ({ children }) => {
         signup,
         signin,
         logout,
+        verifyEmail,
+        resendVerificationEmail, // NUEVA función
         isAuthenticated,
         errors,
+        successMessage,
         loading,
       }}
     >
@@ -124,5 +234,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
-export default AuthContext;

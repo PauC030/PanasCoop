@@ -1,4 +1,3 @@
-// hooks/useSocket.js - CORREGIDO SIN DEPENDENCIAS CIRCULARES
 import { useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from '../context/authContext';
@@ -12,7 +11,7 @@ const useSocket = () => {
   const isConnectingRef = useRef(false);
   const reconnectTimeoutRef = useRef(null);
 
-  // Función para limpiar timeouts - REMOVIDA del useEffect dependencies
+  // Función para limpiar 
   const clearTimeouts = useCallback(() => {
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
@@ -20,14 +19,14 @@ const useSocket = () => {
     }
   }, []);
 
-  // Función para unirse a la sala - REMOVIDA del useEffect dependencies
+  // Función para unirse a la sala 
   const joinUserRoom = useCallback((socket, userId) => {
     if (!socket || !socket.connected || !userId) return;
     
     console.log('🏠 Intentando unirse a sala:', userId);
     socket.emit('join', userId);
     
-    // Reintento después de 2 segundos si no se confirma
+   
     setTimeout(() => {
       if (socket.connected) {
         console.log('🔄 Reintento de unión a sala:', userId);
@@ -35,8 +34,7 @@ const useSocket = () => {
       }
     }, 2000);
   }, []);
-
-  // EFECTO PRINCIPAL - Solo depende de isAuthenticated y user
+  // Solo depende de isAuthenticated y user
   useEffect(() => {
     console.log('🔄 useSocket Effect ejecutándose...');
     console.log('👤 Usuario autenticado:', isAuthenticated);
@@ -59,13 +57,12 @@ const useSocket = () => {
       return;
     }
 
-    // Evitar múltiples conexiones simultáneas
+    
     if (isConnectingRef.current) {
       console.log('⚠️ Conexión ya en progreso, saltando...');
       return;
     }
 
-    // Si ya hay una conexión activa, verificar y re-unirse
     if (socketRef.current?.connected) {
       console.log('✅ Socket ya conectado, re-uniéndose a sala...');
       const userId = user.id || user._id;
@@ -101,7 +98,7 @@ const useSocket = () => {
 
     socketRef.current = socket;
 
-    // Función interna para unirse a sala (evita dependencias circulares)
+    
     const joinRoom = (userId) => {
       if (!socket || !socket.connected || !userId) return;
       console.log('🏠 Intentando unirse a sala:', userId);
@@ -140,12 +137,12 @@ const useSocket = () => {
       });
     });
 
-    // Evento: Error al unirse a sala
+    
     socket.on('join_error', (error) => {
       console.error('❌ Error al unirse a sala:', error);
       toast.error('Error al configurar notificaciones');
       
-      // Reintentar unirse después de un tiempo
+      
       const userId = user.id || user._id;
       reconnectTimeoutRef.current = setTimeout(() => {
         if (socket.connected) {
@@ -155,7 +152,7 @@ const useSocket = () => {
       }, 3000);
     });
 
-    // Escuchar notificaciones - evento principal
+   
     socket.on('nueva_notificacion', (notification) => {
       console.log('🔔 NOTIFICACIÓN RECIBIDA (nueva_notificacion):', notification);
       
@@ -185,7 +182,7 @@ const useSocket = () => {
       }
     });
 
-    // También escuchar 'notification' por compatibilidad
+   
     socket.on('notification', (notification) => {
       console.log('🔔 NOTIFICACIÓN RECIBIDA (notification):', notification);
       
@@ -209,7 +206,7 @@ const useSocket = () => {
       }
     });
 
-    // Evento de prueba
+    
     socket.on('test_notification', (data) => {
       console.log('🧪 NOTIFICACIÓN DE PRUEBA RECIBIDA:', data);
       toast.success('¡Notificación de prueba recibida!', {
@@ -218,7 +215,7 @@ const useSocket = () => {
       });
     });
 
-    // Evento: Desconexión
+   
     socket.on('disconnect', (reason) => {
       console.log('🔌 Socket desconectado. Razón:', reason);
       isConnectingRef.current = false;
@@ -231,7 +228,7 @@ const useSocket = () => {
       }
     });
 
-    // Evento: Error de conexión
+    
     socket.on('connect_error', (error) => {
       console.error('❌ Error de conexión socket:', error);
       isConnectingRef.current = false;
@@ -240,7 +237,7 @@ const useSocket = () => {
       });
     });
 
-    // Evento: Reconexión exitosa
+   
     socket.on('reconnect', (attemptNumber) => {
       console.log('🔄 Socket reconectado después de', attemptNumber, 'intentos');
       toast.success('Reconectado a notificaciones', {
@@ -253,17 +250,17 @@ const useSocket = () => {
       joinRoom(userId);
     });
 
-    // Evento: Intento de reconexión
+    
     socket.on('reconnect_attempt', (attemptNumber) => {
       console.log('🔄 Intento de reconexión #', attemptNumber);
     });
 
-    // Evento: Error de reconexión
+   
     socket.on('reconnect_error', (error) => {
       console.error('❌ Error de reconexión:', error);
     });
 
-    // Evento: Falló la reconexión completamente
+   
     socket.on('reconnect_failed', () => {
       console.error('❌ Falló la reconexión completamente');
       toast.error('No se pudo reconectar a notificaciones', {
@@ -271,7 +268,7 @@ const useSocket = () => {
       });
     });
 
-    // Cleanup al desmontar
+    
     return () => {
       console.log('🧹 Limpiando socket...');
       if (reconnectTimeoutRef.current) {

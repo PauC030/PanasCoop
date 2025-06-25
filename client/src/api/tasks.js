@@ -4,14 +4,14 @@ export const getTasksRequest = async () => axios.get("/tasks");
 
 export const createTaskRequest = async (task) => {
   if (task instanceof FormData) {
-    return axios.post("/tasks", task); // <-- Sin headers
+    return axios.post("/tasks", task); 
   }
   return axios.post("/tasks", task);
 };
 
 export const updateTaskRequest = async (id, task) => {
   if (task instanceof FormData) {
-    return axios.put(`/tasks/${id}`, task); // <-- Sin headers
+    return axios.put(`/tasks/${id}`, task); 
   }
   return axios.put(`/tasks/${id}`, task);
 };

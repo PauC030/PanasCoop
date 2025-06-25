@@ -17,10 +17,10 @@ export function ConfigurarNotificaciones() {
   const [savingConfig, setSavingConfig] = useState(false);
   const location = useLocation();
 
-  // Obtener el contexto de notificaciones
+
   const notificationsContext = useNotifications();
 
-  // Verificar si el contexto está disponible
+ 
   if (!notificationsContext) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
@@ -49,7 +49,7 @@ export function ConfigurarNotificaciones() {
     clearError
   } = notificationsContext;
 
-  // Leer taskId de la URL y seleccionarlo por defecto
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const taskId = params.get("taskId");
@@ -58,7 +58,7 @@ export function ConfigurarNotificaciones() {
     }
   }, [location.search]);
 
-  // Función auxiliar para verificar si una tarea es seleccionable (futura)
+
   const isTaskSelectable = useCallback((taskDate) => {
     if (!taskDate) return false;
     
@@ -75,12 +75,12 @@ export function ConfigurarNotificaciones() {
     }
   }, []);
 
-  // Función para verificar si una tarea ya tiene notificación configurada
+  //  verificar si una tarea ya tiene notificación configurada
   const isTaskConfigured = useCallback((taskId) => {
     return notifications.some(n => n.task?._id === taskId);
   }, [notifications]);
 
-  // Función para obtener tareas confirmadas
+  // obtener tareas confirmadas
   const fetchConfirmedTasks = useCallback(async () => {
     setLoadingTasks(true);
     if (setError) setError(null);
@@ -211,7 +211,7 @@ export function ConfigurarNotificaciones() {
   // Cargar solo las tareas confirmadas al inicio, NO las notificaciones
   useEffect(() => {
     fetchConfirmedTasks();
-    // REMOVIDO: getNotifications() - solo cargar cuando sea necesario
+
   }, [fetchConfirmedTasks]);
 
   // Función para limpiar mensajes después de un tiempo
@@ -268,7 +268,7 @@ export function ConfigurarNotificaciones() {
     // Guardar la configuración
     await saveNotificationConfig(selectedActivity, anticipationValue);
     
-    // ✅ AQUÍ ESTÁ LA CLAVE: Recargar las notificaciones automáticamente
+
     try {
       await getNotifications();
       console.log("✅ Notificaciones recargadas automáticamente");
@@ -285,8 +285,7 @@ export function ConfigurarNotificaciones() {
   } catch (error) {
     console.error("❌ Error al guardar:", error);
     
-    // ⚠️ IMPORTANTE: Verificar si realmente falló o es solo un problema de respuesta
-    // Si el error es 500 pero el guardado fue exitoso, intentar recargar
+
     if (error.response?.status === 500) {
       console.log("🔄 Error 500 detectado, intentando verificar si se guardó...");
       
@@ -424,7 +423,7 @@ export function ConfigurarNotificaciones() {
           <p className="text-gray-600 ml-4">Configura recordatorios para tus actividades confirmadas</p>
         </div>
 
-        {/* Main Content Grid - Intercambiadas las posiciones */}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Notificaciones Activas - Ahora a la izquierda */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
@@ -542,7 +541,7 @@ export function ConfigurarNotificaciones() {
             </div>
           </div>
 
-          {/* Nueva Configuración - Ahora a la derecha */}
+
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
             <div className="p-6 bg-gradient-to-r from-green-100 to-emerald-50 border-b border-gray-100">
               <div className="flex items-center gap-3">
@@ -557,7 +556,7 @@ export function ConfigurarNotificaciones() {
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Mostrar mensaje solo en esta sección */}
+            
               {mensaje && (
                 <div className={`border rounded-xl p-4 ${
                   mensaje.includes("Error") 

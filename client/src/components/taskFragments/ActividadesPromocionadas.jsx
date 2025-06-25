@@ -9,14 +9,12 @@ export function ActividadesPromocionadas() {
     getPromotedTasks();
   }, []);
 
-  // Obtener el email del usuario actual
-  const currentUserEmail = localStorage.getItem("userEmail");
+   const currentUserEmail = localStorage.getItem("userEmail");
   
-  // Debug: Verificar las propiedades de las tareas
   console.log('Promoted tasks:', promotedTasks);
   console.log('Current user email:', currentUserEmail);
   
-  // Debug más detallado del objeto user
+ 
   if (promotedTasks.length > 0) {
     console.log('First task user object:', promotedTasks[0].user);
     console.log('User object keys:', Object.keys(promotedTasks[0].user || {}));
@@ -31,8 +29,7 @@ export function ActividadesPromocionadas() {
   
   // Método 2: Si isOwner no funciona, usar comparación por email o ID
   const myPromotedTasksAlt = promotedTasks.filter(task => {
-    // Compara con diferentes propiedades posibles del objeto user
-    return task.user?.email === currentUserEmail || 
+        return task.user?.email === currentUserEmail || 
            task.user?.correo === currentUserEmail ||
            task.createdBy === currentUserEmail ||
            task.userEmail === currentUserEmail;
@@ -42,15 +39,14 @@ export function ActividadesPromocionadas() {
     return task.isOwner === false || task.isOwner === undefined;
   });
   
-  // Usar el método alternativo si isOwner no funciona
-  const finalMyTasks = myPromotedTasks.length > 0 ? myPromotedTasks : myPromotedTasksAlt;
+   const finalMyTasks = myPromotedTasks.length > 0 ? myPromotedTasks : myPromotedTasksAlt;
   const finalOthersTasks = finalMyTasks.length > 0 
     ? promotedTasks.filter(task => !finalMyTasks.includes(task))
     : othersPromotedTasks;
 
   return (
     <div className="text-black p-4">
-      {/* Sección: Actividades Promocionadas de Otros - ARRIBA */}
+    {/* Sección: Actividades Promocionadas de Otros - ARRIBA */}
       <div className="mb-8">
         <div className="flex items-center mb-6">
           <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full mr-3"></div>
@@ -103,7 +99,7 @@ export function ActividadesPromocionadas() {
                 key={task._id}
                 task={task}
                 showPromoBadge={true}
-                showAttendanceButton={false} // Sin botones de asistencia para mis actividades
+                showAttendanceButton={false} 
               />
             ))}
           </div>

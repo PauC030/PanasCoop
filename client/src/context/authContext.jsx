@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { createContext, useContext, useState } from "react";
-import { loginRequest, registerRequest, verifyTokenRequest } from "../api/auth";
+import { loginRequest, registerRequest, verifyTokenRequest,logoutRequest } from "../api/auth";
 import Cookies from "js-cookie";
 
 const AuthContext = createContext();
@@ -69,13 +69,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    const email = localStorage.getItem("userEmail");
-    cleanupLocalStorage(email);
-    Cookies.remove("token");
-    setUser(null);
-    setIsAuthenticated(false);
-  };
+const logout = async () => {
+  const email = localStorage.getItem("userEmail");
+  cleanupLocalStorage(email);
+
+  try {
+    await logoutRequest(); 
+  } catch (err) {
+    console.error("Error al cerrar sesión:", err);
+  }
+
+  setUser(null);
+  setIsAuthenticated(false);
+};
+
 
   useEffect(() => {
     const checkLogin = async () => {

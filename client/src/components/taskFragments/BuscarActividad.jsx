@@ -15,7 +15,7 @@ export function BuscarActividad() {
   const [taskToDelete, setTaskToDelete] = useState(null);
   const { searchTasks, results, loading } = useSearch();
   const { user } = useAuth();
-  const { deleteTask, updateTask } = useTasks(); // Para operaciones instantáneas
+  const { deleteTask, updateTask } = useTasks(); 
 
   const handleBuscar = () => {
     searchTasks({
@@ -25,7 +25,7 @@ export function BuscarActividad() {
       date: dateFilter,
     });
 
-    // Hacer scroll suave hacia los resultados
+  
     setTimeout(() => {
       const resultsSection = document.getElementById('results-section');
       if (resultsSection) {
@@ -36,8 +36,6 @@ export function BuscarActividad() {
       }
     }, 100);
   };
-
-  // Auto-recarga cuando se monta el componente
   useEffect(() => {
     searchTasks({
       q: search,
@@ -47,7 +45,6 @@ export function BuscarActividad() {
     });
   }, []);
 
-  // Auto-recarga cuando cambian los filtros (opcional)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (search || location || status || dateFilter) {
@@ -58,12 +55,12 @@ export function BuscarActividad() {
           date: dateFilter,
         });
       }
-    }, 500); // Espera 500ms después de que el usuario deje de escribir
+    }, 500); 
 
     return () => clearTimeout(timeoutId);
   }, [search, location, status, dateFilter]);
 
-  // Manejo instantáneo de eliminación para actividades propias
+
   const handleDeleteClick = (task) => {
     setTaskToDelete(task);
     setDeleteModalOpen(true);
@@ -75,7 +72,7 @@ export function BuscarActividad() {
         await deleteTask(taskToDelete._id);
         setDeleteModalOpen(false);
         setTaskToDelete(null);
-        // Actualizar resultados inmediatamente sin recargar
+
         searchTasks({
           q: search,
           place: location,
@@ -122,7 +119,6 @@ export function BuscarActividad() {
           </p>
         </div>
 
-        {/* Search Form Card - Más delicado */}
       <div className="bg-white shadow-lg border border-gray-100 rounded-2xl overflow-hidden mb-8 max-w-5xl sm:max-w-[95vw] sm:ml-10 sm:mr-0">
           <div className="bg-gray-200 px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-700 text-center flex items-center justify-center gap-2">
@@ -134,7 +130,7 @@ export function BuscarActividad() {
           </div>
           
           <div className="p-6">
-            {/* Búsqueda principal */}
+          
             <div className="mb-6">
               <label className="text-sm font-medium text-gray-600 flex items-center gap-2 mb-2">
                 <Search className="w-4 h-4 text-gray-500" />
@@ -152,7 +148,6 @@ export function BuscarActividad() {
               </div>
             </div>
 
-            {/* Filtros en grid horizontal - Más compactos */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               {/* Filtro por fecha */}
               <div className="space-y-2">
@@ -210,7 +205,6 @@ export function BuscarActividad() {
               </div>
             </div>
 
-            {/* Botón de búsqueda - Más pequeño */}
             <div className="flex justify-center">
               <Button
                 onClick={handleBuscar}
@@ -222,7 +216,7 @@ export function BuscarActividad() {
           </div>
         </div>
 
-        {/* Results Counter - Solo si hay resultados */}
+      
         {!loading && results.length > 0 && (
           <div className="flex justify-center mb-6">
             <div className="bg-white shadow-md border border-gray-100 rounded-full px-6 py-3">
@@ -240,7 +234,7 @@ export function BuscarActividad() {
           </div>
         )}
 
-        {/* Loading State */}
+   
         {loading && (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
@@ -248,7 +242,6 @@ export function BuscarActividad() {
           </div>
         )}
 
-        {/* Results Grid - CAMBIO PRINCIPAL: Ahora usa grid ordenado como el segundo código */}
         {!loading && (
           <div id="results-section">
             {results.length === 0 ? (
@@ -282,7 +275,7 @@ export function BuscarActividad() {
                         showPromoBadge={task.isPromoted && !task.isOwner} 
                         showAttendanceButton={!isPast} 
                         refreshSearch={handleBuscar}
-                        // Props adicionales para actividades propias
+                       
                         onQuickDelete={task.isOwner ? () => handleDeleteClick(task) : undefined}
                         onQuickUpdate={task.isOwner ? (updates) => handleQuickUpdate(task._id, updates) : undefined}
                         isPastActivity={isPast}

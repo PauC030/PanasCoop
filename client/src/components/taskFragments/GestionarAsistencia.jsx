@@ -205,7 +205,7 @@ export function GestionarAsistencia() {
       setSelectedTask(task);
       fetchAttendees(taskIdFromUrl);
     } else if (tasks.length > 0) {
-      // Auto-seleccionar la primera tarea si no hay una seleccionada
+
       const firstTask = tasks[0];
       setSelectedTask(firstTask);
       navigate(`/tasks/asistencia?taskId=${firstTask._id}`);
@@ -328,7 +328,7 @@ export function GestionarAsistencia() {
         Administra los participantes de tus actividades
       </p>
 
-          {/* Task Selection and Info */}
+      
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div className="flex-1">
@@ -372,7 +372,7 @@ export function GestionarAsistencia() {
           </div>
         </div>
 
-        {/* Main Content */}
+
         {(taskIdFromUrl || (selectedTask && tasks.length > 0)) && (
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
             {/* Stats and Actions Header */}

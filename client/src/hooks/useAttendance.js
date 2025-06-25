@@ -16,24 +16,24 @@ export function useAttendance(taskId) {
         setIsLoading(true);
         const userEmail = localStorage.getItem('userEmail')?.toLowerCase()?.trim();
         
-        // Consultar la base de datos en lugar de localStorage
+      
         const response = await checkAttendanceRequest(taskId, userEmail);
         setIsAttending(response.data.isAttending);
         
-        // Opcional: Sincronizar localStorage con la BD
+      
         if (userEmail) {
           const userAttendances = JSON.parse(
             localStorage.getItem(`userAttendances_${userEmail}`) || '[]'
           );
           
           if (response.data.isAttending && !userAttendances.includes(taskId)) {
-            // Agregar a localStorage si está en BD pero no en local
+      
             localStorage.setItem(
               `userAttendances_${userEmail}`,
               JSON.stringify([...userAttendances, taskId])
             );
           } else if (!response.data.isAttending && userAttendances.includes(taskId)) {
-            // Remover de localStorage si no está en BD
+         
             localStorage.setItem(
               `userAttendances_${userEmail}`,
               JSON.stringify(userAttendances.filter(id => id !== taskId))
@@ -59,10 +59,10 @@ export function useAttendance(taskId) {
   }, [taskId]);
 
   const setAttendance = (value) => {
-    // Solo actualizar el estado local, la BD se actualiza en las funciones confirm/cancel
+
     setIsAttending(value);
     
-    // Sincronizar localStorage
+
     const userEmail = localStorage.getItem('userEmail')?.toLowerCase()?.trim();
     if (!userEmail) return;
 

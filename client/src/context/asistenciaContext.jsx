@@ -31,18 +31,18 @@ export const AsistenciaProvider = ({ children }) => {
   };
 
 
-  // 🔄 Cargar asistentes de una tarea
+
 const fetchAttendees = async (taskId) => {
   try {
     const res = await getAttendanceRequest(taskId);
-    setAttendees(res.data); // asegúrate que esto esté actualizando correctamente
+    setAttendees(res.data); 
   } catch (error) {
     console.error("Error al obtener asistentes:", error);
   }
 };
 
 
-  // ✅ Confirmar asistencia
+  //  Confirmar asistencia
 const confirmAttendance = async (data) => {
 
 
@@ -59,7 +59,7 @@ const confirmAttendance = async (data) => {
 
     const response = await confirmAttendanceRequest(data);
     
-    // Adaptación clave: Normaliza la respuesta del backend
+   
     const normalizedData = {
       ...response.data.attendance,  // Accede al objeto attendance
       taskId: response.data.attendance.task, // Asegura taskId
@@ -85,7 +85,7 @@ const confirmAttendance = async (data) => {
 };  
 
 
-  // ❌ Cancelar asistencia
+  //  Cancelar asistencia
 
 const cancelAttendance = async ({ taskId, email }) => {
   setError(null);
@@ -102,7 +102,7 @@ const cancelAttendance = async ({ taskId, email }) => {
       prev.filter(a => !(a.task === taskId && a.email === lowerEmail))
     );
     
-    return true; // Éxito
+    return true; 
   } catch (err) {
     console.error("Error en cancelAttendance:", {
       taskId,
@@ -121,7 +121,7 @@ const cancelAttendance = async ({ taskId, email }) => {
   }
 };
 
-  // ✏️ Editar asistencia
+  //  Editar asistencia
   
 const updateAttendance = async (id, updatedData) => {
   setError(null);
@@ -206,7 +206,7 @@ const updateAttendance = async (id, updatedData) => {
         userAttendances,
         loadingAttendances,
         loadUserAttendances,
-        checkUserAttendance, // Nueva función
+        checkUserAttendance, 
         fetchAttendees,
         confirmAttendance,
         cancelAttendance,

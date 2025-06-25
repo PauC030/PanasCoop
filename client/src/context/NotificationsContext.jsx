@@ -22,7 +22,7 @@ export function NotificationsProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Función para obtener notificaciones desde la API
+  // obtener notificaciones desde la API
   const fetchNotifications = async () => {
     setLoading(true);
     setError(null);

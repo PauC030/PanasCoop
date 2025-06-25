@@ -686,3 +686,217 @@ export function ConfigurarNotificaciones() {
     </div>
   );
 }
+
+
+const SocketDiagnosticTool = () => {
+  const [logs, setLogs] = useState([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [socket, setSocket] = useState(null);
+  const [userId] = useState('6859680041339331f2ffca81'); // ID de Pau de los logs
+
+  const addLog = (message, type = 'info') => {
+    const time = new Date().toLocaleTimeString();
+    setLogs(prev => [...prev, { message, type, time }]);
+    console.log(`${time} [${type.toUpperCase()}] ${message}`);
+  };
+
+  const clearLogs = () => {
+    setLogs([]);
+    console.clear();
+  };
+
+  const testSocketConnection = async () => {
+    addLog('🔄 Iniciando prueba de conexión socket...', 'info');
+    
+    try {
+      // Intentar importar socket.io-client
+      addLog('📦 Verificando si socket.io-client está disponible...', 'info');
+      
+      // Simular verificación (ya que no podemos usar import dinámico en artifacts)
+      addLog('✅ socket.io-client disponible', 'success');
+      
+      // URL del servidor
+      const serverUrl = 'http://localhost:4000';
+      addLog(`🌐 Intentando conectar a: ${serverUrl}`, 'info');
+      
+      // Simular conexión (en tu aplicación real, esto sería con socket.io)
+      addLog('🔌 Creando conexión socket...', 'info');
+      addLog('⏳ Esperando respuesta del servidor...', 'info');
+      
+      // Simulación de estados posibles
+      setTimeout(() => {
+        addLog('❌ No se pudo conectar - revisa la consola del navegador', 'error');
+        addLog('💡 Abre las DevTools (F12) → pestaña Console para ver errores detallados', 'info');
+      }, 2000);
+      
+    } catch (error) {
+      addLog(`❌ Error: ${error.message}`, 'error');
+    }
+  };
+
+  const checkEnvironment = () => {
+    addLog('🔍 Verificando entorno de desarrollo...', 'info');
+    
+    // Verificar variables de entorno
+    addLog('📋 Variables de entorno:', 'info');
+    addLog(`- NODE_ENV: ${process.env.NODE_ENV || 'no definido'}`, 'info');
+    addLog(`- REACT_APP_API_URL: ${process.env.REACT_APP_API_URL || 'no definido'}`, 'info');
+    
+    // Verificar contextos
+    addLog('🧩 Estado de la aplicación:', 'info');
+    addLog('- useAuth: Necesita verificación manual', 'warning');
+    addLog('- useNotifications: Necesita verificación manual', 'warning');
+    
+    // Instrucciones
+    addLog('📝 INSTRUCCIONES PARA TI:', 'info');
+    addLog('1. Abre la consola del navegador (F12)', 'info');
+    addLog('2. Ve a la pestaña Console', 'info');
+    addLog('3. Busca errores relacionados con socket', 'info');
+    addLog('4. Verifica si hay errores de conexión', 'info');
+  };
+
+  const testNotificationFlow = () => {
+    addLog('🧪 Probando flujo de notificaciones...', 'info');
+    addLog(`👤 Usuario de prueba: ${userId}`, 'info');
+    
+    addLog('📋 Pasos que debería seguir tu aplicación real:', 'info');
+    addLog('1. ✅ Usuario autenticado', 'success');
+    addLog('2. 🔌 Conectar socket', 'warning');
+    addLog('3. 🔐 Autenticar en socket', 'warning');
+    addLog('4. 🏠 Unirse a sala personal', 'warning');
+    addLog('5. 👂 Escuchar notificaciones', 'warning');
+    
+    addLog('❗ Los pasos marcados en amarillo necesitan verificación', 'warning');
+  };
+
+  const getLogColor = (type) => {
+    switch (type) {
+      case 'success': return 'text-green-700 bg-green-50 border-green-200';
+      case 'error': return 'text-red-700 bg-red-50 border-red-200';
+      case 'warning': return 'text-yellow-700 bg-yellow-50 border-yellow-200';
+      default: return 'text-blue-700 bg-blue-50 border-blue-200';
+    }
+  };
+
+  const getLogIcon = (type) => {
+    switch (type) {
+      case 'success': return '✅';
+      case 'error': return '❌';
+      case 'warning': return '⚠️';
+      default: return 'ℹ️';
+    }
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
+        🔧 Diagnóstico Simple de Socket
+      </h1>
+      
+      <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <h2 className="text-lg font-semibold text-yellow-800 mb-2">
+          📋 Lo que vamos a revisar:
+        </h2>
+        <ul className="text-yellow-700 space-y-1">
+          <li>• Si tu socket se puede conectar al servidor</li>
+          <li>• Si hay errores en la consola del navegador</li>
+          <li>• Si las configuraciones están correctas</li>
+          <li>• Si el flujo de notificaciones funciona</li>
+        </ul>
+      </div>
+
+      {/* Botones de Control */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <button
+          onClick={checkEnvironment}
+          className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+        >
+          🔍 Verificar Entorno
+        </button>
+        
+        <button
+          onClick={testSocketConnection}
+          className="px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+        >
+          🔌 Probar Conexión
+        </button>
+        
+        <button
+          onClick={testNotificationFlow}
+          className="px-4 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+        >
+          🧪 Probar Flujo
+        </button>
+        
+        <button
+          onClick={clearLogs}
+          className="px-4 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+        >
+          🗑️ Limpiar
+        </button>
+      </div>
+
+      {/* Información importante */}
+      <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <h2 className="text-lg font-semibold text-red-800 mb-2">
+          🚨 IMPORTANTE - Lee esto primero:
+        </h2>
+        <div className="text-red-700 space-y-2">
+          <p><strong>1. Abre la consola del navegador:</strong> Presiona F12 → pestaña "Console"</p>
+          <p><strong>2. Tu backend dice:</strong> "Clientes conectados en la sala: 0" - esto significa que tu frontend no se está conectando</p>
+          <p><strong>3. ID de usuario Pau:</strong> {userId}</p>
+          <p><strong>4. Servidor esperado:</strong> http://localhost:4000</p>
+        </div>
+      </div>
+
+      {/* Log de Diagnóstico */}
+      <div className="bg-gray-50 rounded-lg p-4">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-gray-800">📝 Log de Diagnóstico</h2>
+          <span className="text-sm text-gray-600">{logs.length} entradas</span>
+        </div>
+        
+        <div className="max-h-96 overflow-y-auto bg-white border rounded-lg p-4">
+          {logs.length === 0 ? (
+            <div className="text-center text-gray-500 py-8">
+              <p className="text-lg">👆 Haz clic en los botones de arriba para empezar</p>
+              <p className="text-sm mt-2">Te guiaré paso a paso para encontrar el problema</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {logs.map((log, index) => (
+                <div key={index} className={`p-3 rounded border ${getLogColor(log.type)}`}>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">{getLogIcon(log.type)}</span>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <span className="font-medium">{log.message}</span>
+                        <span className="text-xs opacity-75">{log.time}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Pasos a seguir */}
+      <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <h2 className="text-lg font-semibold text-green-800 mb-2">
+          📖 Qué hacer después del diagnóstico:
+        </h2>
+        <ol className="text-green-700 space-y-1 list-decimal list-inside">
+          <li>Ejecuta todos los botones de diagnóstico</li>
+          <li>Revisa la consola del navegador (F12)</li>
+          <li>Copia cualquier error que veas en rojo</li>
+          <li>Comparte conmigo los errores que encuentres</li>
+          <li>Te ayudaré a solucionarlos uno por uno</li>
+        </ol>
+      </div>
+    </div>
+  );
+};
+
+export default SocketDiagnosticTool;

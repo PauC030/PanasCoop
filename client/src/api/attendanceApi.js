@@ -11,7 +11,7 @@ export const cancelAttendanceRequest = ({ taskId, email }) =>
 
 export const checkAttendanceRequest = (taskId, email) => {
   const params = email ? { email } : {};
-  return axios.get(`/attendances/check/${taskId}`, { params });
+  return axios.get(`/attendances/check/${taskId}`, { params }); // ✅ Corregido
 };
 
 

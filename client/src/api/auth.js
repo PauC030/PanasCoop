@@ -9,13 +9,22 @@ export const loginRequest = async (user) =>
 export const verifyTokenRequest = async () => 
   axios.get(`/auth/verify`);
 
-// Ruta correcta para verificar email
+
 export const verifyEmailRequest = (token) => 
   axios.post(`/auth/verify-email`, { token });
 
-//  Función para reenviar email de verificación
+
+
 export const resendVerificationEmailRequest = (email) => 
   axios.post(`/auth/resend-verification`, { email });
+
+
+export const sendPasswordResetEmailRequest = (email) => 
+  axios.post(`/auth/password-reset`, { email });
+
+
+export const resetPasswordRequest = (data) => 
+  axios.post(`/auth/reset-password`, data);
 
 export const logoutRequest = async () => 
   axios.post(`/auth/logout`);

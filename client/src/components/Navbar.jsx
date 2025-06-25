@@ -1,39 +1,41 @@
-// Navbar.js - CORREGIDO
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 import { useNotifications } from "../context/NotificationsContext";
 import { ButtonLink } from "./ui/ButtonLink";
 import { useState, useRef, useEffect } from "react";
-
+import useSocket from "../hooks/useSocket";
 import panaLogo from "../assets/coop.png";
 
 export function Navbar() {
   const { isAuthenticated, logout, user } = useAuth();
-  const { 
-    realtimeNotifications, 
-    markAsRead, 
+  const {
+    realtimeNotifications = [],
+    markAsRead,
     clearNotification,
     clearAllNotifications,
-    hasNewNotifications 
-  } = useNotifications();
-  
+    hasNewNotifications = false,
+  } = useNotifications() || {};
+
+  const socketData = useSocket() || {};
+  const { isConnected = false, testNotification } = socketData;
+
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [bellAnimation, setBellAnimation] = useState(false);
-  
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const profileRef = useRef(null);
   const notificationRef = useRef(null);
 
   const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
-  
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const toggleNotifications = () => {
-    setIsNotificationOpen(!isNotificationOpen);
-    // Marcar como leídas cuando se abre el panel
     if (!isNotificationOpen && realtimeNotifications.length > 0) {
       realtimeNotifications
-        .filter(n => !n.read)
-        .forEach(n => markAsRead(n.id));
+        .filter((n) => !n.read)
+        .forEach((n) => markAsRead && markAsRead(n.id));
     }
+    setIsNotificationOpen(!isNotificationOpen);
   };
 
   const handleClickOutside = (event) => {
@@ -45,11 +47,24 @@ export function Navbar() {
     }
   };
 
-  // Efecto para animar la campana cuando llegan nuevas notificaciones
+  // Función para manejar el click en notificación individual
+  const handleNotificationClick = (notification) => {
+    if (!notification.read) {
+      markAsRead?.(notification.id);
+    }
+  };
+
+  // Función para manejar el borrado de notificación
+  const handleDeleteNotification = (e, notificationId) => {
+    e.stopPropagation(); 
+    clearNotification?.(notificationId);
+  };
+
+
   useEffect(() => {
     if (hasNewNotifications) {
       setBellAnimation(true);
-      const timer = setTimeout(() => setBellAnimation(false), 1000);
+      const timer = setTimeout(() => setBellAnimation(false), 1500);
       return () => clearTimeout(timer);
     }
   }, [hasNewNotifications]);
@@ -61,243 +76,471 @@ export function Navbar() {
     };
   }, []);
 
-  const unreadCount = realtimeNotifications ? realtimeNotifications.filter(n => !n.read).length : 0;
+  const unreadCount = realtimeNotifications.filter((n) => !n.read).length;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#002326] text-white p-2 shadow-md h-16">
-      <div className="w-full flex justify-between items-center">
-        {/* Logo */}
-        <h1 className="text-xl p-2 font-bold">
-          <Link
-            to={isAuthenticated ? "/tasks" : "/"}
-            className="hover:opacity-80 transition-opacity flex items-center"
-          >
-            <img
-              src={panaLogo}
-              alt="PanascOOP"
-              className="h-[45px] w-auto -my-2"
-            />
-          </Link>
-        </h1>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#002326] text-white shadow-md h-16">
+      <div className="max-w-full px-4 sm:px-6 lg:px-8 h-full">
+        <div className="flex justify-between items-center h-full">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <Link
+              to={isAuthenticated ? "/tasks" : "/"}
+              className="hover:opacity-80 transition-opacity flex items-center"
+            >
+              <img src={panaLogo} alt="PanascOOP" className="h-[40px] sm:h-[45px] w-auto" />
+            </Link>
+          </div>
 
-        {/* Right side options */}
-        <div className="flex items-center gap-4">
-          {isAuthenticated ? (
-            <>
-              <Link
-                to="/tasks"
-                className="text-white text-sm hover:text-gray-300 transition-colors underline underline-offset-4 decoration-[1px] decoration-gray-300"
-              >
-                Mis actividades
-              </Link>
-
-              <ButtonLink
-                to="/add-task"
-                className="bg-[#03683E] hover:bg-[#028a4b] transition-colors px-4 py-2 rounded-md font-medium text-sm"
-              >
-                Crear nueva Actividad
-              </ButtonLink>
-
-              {/* Campana de notificaciones */}
-              <div className="relative" ref={notificationRef}>
-                <button
-                  onClick={toggleNotifications}
-                  className={`relative p-2 hover:bg-[#003d40] rounded-full transition-all duration-300 ${
-                    bellAnimation ? 'animate-bounce' : ''
-                  } ${hasNewNotifications ? 'bg-[#03683E]' : ''}`}
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center gap-3 xl:gap-4">
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/tasks"
+                  className="text-white text-sm hover:text-gray-300 transition-colors underline underline-offset-4 decoration-[1px] decoration-gray-300 whitespace-nowrap"
                 >
-                  {/* Icono de campana */}
-                  <svg
-                    className={`w-5 h-5 transition-all duration-300 ${
-                      bellAnimation ? 'animate-pulse' : ''
-                    } ${hasNewNotifications ? 'text-yellow-300' : 'text-white'}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
+                  Mis actividades
+                </Link>
+                <ButtonLink
+                  to="/add-task"
+                  className="bg-[#03683E] hover:bg-[#028a4b] transition-colors px-3 xl:px-4 py-2 rounded-md font-medium text-sm whitespace-nowrap"
+                >
+                  Crear Actividad
+                </ButtonLink>
+
+                {/* CAMPANA DE NOTIFICACIONES RESPONSIVE */}
+                <div className="relative" ref={notificationRef}>
+                  <button
+                    onClick={toggleNotifications}
+                    className={`relative p-2.5 rounded-full transition-all duration-300 transform hover:scale-105 ${
+                      bellAnimation ? "animate-bounce" : ""
+                    } ${
+                      hasNewNotifications 
+                        ? "bg-gradient-to-r from-amber-400 to-orange-500 shadow-lg shadow-amber-500/30" 
+                        : "bg-[#003d40] hover:bg-[#004a50]"
+                    }`}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                    />
-                  </svg>
+                    <svg
+                      className={`w-5 h-5 xl:w-6 xl:h-6 transition-all duration-300 ${
+                        bellAnimation ? "animate-pulse" : ""
+                      } ${
+                        hasNewNotifications 
+                          ? "text-white drop-shadow-sm" 
+                          : "text-gray-300"
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                      />
+                    </svg>
 
-                  {/* Contador de notificaciones */}
-                  {unreadCount > 0 && (
-                    <span className={`absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium transition-all duration-300 ${
-                      bellAnimation ? 'animate-pulse scale-110' : ''
-                    }`}>
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                  )}
+                    {/* Contador responsive */}
+                    {unreadCount > 0 && (
+                      <span
+                        className={`absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[20px] xl:min-w-[22px] h-[20px] xl:h-[22px] flex items-center justify-center font-bold border-2 border-white shadow-lg transition-all duration-300 ${
+                          bellAnimation ? "animate-pulse scale-110" : ""
+                        }`}
+                      >
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
 
-                  {/* Efecto de pulso para nuevas notificaciones */}
-                  {hasNewNotifications && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-400 rounded-full animate-ping"></span>
-                  )}
-                </button>
+                    {/* Efectos de animación */}
+                    {hasNewNotifications && (
+                      <>
+                        <span className="absolute -top-1 -right-1 w-5 h-5 xl:w-6 xl:h-6 bg-red-400 rounded-full animate-ping opacity-60"></span>
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 opacity-20 animate-pulse"></div>
+                      </>
+                    )}
+                  </button>
 
-                {/* Panel de notificaciones */}
-                {isNotificationOpen && (
-                  <div className="absolute right-0 mt-2 w-80 bg-[#003d40] rounded-lg shadow-xl border border-gray-700 z-50 max-h-96 overflow-hidden">
-                    <div className="p-4 border-b border-gray-700 bg-[#002a2d]">
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-semibold text-white">Notificaciones</h3>
-                        {realtimeNotifications && realtimeNotifications.length > 0 && (
-                          <button
-                            onClick={clearAllNotifications}
-                            className="text-xs text-gray-400 hover:text-white transition-colors"
-                          >
-                            Limpiar todo
-                          </button>
+                  {/* Panel de notificaciones RESPONSIVE */}
+                  {isNotificationOpen && (
+                    <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[500px] overflow-hidden">
+                      {/* Header del panel */}
+                      <div className="p-3 sm:p-4 border-b border-gray-100 bg-gradient-to-r from-[#064349] to-[#03683E]">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+                            </svg>
+                            <h3 className="font-bold text-white text-sm sm:text-base">Notificaciones</h3>
+                            {unreadCount > 0 && (
+                              <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                                {unreadCount}
+                              </span>
+                            )}
+                          </div>
+                          {realtimeNotifications.length > 0 && (
+                            <button
+                              onClick={clearAllNotifications}
+                              className="text-xs text-white/80 hover:text-white transition-colors bg-white/20 px-2 sm:px-3 py-1 rounded-full hover:bg-white/30"
+                            >
+                              Limpiar
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Contenido responsive */}
+                      <div className="max-h-80 overflow-y-auto">
+                        {realtimeNotifications.length === 0 ? (
+                          <div className="p-6 sm:p-8 text-center text-gray-500">
+                            <div className="w-8 h-8 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                              </svg>
+                            </div>
+                            <p className="text-sm font-medium">No hay notificaciones</p>
+                            <p className="text-xs text-gray-400 mt-1">Te avisaremos cuando tengas algo nuevo</p>
+                          </div>
+                        ) : (
+                          realtimeNotifications.map((notification) => (
+                            <div
+                              key={notification.id}
+                              className={`p-3 sm:p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group ${
+                                !notification.read ? "bg-blue-50 border-l-4 border-l-blue-500" : ""
+                              }`}
+                            >
+                              <div className="flex justify-between items-start">
+                                <div 
+                                  className="flex-1 mr-2 sm:mr-3 cursor-pointer"
+                                  onClick={() => handleNotificationClick(notification)}
+                                >
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <h4 className="font-semibold text-sm text-gray-900 line-clamp-1">
+                                      {notification.title || "Notificación"}
+                                    </h4>
+                                    {!notification.read && (
+                                      <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse flex-shrink-0"></span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                                    {notification.message || "Sin mensaje"}
+                                  </p>
+                                  <div className="flex flex-col xs:flex-row xs:justify-between xs:items-center gap-2">
+                                    <span className="text-xs text-gray-400 flex items-center gap-1">
+                                      <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"/>
+                                      </svg>
+                                      {notification.timestamp
+                                        ? new Date(notification.timestamp).toLocaleTimeString("es-ES", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                            day: "2-digit",
+                                            month: "2-digit",
+                                          })
+                                        : "Ahora"}
+                                    </span>
+                                    {notification.taskId && (
+                                      <Link
+                                        to={`/tasks/view/${notification.taskId}`}
+                                        className="text-xs text-[#03683E] hover:text-[#028a4b] font-medium bg-green-50 px-2 py-1 rounded-full hover:bg-green-100 transition-colors whitespace-nowrap"
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        Ver actividad
+                                      </Link>
+                                    )}
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={(e) => handleDeleteNotification(e, notification.id)}
+                                  className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50 opacity-0 group-hover:opacity-100 flex-shrink-0"
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                          ))
                         )}
                       </div>
                     </div>
-                    
-                    <div className="max-h-64 overflow-y-auto">
-                      {!realtimeNotifications || realtimeNotifications.length === 0 ? (
-                        <div className="p-6 text-center text-gray-400">
-                          <svg
-                            className="w-12 h-12 mx-auto mb-3 text-gray-500"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={1}
-                              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                            />
-                          </svg>
-                          <p className="text-sm">No hay notificaciones</p>
-                        </div>
+                  )}
+                </div>
+
+                {/* Menú de perfil responsive */}
+                <div className="relative" ref={profileRef}>
+                  <button
+                    onClick={toggleProfile}
+                    className="flex items-center space-x-2 bg-[#03683E] hover:bg-[#028a4b] transition-colors px-2 xl:px-3 py-2 rounded-md"
+                  >
+                    <div className="w-5 h-5 xl:w-6 xl:h-6 bg-white rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-[#03683E] font-semibold text-xs xl:text-sm">
+                        {user?.username?.charAt(0).toUpperCase() || "U"}
+                      </span>
+                    </div>
+                    <div className="hidden xl:flex flex-col items-start">
+                      <span className="text-sm font-medium truncate max-w-24">{user?.username || "Usuario"}</span>
+                      {isConnected ? (
+                        <span className="text-xs text-green-300">🔌 Conectado</span>
                       ) : (
-                        realtimeNotifications.map((notification) => (
-                          <div
-                            key={notification.id}
-                            className={`p-4 border-b border-gray-700 hover:bg-[#002a2d] transition-colors cursor-pointer ${
-                              !notification.read ? 'bg-[#03683E]/20' : ''
-                            }`}
-                            onClick={() => markAsRead(notification.id)}
-                          >
-                            <div className="flex justify-between items-start">
-                              <div className="flex-1 mr-3">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h4 className="font-medium text-sm text-white line-clamp-1">
-                                    {notification.title || 'Notificación'}
-                                  </h4>
-                                  {!notification.read && (
-                                    <span className="w-2 h-2 bg-[#03683E] rounded-full"></span>
-                                  )}
-                                </div>
-                                <p className="text-xs text-gray-300 mb-2 line-clamp-2">
-                                  {notification.message || 'Sin mensaje'}
-                                </p>
-                                <div className="flex justify-between items-center">
-                                  <span className="text-xs text-gray-400">
-                                    {notification.timestamp ? new Date(notification.timestamp).toLocaleTimeString('es-ES', {
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                      day: '2-digit',
-                                      month: '2-digit'
-                                    }) : 'Ahora'}
-                                  </span>
-                                  {notification.taskId && (
-                                    <Link
-                                      to={`/tasks/${notification.taskId}`}
-                                      className="text-xs text-[#03683E] hover:text-[#028a4b] font-medium"
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      Ver actividad
-                                    </Link>
-                                  )}
-                                </div>
-                              </div>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  clearNotification(notification.id);
-                                }}
-                                className="text-gray-400 hover:text-white transition-colors p-1"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        ))
+                        <span className="text-xs text-red-400">❌ Desconectado</span>
                       )}
                     </div>
-                  </div>
-                )}
-              </div>
+                    <svg
+                      className={`w-4 h-4 transition-transform flex-shrink-0 ${isProfileOpen ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
 
-              {/* Menú del perfil */}
-              <div className="relative" ref={profileRef}>
-                <button
-                  onClick={toggleProfile}
-                  className="flex items-center space-x-2 bg-[#03683E] hover:bg-[#028a4b] transition-colors px-3 py-2 rounded-md"
-                >
-                  <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                    <span className="text-[#03683E] font-semibold text-sm">
-                      {user?.username?.charAt(0).toUpperCase() || 'U'}
-                    </span>
-                  </div>
-                  <span className="text-sm font-medium">{user?.username || 'Usuario'}</span>
-                  <svg
-                    className={`w-4 h-4 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-
-                {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-[#003d40] rounded-lg shadow-xl border border-gray-700 z-50">
-                    <div className="py-2">
-                      <div className="px-4 py-2 border-b border-gray-700">
-                        <p className="text-sm font-medium text-white">{user?.username}</p>
-                        <p className="text-xs text-gray-400">{user?.email}</p>
+                  {isProfileOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-[#003d40] rounded-lg shadow-xl border border-gray-700 z-50">
+                      <div className="py-2">
+                        <div className="px-4 py-2 border-b border-gray-700">
+                          <p className="text-sm font-medium text-white truncate">{user?.username}</p>
+                          <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+                        </div>
+                        <Link
+                          to="/profile"
+                          className="block px-4 py-2 text-sm text-white hover:bg-[#002a2d] transition-colors"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          Mi Perfil
+                        </Link>
+                        <button
+                          onClick={() => {
+                            logout();
+                            setIsProfileOpen(false);
+                          }}
+                          className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-[#002a2d] transition-colors"
+                        >
+                          Cerrar Sesión
+                        </button>
                       </div>
-                      <Link
-                        to="/profile"
-                        className="block px-4 py-2 text-sm text-white hover:bg-[#002a2d] transition-colors"
-                        onClick={() => setIsProfileOpen(false)}
-                      >
-                        Mi Perfil
-                      </Link>
-                      <button
-                        onClick={() => {
-                          logout();
-                          setIsProfileOpen(false);
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-[#002a2d] transition-colors"
-                      >
-                        Cerrar Sesión
-                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Botón de prueba - solo en desktop */}
+                {testNotification && (
+                  <button
+                    onClick={testNotification}
+                    className="hidden xl:block p-2 text-xs text-gray-400 hover:text-white hover:bg-[#003d40] rounded-md transition-all duration-200"
+                    title="Probar conexión socket"
+                  >
+                    🧪
+                  </button>
+                )}
+              </>
+            ) : (
+              <>
+                <ButtonLink to="/login" className="bg-[#03683E] hover:bg-[#028a4b] transition-colors px-3 xl:px-4 py-2 text-sm">
+                  Acceder
+                </ButtonLink>
+                <ButtonLink
+                  to="/register"
+                  className="bg-transparent border border-[#03683E] hover:bg-[#03683E] transition-colors px-3 xl:px-4 py-2 text-sm"
+                >
+                  Registrarse
+                </ButtonLink>
+              </>
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="lg:hidden">
+            <button
+              onClick={toggleMobileMenu}
+              className="text-white hover:text-gray-300 p-2"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile menu - NUEVO COLOR DE FONDO */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden absolute top-16 left-0 right-0 bg-gradient-to-br from-[#064349] to-[#03683E] border-t border-green-600 shadow-xl backdrop-blur-sm">
+            <div className="px-4 py-4 space-y-3">
+              {isAuthenticated ? (
+                <>
+                  {/* User info mobile */}
+                  <div className="flex items-center space-x-3 pb-3 border-b border-green-600/30">
+                    <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center ring-2 ring-white/30">
+                      <span className="text-white font-bold text-sm">
+                        {user?.username?.charAt(0).toUpperCase() || "U"}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{user?.username || "Usuario"}</p>
+                      <p className="text-xs text-green-200">
+                        {isConnected ? "🔌 Conectado" : "❌ Desconectado"}
+                      </p>
                     </div>
                   </div>
-                )}
-              </div>
-            </>
-          ) : (
-            <>
-              <ButtonLink to="/login" className="bg-[#03683E] hover:bg-[#028a4b] transition-colors">
-                Acceder
-              </ButtonLink>
-              <ButtonLink to="/register" className="bg-transparent border border-[#03683E] hover:bg-[#03683E] transition-colors">
-                Registrarse
-              </ButtonLink>
-            </>
-          )}
-        </div>
+
+                  {/* Notifications mobile */}
+                  <div className="relative" ref={notificationRef}>
+                    <button
+                      onClick={toggleNotifications}
+                      className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-300 ${
+                        hasNewNotifications 
+                          ? "bg-gradient-to-r from-amber-400 to-orange-500 shadow-lg" 
+                          : "bg-white/10 backdrop-blur-sm hover:bg-white/20 border border-white/20"
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        <span className="text-sm font-medium text-white">Notificaciones</span>
+                      </div>
+                      {unreadCount > 0 && (
+                        <span className="bg-red-500 text-white text-xs px-2.5 py-1 rounded-full font-bold shadow-lg">
+                          {unreadCount}
+                        </span>
+                      )}
+                    </button>
+
+                    {/* Mobile notifications panel */}
+                    {isNotificationOpen && (
+                      <div className="mt-3 bg-white rounded-xl shadow-2xl border border-gray-200 max-h-80 overflow-hidden">
+                        <div className="p-3 border-b border-gray-100 bg-gradient-to-r from-[#064349] to-[#03683E]">
+                          <div className="flex justify-between items-center">
+                            <h3 className="font-bold text-white text-sm">Notificaciones</h3>
+                            {realtimeNotifications.length > 0 && (
+                              <button
+                                onClick={clearAllNotifications}
+                                className="text-xs text-white/90 hover:text-white bg-white/20 px-3 py-1 rounded-full hover:bg-white/30 transition-colors"
+                              >
+                                Limpiar
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        <div className="max-h-60 overflow-y-auto">
+                          {realtimeNotifications.length === 0 ? (
+                            <div className="p-6 text-center text-gray-500">
+                              <p className="text-sm">No hay notificaciones</p>
+                            </div>
+                          ) : (
+                            realtimeNotifications.map((notification) => (
+                              <div
+                                key={notification.id}
+                                className={`p-3 border-b border-gray-100 group ${
+                                  !notification.read ? "bg-blue-50 border-l-4 border-l-blue-500" : ""
+                                }`}
+                              >
+                                <div className="flex justify-between items-start">
+                                  <div 
+                                    className="flex-1 mr-2 cursor-pointer"
+                                    onClick={() => handleNotificationClick(notification)}
+                                  >
+                                    <h4 className="font-semibold text-sm text-gray-900 mb-1">
+                                      {notification.title || "Notificación"}
+                                    </h4>
+                                    <p className="text-xs text-gray-600 mb-2">
+                                      {notification.message || "Sin mensaje"}
+                                    </p>
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-xs text-gray-400">
+                                        {notification.timestamp
+                                          ? new Date(notification.timestamp).toLocaleTimeString("es-ES", {
+                                              hour: "2-digit",
+                                              minute: "2-digit",
+                                            })
+                                          : "Ahora"}
+                                      </span>
+                                      {notification.taskId && (
+                                        <Link
+                                          to={`/tasks/view/${notification.taskId}`}
+                                          className="text-xs text-[#03683E] bg-green-50 px-2 py-1 rounded-full hover:bg-green-100 transition-colors"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setIsNotificationOpen(false);
+                                            setIsMobileMenuOpen(false);
+                                          }}
+                                        >
+                                          Ver
+                                        </Link>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <button
+                                    onClick={(e) => handleDeleteNotification(e, notification.id)}
+                                    className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50 flex-shrink-0"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Mobile navigation links */}
+                  <Link
+                    to="/tasks"
+                    className="block text-white text-sm hover:text-green-200 py-3 px-3 rounded-lg hover:bg-white/10 transition-all duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    📋 Mis actividades
+                  </Link>
+                  <Link
+                    to="/add-task"
+                    className="block bg-white/20 backdrop-blur-sm hover:bg-white/30 text-center py-4 rounded-xl font-semibold text-sm text-white border border-white/30 hover:border-white/50 transition-all duration-300 shadow-lg"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    ➕ Crear nueva Actividad
+                  </Link>
+                  <Link
+                    to="/profile"
+                    className="block text-white text-sm hover:text-green-200 py-3 px-3 rounded-lg hover:bg-white/10 transition-all duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    👤 Mi Perfil
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left text-red-300 text-sm hover:text-red-200 py-3 px-3 rounded-lg hover:bg-red-500/20 transition-all duration-200"
+                  >
+                    🚪 Cerrar Sesión
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="block bg-white/20 backdrop-blur-sm hover:bg-white/30 text-center py-4 rounded-xl font-semibold text-white border border-white/30 hover:border-white/50 transition-all duration-300"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    🔑 Acceder
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="block border-2 border-white/50 hover:bg-white/20 backdrop-blur-sm text-center py-4 rounded-xl font-semibold text-white hover:border-white transition-all duration-300"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    📝 Registrarse
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

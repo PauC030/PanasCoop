@@ -1,4 +1,4 @@
-import { useEffect, useState  } from "react";
+import { useEffect, useState } from "react";
 import { useTasks } from "../context/tasksContext";
 import { TaskCard } from "../components/tasks/TaskCard";
 import { ImFileEmpty } from "react-icons/im";
@@ -12,7 +12,7 @@ export function TasksPage() {
   const { user } = useAuth();
 
   const [sortedTasks, setSortedTasks] = useState({
-    future: [],                                         
+    future: [],
     past: []
   });
 
@@ -22,11 +22,11 @@ export function TasksPage() {
 
   useEffect(() => {
     const now = new Date();
-    
+
     const future = tasks
       .filter(task => new Date(task.date) >= now)
       .sort((a, b) => new Date(a.date) - new Date(b.date));
-                                                                   
+
     const past = tasks
       .filter(task => new Date(task.date) < now)
       .sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -34,13 +34,19 @@ export function TasksPage() {
     setSortedTasks({ future, past });
   }, [tasks]);
 
-  // Verificamos si estamos en la ruta base (/tasks)
   const isBaseRoute = location.pathname === "/tasks";
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-white-100 mt-16">
+
+    <div className="flex min-h-screen bg-white mt-16">
       {/* Sidebar izquierda */}
-      <div className="mt-16 fixed top-0 left-0 h-screen w-fit z-50 bg-gradient-to-b from-[#002615] to-[#056e51] p-4 max-md:p-3 max-sm:p-2">
+      <div
+        className={`${
+          isMobileMenuOpen ? "hidden" : "block"
+        } mt-16 fixed top-0 left-0 h-screen w-fit z-40 bg-gradient-to-b from-[#002615] to-[#056e51] p-4 max-md:p-3 max-sm:p-2 transition-all duration-300`}
+      >
+
         <aside className="w-28 sm:w-32 md:w-36 max-md:w-28 max-sm:w-24 text-white">
           <h1 className="text-sm max-md:text-xs max-sm:text-[10px] font-bold mb-6 max-md:mb-5 max-sm:mb-4">
             Actividades solidarias
@@ -77,7 +83,7 @@ export function TasksPage() {
 
             {/* Panel de administración (solo para superadmin) */}
             {user?.role === "superadmin" && (
-              <div className="mb-4 border-t border-[#003529] pt-4">
+              <div className="mt-4 border-t border-[#003529] pt-4">
                 <h2 className="text-xs font-bold mb-2 text-white opacity-80">Administración</h2>
                 <ButtonLink
                   to="/admin-dashboard"
@@ -106,44 +112,35 @@ export function TasksPage() {
                 </ButtonLink>
               </div>
             )}
-      
-{/* Panel de administración */}
-{user?.role === "admin" && (
-  <div className="mb-4 border-t border-[#003529] pt-4">
-    <h2 className="text-xs font-bold mb-2 text-white opacity-80">
-      Administración
-    </h2>
-    <button
-      onClick={() => window.location.href = "/admin-dashboard"}
-      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs flex items-center justify-center gap-1"
-    >
-      <svg 
-        className="w-4 h-4" 
-        fill="none" 
-        stroke="currentColor" 
-        viewBox="0 0 24 24"
-      >
-        <path 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          strokeWidth={2} 
-          d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" 
-        />
-      </svg>
-      Panel de Administración
-    </button>
-  </div>
-)}
 
+            {/* Panel de administración para admin */}
+            {user?.role === "admin" && (
+              <div className="mt-4 border-t border-[#003529] pt-4">
+                <h2 className="text-xs font-bold mb-2 text-white opacity-80">Administración</h2>
+                <button
+                  onClick={() => window.location.href = "/admin-dashboard"}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs flex items-center justify-center gap-1"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                    />
+                  </svg>
+                  Panel de Administración
+                </button>
+              </div>
+            )}
+          </div>
+        </aside>
+      </div>
 
-  </div>
-</aside>
-    </div>
-
-
-      <main className="flex-1 p-4 ml-28 sm:ml-32 md:ml-36 max-md:ml-28 max-sm:ml-24 mr-4">
+      {/* Main content */}
+      <main className="flex-1 p-4 ml-0 sm:ml-28 md:ml-32 lg:ml-36 max-md:ml-28 max-sm:ml-24 mr-4">
         <Outlet />
-        
+
         {isBaseRoute && (
           <>
             {tasks.length === 0 ? (
@@ -151,28 +148,26 @@ export function TasksPage() {
                 <div>
                   <ImFileEmpty className="text-6xl text-gray-400 m-auto my-2" />
                   <h1 className="font-bold text-xl text-gray-400">
-                    No hay tareas aún, Porfavor agregue una nueva tarea
+                    No hay tareas aún, por favor agregue una nueva tarea
                   </h1>
                 </div>
               </div>
-            ) : (                                                             
+            ) : (
               <div className="text-black p-4 relative">
-
                 {/* Sección actividades futuras */}
                 {sortedTasks.future.length > 0 && (
                   <div className="mb-12">
-                    {/* Header opcional para actividades futuras */}
                     <div className="flex items-center gap-3 mb-6">
                       <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
                       <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-                        Mis Actividades 
+                        Mis Actividades
                         <span className="ml-2 text-2xl font-bold text-gray-800">
                           ({sortedTasks.future.length})
                         </span>
                       </h2>
                       <div className="flex-1 h-px bg-gradient-to-r from-blue-200 to-transparent"></div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {sortedTasks.future.map((task) => (
                         <TaskCard task={task} key={task._id} isPast={false} />
@@ -181,14 +176,12 @@ export function TasksPage() {
                   </div>
                 )}
 
-                {/* Línea separadora mejorada */}
+                {/* Separador */}
                 {sortedTasks.future.length > 0 && sortedTasks.past.length > 0 && (
                   <div className="relative my-8">
                     <hr className="border-t-2 border-gray-300 opacity-50" />
                     <div className="absolute inset-0 flex justify-center items-center">
-                      <span className="bg-white px-4 text-gray-500 font-medium">
-                        ⏳ Historial
-                      </span>
+                      <span className="bg-white px-4 text-gray-500 font-medium">⏳ Historial</span>
                     </div>
                   </div>
                 )}
@@ -209,7 +202,7 @@ export function TasksPage() {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {sortedTasks.past.map((task) => (
-                        <TaskCard task={task} key={task._id} isPast={true}/>
+                        <TaskCard task={task} key={task._id} isPast={true} />
                       ))}
                     </div>
                   </div>
@@ -218,9 +211,12 @@ export function TasksPage() {
             )}
           </>
         )}
-
       </main>
 
+      {/* Menú móvil*/}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 lg:hidden" onClick={() => setIsMobileMenuOpen(false)}></div>
+      )}
     </div>
   );
 }

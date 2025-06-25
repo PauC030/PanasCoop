@@ -19,6 +19,7 @@ import { TaskFormPage } from "./pages/TaskFormPage";
 import { LoginPage } from "./pages/LoginPage";
 import { TasksPage } from "./pages/TasksPage";
 import { TaskProvider } from "./context/tasksContext";
+import {ResetPasswordPage} from "./pages/ResetPasswordPage";
 
 import { AdminProvider } from "./context/adminContext";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -83,7 +84,9 @@ function App() {
                         {/* Ruta para verificación de email - NO protegida */}
                         <Route path="/verify-email" element={<VerifyEmailPage />} />
                         <Route path="/verificar-email" element={<EmailVerificationPage />} />
-                        
+                        {/* Ruta para restablecimiento de contraseña */}
+                         <Route path="/reset-password" element={<ResetPasswordPage />} />
+
                         {/* Rutas protegidas para usuarios autenticados */}
                         <Route element={<ProtectedRoute allowedRoles={["user", "admin", "superadmin"]} />}>
                           <Route path="/welcome" element={<WelcomePage />} />

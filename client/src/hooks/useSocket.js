@@ -7,48 +7,45 @@ import toast from 'react-hot-toast';
 const useSocket = () => {
   const { user, isAuthenticated } = useAuth();
   const { addRealtimeNotification } = useNotifications();
+
   const socketRef = useRef(null);
   const isConnectingRef = useRef(false);
   const reconnectTimeoutRef = useRef(null);
+  const authRetryRef = useRef(null);
+  const heartbeatRef = useRef(null);
 
-  // Función para limpiar 
   const clearTimeouts = useCallback(() => {
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
-    }
+    clearTimeout(reconnectTimeoutRef.current);
+    reconnectTimeoutRef.current = null;
+    clearTimeout(authRetryRef.current);
+    authRetryRef.current = null;
+    clearInterval(heartbeatRef.current);
+    heartbeatRef.current = null;
   }, []);
 
-  // Función para unirse a la sala 
-  const joinUserRoom = useCallback((socket, userId) => {
+  const authenticateUser = useCallback((socket, userId) => {
     if (!socket || !socket.connected || !userId) return;
-    
-    console.log('🏠 Intentando unirse a sala:', userId);
-    socket.emit('join', userId);
-    
-   
-    setTimeout(() => {
+    socket.emit('auth', userId);
+    authRetryRef.current = setTimeout(() => {
       if (socket.connected) {
-        console.log('🔄 Reintento de unión a sala:', userId);
-        socket.emit('join', userId);
+        socket.emit('auth', userId);
       }
-    }, 2000);
+    }, 5000);
   }, []);
-  // Solo depende de isAuthenticated y user
+
+  const startHeartbeat = useCallback((socket) => {
+    clearInterval(heartbeatRef.current);
+    heartbeatRef.current = setInterval(() => {
+      if (socket && socket.connected) {
+        socket.emit('ping');
+      }
+    }, 30000);
+  }, []);
+
   useEffect(() => {
-    console.log('🔄 useSocket Effect ejecutándose...');
-    console.log('👤 Usuario autenticado:', isAuthenticated);
-    console.log('👤 Usuario:', user);
+    clearTimeouts();
 
-    // Limpiar timeouts anteriores
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
-    }
-
-    // Si no está autenticado o no hay usuario, desconectar
     if (!isAuthenticated || !user) {
-      console.log('❌ Usuario no autenticado, desconectando socket...');
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -57,285 +54,152 @@ const useSocket = () => {
       return;
     }
 
-    
-    if (isConnectingRef.current) {
-      console.log('⚠️ Conexión ya en progreso, saltando...');
-      return;
-    }
+    if (isConnectingRef.current) return;
 
     if (socketRef.current?.connected) {
-      console.log('✅ Socket ya conectado, re-uniéndose a sala...');
-      const userId = user.id || user._id;
-      // Llamar directamente sin usar el callback
-      if (socketRef.current && socketRef.current.connected && userId) {
-        console.log('🏠 Re-uniéndose a sala:', userId);
-        socketRef.current.emit('join', userId);
-      }
+      authenticateUser(socketRef.current, user.id || user._id);
       return;
     }
 
-    console.log('🔌 Iniciando nueva conexión socket...');
     isConnectingRef.current = true;
-    
-    // URL del servidor
-    const serverUrl = process.env.REACT_APP_API_URL || 'http://localhost:4000';
-    console.log('🌐 URL del servidor:', serverUrl);
 
-    // Crear conexión socket con configuración optimizada
+    const serverUrl = import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:4000';
+    const userId = user.id || user._id;
+
     const socket = io(serverUrl, {
       transports: ['websocket', 'polling'],
       timeout: 20000,
-      forceNew: false,
       reconnection: true,
-      reconnectionAttempts: 10,
+      reconnectionAttempts: 15,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
-      maxReconnectionAttempts: 10,
-      query: {
-        userId: user.id || user._id
-      }
+      forceNew: true,
+      query: { userId }
     });
 
     socketRef.current = socket;
 
-    
-    const joinRoom = (userId) => {
-      if (!socket || !socket.connected || !userId) return;
-      console.log('🏠 Intentando unirse a sala:', userId);
-      socket.emit('join', userId);
-      
-      setTimeout(() => {
-        if (socket.connected) {
-          console.log('🔄 Reintento de unión a sala:', userId);
-          socket.emit('join', userId);
-        }
-      }, 2000);
-    };
-
-    // Evento: Conexión exitosa
     socket.on('connect', () => {
-      console.log('✅ Socket conectado exitosamente!');
-      console.log('🆔 Socket ID:', socket.id);
       isConnectingRef.current = false;
-      
-      toast.success('Conectado a notificaciones', {
-        duration: 2000,
-        icon: '🔌'
-      });
-
-      // Unirse a la sala del usuario INMEDIATAMENTE
-      const userId = user.id || user._id;
-      joinRoom(userId);
+      authenticateUser(socket, userId);
+      startHeartbeat(socket);
     });
 
-    // Confirmar que se unió a la sala
-    socket.on('joined', (room) => {
-      console.log('✅ Unido exitosamente a la sala:', room);
-      toast.success(`Conectado a notificaciones personales`, {
-        duration: 1500,
-        icon: '🏠'
-      });
-    });
-
-    
-    socket.on('join_error', (error) => {
-      console.error('❌ Error al unirse a sala:', error);
-      toast.error('Error al configurar notificaciones');
-      
-      
-      const userId = user.id || user._id;
-      reconnectTimeoutRef.current = setTimeout(() => {
-        if (socket.connected) {
-          console.log('🔄 Reintentando unirse a sala después de error...');
-          joinRoom(userId);
-        }
-      }, 3000);
-    });
-
-   
-    socket.on('nueva_notificacion', (notification) => {
-      console.log('🔔 NOTIFICACIÓN RECIBIDA (nueva_notificacion):', notification);
-      
+    const handleNotification = (notification) => {
       try {
+        const processedNotification = {
+          title: notification.title || 'Nueva notificación',
+          message: notification.message || 'Tienes una nueva actividad',
+          type: notification.type || 'reminder',
+          taskId: notification.taskId,
+          timestamp: notification.timestamp || new Date(),
+          read: false
+        };
         if (addRealtimeNotification) {
-          addRealtimeNotification({
-            title: notification.title || 'Nueva notificación',
-            message: notification.message || 'Tienes una nueva actividad',
-            type: notification.type || 'reminder',
-            taskId: notification.taskId,
-            timestamp: notification.timestamp || new Date()
-          });
-
-          toast.success(notification.message || 'Nueva notificación', {
-            duration: 4000,
-            icon: '🔔'
-          });
-        } else {
-          console.error('❌ addRealtimeNotification no está disponible');
-          toast.success(notification.message || 'Nueva notificación', {
-            duration: 4000,
-            icon: '🔔'
-          });
+          addRealtimeNotification(processedNotification);
         }
-      } catch (error) {
-        console.error('❌ Error procesando notificación:', error);
-      }
-    });
-
-   
-    socket.on('notification', (notification) => {
-      console.log('🔔 NOTIFICACIÓN RECIBIDA (notification):', notification);
-      
-      try {
-        if (addRealtimeNotification) {
-          addRealtimeNotification({
-            title: notification.title || 'Nueva notificación',
-            message: notification.message || 'Tienes una nueva actividad',
-            type: notification.type || 'reminder',
-            taskId: notification.taskId,
-            timestamp: notification.timestamp || new Date()
-          });
-        }
-
-        toast.success(notification.message || 'Nueva notificación', {
+        toast.success(processedNotification.message, {
           duration: 4000,
           icon: '🔔'
         });
       } catch (error) {
-        console.error('❌ Error procesando notificación:', error);
+        toast.error('Error procesando notificación');
       }
-    });
+    };
 
-    
-    socket.on('test_notification', (data) => {
-      console.log('🧪 NOTIFICACIÓN DE PRUEBA RECIBIDA:', data);
-      toast.success('¡Notificación de prueba recibida!', {
-        duration: 3000,
-        icon: '🧪'
-      });
-    });
+    socket.on('nueva_notificacion', handleNotification);
+    socket.on('notification', handleNotification);
+    socket.on('notificacion', handleNotification);
 
-   
-    socket.on('disconnect', (reason) => {
-      console.log('🔌 Socket desconectado. Razón:', reason);
+    socket.on('disconnect', () => {
       isConnectingRef.current = false;
-      
-      if (reason !== 'io client disconnect') {
-        toast.error(`Desconectado de notificaciones`, {
-          duration: 2000,
-          icon: '🔌'
-        });
-      }
+      clearTimeouts();
     });
 
-    
-    socket.on('connect_error', (error) => {
-      console.error('❌ Error de conexión socket:', error);
+    socket.on('connect_error', () => {
       isConnectingRef.current = false;
-      toast.error('Error conectando a notificaciones', {
-        duration: 2000
-      });
     });
 
-   
-    socket.on('reconnect', (attemptNumber) => {
-      console.log('🔄 Socket reconectado después de', attemptNumber, 'intentos');
-      toast.success('Reconectado a notificaciones', {
-        duration: 2000,
-        icon: '🔄'
-      });
-      
-      // Re-unirse a la sala después de reconectar
-      const userId = user.id || user._id;
-      joinRoom(userId);
+    socket.on('reconnect', () => {
+      authenticateUser(socket, userId);
+      startHeartbeat(socket);
     });
 
-    
-    socket.on('reconnect_attempt', (attemptNumber) => {
-      console.log('🔄 Intento de reconexión #', attemptNumber);
-    });
-
-   
-    socket.on('reconnect_error', (error) => {
-      console.error('❌ Error de reconexión:', error);
-    });
-
-   
-    socket.on('reconnect_failed', () => {
-      console.error('❌ Falló la reconexión completamente');
-      toast.error('No se pudo reconectar a notificaciones', {
-        duration: 3000
-      });
-    });
-
-    
     return () => {
-      console.log('🧹 Limpiando socket...');
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-        reconnectTimeoutRef.current = null;
-      }
+      clearTimeouts();
       isConnectingRef.current = false;
       if (socket) {
-        socket.off(); // Remover todos los listeners
+        socket.off();
         socket.disconnect();
       }
     };
-  }, [isAuthenticated, user]); 
 
-  // Función para probar notificaciones
+
+  }, [
+    isAuthenticated,
+    user,
+    authenticateUser,
+    addRealtimeNotification,
+    startHeartbeat
+  ]);
+
+
   const testNotification = useCallback(() => {
-    console.log('🧪 Probando notificación...');
-    if (socketRef.current?.connected) {
-      const userId = user?.id || user?._id;
-      console.log('📤 Enviando test-notification para usuario:', userId);
-      
-      socketRef.current.emit('test-notification', {
-        message: 'Probando notificación desde el frontend',
-        userId: userId
-      });
-      
-      toast.success('Solicitud de prueba enviada', {
-        duration: 2000,
-        icon: '🧪'
-      });
-    } else {
-      console.error('❌ Socket no conectado');
-      toast.error('Socket no conectado');
-    }
+    if (!socketRef.current?.connected) return;
+    const userId = user?.id || user?._id;
+    socketRef.current.emit('test-notification', {
+      message: 'Probando notificación desde el frontend',
+      userId
+    });
   }, [user]);
 
-  // Función para forzar unión a sala
   const forceJoinRoom = useCallback(() => {
-    if (socketRef.current?.connected && user) {
-      const userId = user.id || user._id;
-      console.log('🔄 Forzando unión a sala:', userId);
-      // Llamar directamente sin usar callback
-      if (socketRef.current && socketRef.current.connected && userId) {
-        socketRef.current.emit('join', userId);
-        toast.info('Reintentando conexión a sala...', {
-          duration: 1500,
-          icon: '🔄'
-        });
-      }
-    } else {
-      toast.error('Socket no conectado o usuario no disponible');
-    }
-  }, [user]);
+    if (!socketRef.current?.connected || !user) return;
+    const userId = user.id || user._id;
+    clearTimeouts();
+    authenticateUser(socketRef.current, userId);
+  }, [user, authenticateUser, clearTimeouts]);
 
-  // Función para obtener estado del socket
   const getSocketStatus = useCallback(() => {
     if (!socketRef.current) return 'No inicializado';
-    if (socketRef.current.connected) return 'Conectado';
-    return 'Desconectado';
+    return socketRef.current.connected ? 'Conectado' : 'Desconectado';
   }, []);
 
-  // Función para verificar salas
   const getRooms = useCallback(() => {
     if (socketRef.current?.connected) {
       return Array.from(socketRef.current.rooms || []);
     }
     return [];
+  }, []);
+
+  const getDebugInfo = useCallback(() => {
+    const basicInfo = {
+      socketExists: !!socketRef.current,
+      connected: socketRef.current?.connected || false,
+      socketId: socketRef.current?.id,
+      rooms: getRooms(),
+      userId: user?.id || user?._id,
+      isAuthenticated,
+      userName: user?.username
+    };
+    return Promise.resolve(basicInfo);
+  }, [getRooms, user, isAuthenticated]);
+
+  const pingServer = useCallback(() => {
+    if (socketRef.current?.connected) {
+      socketRef.current.emit('ping');
+      return new Promise((resolve) => {
+        const timeout = setTimeout(() => {
+          resolve(null);
+        }, 5000);
+        socketRef.current.once('pong', (data) => {
+          clearTimeout(timeout);
+          resolve(data);
+        });
+      });
+    } else {
+      return Promise.resolve(null);
+    }
   }, []);
 
   return {
@@ -344,6 +208,8 @@ const useSocket = () => {
     getSocketStatus,
     getRooms,
     forceJoinRoom,
+    getDebugInfo,
+    pingServer,
     isConnected: socketRef.current?.connected || false
   };
 };

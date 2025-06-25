@@ -1,4 +1,3 @@
-// context/notificationsContext.js - CORREGIDO
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from './authContext';
 import { 
@@ -26,7 +25,7 @@ export function NotificationsProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
-  // Estado para notificaciones en tiempo real (frontend)
+  // Estado para notificaciones en tiempo real
   const [realtimeNotifications, setRealtimeNotifications] = useState([]);
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
 

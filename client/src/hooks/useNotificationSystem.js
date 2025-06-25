@@ -83,8 +83,7 @@ export function useNotificationSystem() {
   };
 }
 
-// 2. Componente de Notificaciones Toast
-// components/NotificationToast.jsx
+
 import { useState, useEffect } from 'react';
 import { X, Bell, Calendar, MapPin } from 'lucide-react';
 
@@ -160,7 +159,7 @@ export function NotificationToast({ notification, onClose, onSnooze }) {
 }
 
 // 3. Componente principal de gestión de notificaciones
-// components/NotificationManager.jsx
+
 import { useState, useEffect } from 'react';
 import { useNotificationSystem } from '../hooks/useNotificationSystem';
 import { NotificationToast } from './NotificationToast';
@@ -222,7 +221,7 @@ export function NotificationManager() {
 }
 
 // 4. Indicador de notificaciones en el header/navbar
-// components/NotificationBadge.jsx
+
 import { Bell, BellRing } from 'lucide-react';
 import { useNotificationSystem } from '../hooks/useNotificationSystem';
 
@@ -250,8 +249,7 @@ export function NotificationBadge({ onClick }) {
   );
 }
 
-// 5. Panel de notificaciones (dropdown)
-// components/NotificationPanel.jsx
+// 5. Panel de notificaciones 
 import { Calendar, MapPin, Clock } from 'lucide-react';
 import { useNotificationSystem } from '../hooks/useNotificationSystem';
 

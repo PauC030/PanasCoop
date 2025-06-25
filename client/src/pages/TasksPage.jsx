@@ -39,7 +39,7 @@ export function TasksPage() {
 
   return (
     <div className="flex min-h-screen bg-white-100 mt-16">
-      {/* Sidebar izquierda - visible en todos los tamaños */}
+      {/* Sidebar izquierda */}
       <div className="mt-16 fixed top-0 left-0 h-screen w-fit z-50 bg-gradient-to-b from-[#002615] to-[#056e51] p-4 max-md:p-3 max-sm:p-2">
         <aside className="w-28 sm:w-32 md:w-36 max-md:w-28 max-sm:w-24 text-white">
           <h1 className="text-sm max-md:text-xs max-sm:text-[10px] font-bold mb-6 max-md:mb-5 max-sm:mb-4">

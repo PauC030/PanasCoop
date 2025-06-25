@@ -152,7 +152,7 @@ const VerifyEmailPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
-      {/* Elementos decorativos de fondo animados */}
+    
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-32 -right-32 w-64 h-64 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-full opacity-20 animate-pulse"></div>
         <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-gradient-to-br from-cyan-100 to-teal-100 rounded-full opacity-20 animate-pulse" style={{ animationDelay: '1s' }}></div>

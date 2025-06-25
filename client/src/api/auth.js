@@ -9,11 +9,11 @@ export const loginRequest = async (user) =>
 export const verifyTokenRequest = async () => 
   axios.get(`/auth/verify`);
 
-// CORREGIDO: Ruta correcta para verificar email
+// Ruta correcta para verificar email
 export const verifyEmailRequest = (token) => 
   axios.post(`/auth/verify-email`, { token });
 
-// NUEVA: Función para reenviar email de verificación
+//  Función para reenviar email de verificación
 export const resendVerificationEmailRequest = (email) => 
   axios.post(`/auth/resend-verification`, { email });
 

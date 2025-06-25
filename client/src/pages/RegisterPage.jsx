@@ -30,7 +30,7 @@ function Register() {
     <div className="h-screen flex items-center justify-center bg-gray-100 p-4 mt-16">
       <div className="flex rounded-xl overflow-hidden shadow-2xl w-full max-w-6xl h-[70vh] min-h-[550px] -mt-14">
         
-        {/* Imagen a la izquierda */}
+        
         <div className="w-1/1 bg-[#165a4c] relative">
           <img 
             src={registerImage} 
@@ -44,12 +44,12 @@ function Register() {
           </div>
         </div>
 
-        {/* Formulario a la derecha */}
+        {/* Formulario  */}
         <Card className="p-6 w-1/2 rounded-none shadow-none flex flex-col justify-between">
           <div className="w-full max-w-md mx-auto">
             <h1 className="text-2xl font-bold text-[#165a4c] text-center mb-6">Registrarse</h1>
             
-            {/* NUEVO: Mostrar mensaje de éxito */}
+            {/*  mensaje de éxito */}
             {successMessage && (
               <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
                 <div className="flex items-center">
@@ -61,7 +61,7 @@ function Register() {
               </div>
             )}
             
-            {/* NUEVO: Mensaje informativo detallado cuando el registro es exitoso */}
+            {/*  Mensaje informativo detallado cuando el registro es exitoso */}
             {successMessage && (
               <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded mb-4">
                 <div className="flex items-start">
@@ -134,7 +134,7 @@ function Register() {
               <Button 
                 type="submit"
                 className="bg-[#165a4c] text-white rounded-md px-4 py-3 text-base shadow-lg hover:bg-[#144736] transition mt-4"
-                disabled={!!successMessage} // NUEVO: Deshabilitar botón después del registro exitoso
+                disabled={!!successMessage} //Deshabilitar botón después del registro exitoso
               >
                 {successMessage ? "Registro Exitoso" : "Registrarse"}
               </Button>
@@ -147,7 +147,7 @@ function Register() {
               </Link>
             </p>
             
-            {/* NUEVO: Enlace para reenviar email de verificación (opcional) */}
+            {/* Enlace para reenviar email de verificación  */}
             {successMessage && (
               <div className="mt-4 text-center">
                 <p className="text-sm text-gray-600 mb-2">¿No recibiste el email?</p>
@@ -155,7 +155,7 @@ function Register() {
                   type="button"
                   className="text-blue-500 hover:underline text-sm font-medium"
                   onClick={() => {
-                    // Aquí podrías implementar una función para reenviar el email
+                    //  reenviar el email
                     alert("Funcionalidad de reenvío de email por implementar");
                   }}
                 >

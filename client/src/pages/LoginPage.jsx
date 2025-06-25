@@ -30,7 +30,7 @@ export function LoginPage() {
   return (
     <div className="h-screen flex items-center justify-center bg-gray-100 p-4  mt-16 ">
       <div className="flex rounded-xl overflow-hidden shadow-2xl w-full max-w-6xl h-[70vh] min-h-[550px] -mt-14">
-        {/* Sección del formulario (mitad izquierda) */}
+      
         <Card className="p-10 w-1/2 rounded-none shadow-none flex flex-col justify-center">
           <div className="w-full max-w-md mx-auto">
             <h1 className="text-3xl font-bold text-[#165a4c] text-center mb-8">Inicia sesión</h1>
@@ -76,7 +76,7 @@ export function LoginPage() {
           ))}
         </Card>
         
-        {/* Sección de la imagen (mitad derecha) */}
+       
         <div className="w-1/1 bg-[#165a4c] relative">
           <img 
             src={loginImage} 

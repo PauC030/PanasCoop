@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { AuthProvider } from "./context/authContext";
 import { ProtectedRoute } from "./routes";
+
 import { SearchProvider } from "./context/searchContext";
 import { BuscarActividad } from "./components/taskFragments/BuscarActividad";
 import { ListaActividades } from "./components/taskFragments/ListaActividades";
@@ -24,10 +25,12 @@ import AdminDashboard from "./pages/AdminDashboard";
 import { AsistenciaProvider } from "./context/asistenciaContext";
 import { NotificationsProvider } from "./context/NotificationsContext";
 import { AdminPanelProvider } from "./context/adminPanelContext";
+
+
 import { Toaster } from 'react-hot-toast';
 import React, { Suspense } from 'react';
 
-// Importar useSocket de forma lazy y segura
+
 const useSocket = React.lazy(() => 
   import("./hooks/useSocket")
     .then(module => ({ default: () => { module.default(); return null; } }))
@@ -37,7 +40,7 @@ const useSocket = React.lazy(() =>
     })
 );
 
-// Componente para manejar el socket de forma segura
+// Componente para manejar el socket 
 function SocketManager() {
   return (
     <Suspense fallback={null}>
@@ -69,7 +72,6 @@ function App() {
                       <Navbar />
                       <Toaster position="top-center" reverseOrder={false} />
                       
-                      {/* Socket Manager - Con manejo de errores */}
                       <SocketManager />
                       
                       <Routes>

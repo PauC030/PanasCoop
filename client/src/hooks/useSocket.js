@@ -281,7 +281,7 @@ const useSocket = () => {
         socket.disconnect();
       }
     };
-  }, [isAuthenticated, user]); // SOLO estas dos dependencias
+  }, [isAuthenticated, user]); 
 
   // Función para probar notificaciones
   const testNotification = useCallback(() => {

@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Función para verificar email
+  // verificar email
   const verifyEmail = async (token) => {
     try {
       console.log('Verificando email con token:', token);
@@ -135,7 +135,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // NUEVA: Función para reenviar email de verificación
+  //  reenviar email de verificación
   const resendVerificationEmail = async (email) => {
     try {
       setLoading(true);
@@ -224,7 +224,7 @@ const logout = async () => {
         signin,
         logout,
         verifyEmail,
-        resendVerificationEmail, // NUEVA función
+        resendVerificationEmail,
         isAuthenticated,
         errors,
         successMessage,

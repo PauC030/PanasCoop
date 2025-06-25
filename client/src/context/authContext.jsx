@@ -5,7 +5,9 @@ import {
   registerRequest, 
   verifyTokenRequest, 
   verifyEmailRequest,
-  resendVerificationEmailRequest 
+  resendVerificationEmailRequest,
+  sendPasswordResetEmailRequest,
+  resetPasswordRequest  // NUEVA importación
 } from "../api/auth";
 import Cookies from "js-cookie";
 
@@ -63,7 +65,6 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       const res = await registerRequest(user);
       
-      // El registro NO autentica automáticamente
       setSuccessMessage(res.data.message || "Usuario registrado. Revisa tu correo para verificar la cuenta.");
       setErrors([]);
       
@@ -97,7 +98,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Función para verificar email
   const verifyEmail = async (token) => {
     try {
       console.log('Verificando email con token:', token);
@@ -106,7 +106,6 @@ export const AuthProvider = ({ children }) => {
       console.log('Respuesta de verificación:', res.data);
       
       if (res.data.success) {
-        // Actualizar el estado del usuario después de la verificación exitosa
         setUser(res.data.user);
         setIsAuthenticated(true);
         setupLocalStorage(res.data.user);
@@ -141,7 +140,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // NUEVA: Función para reenviar email de verificación
   const resendVerificationEmail = async (email) => {
     try {
       setLoading(true);
@@ -158,6 +156,62 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Error al reenviar email:", error);
       const errorMessage = error.response?.data?.message || "Error al reenviar email";
+      setErrors([errorMessage]);
+      
+      return {
+        success: false,
+        message: errorMessage
+      };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const sendPasswordReset = async (email) => {
+    try {
+      setLoading(true);
+      const res = await sendPasswordResetEmailRequest(email);
+      
+      setSuccessMessage(res.data.message || "Se ha enviado un enlace de recuperación a tu correo");
+      setErrors([]);
+      
+      return {
+        success: true,
+        message: res.data.message,
+        resetLink: res.data.resetLink
+      };
+      
+    } catch (error) {
+      console.error("Error al solicitar reset:", error);
+      const errorMessage = error.response?.data?.message || "Error al enviar enlace de recuperación";
+      setErrors([errorMessage]);
+      
+      return {
+        success: false,
+        message: errorMessage
+      };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // NUEVA: Función para restablecer contraseña
+  const resetPassword = async (token, newPassword) => {
+    try {
+      setLoading(true);
+      const res = await resetPasswordRequest({ token, newPassword });
+      
+      setSuccessMessage(res.data.message || "Contraseña restablecida exitosamente");
+      setErrors([]);
+      
+      return {
+        success: true,
+        message: res.data.message
+      };
+      
+    } catch (error) {
+      console.error("Error al restablecer contraseña:", error);
+      const errorMessage = error.response?.data?.message || "Error al restablecer contraseña";
       setErrors([errorMessage]);
       
       return {
@@ -223,7 +277,9 @@ export const AuthProvider = ({ children }) => {
         signin,
         logout,
         verifyEmail,
-        resendVerificationEmail, // NUEVA función
+        resendVerificationEmail,
+        sendPasswordReset,
+        resetPassword, 
         isAuthenticated,
         errors,
         successMessage,

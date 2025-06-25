@@ -1,9 +1,10 @@
 import { useAuth } from "../context/authContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, Message, Button, Input, Label } from "../components/ui";
+import { PasswordResetModal } from "../components/PasswordResetModal"; // NUEVA importación
 import { loginSchema } from "../schemas/auth";
 import loginImage from '../assets/image login2.jpg';
 
@@ -17,6 +18,7 @@ export function LoginPage() {
   });
   const { signin, errors: loginErrors, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [showPasswordReset, setShowPasswordReset] = useState(false); // NUEVO estado
 
   const onSubmit = (data) => signin(data);
 
@@ -25,7 +27,6 @@ export function LoginPage() {
       navigate("/tasks");
     }
   }, [isAuthenticated]);
-
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-100 p-4  mt-16 ">
@@ -56,6 +57,17 @@ export function LoginPage() {
                   {...register("password", { required: true, minLength: 6 })}
                 />
                 <p className="text-red-500 text-sm mt-1">{errors.password?.message}</p>
+              </div>
+
+              {/* NUEVO: Enlace para recuperar contraseña */}
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordReset(true)}
+                  className="text-sm text-blue-500 hover:underline"
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
               </div>
 
               <Button className="bg-[#165a4c] text-white rounded-lg px-6 py-4 text-lg shadow-lg hover:bg-[#144736] transition mt-6">
@@ -90,6 +102,12 @@ export function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* NUEVO: Modal para reset de contraseña */}
+      <PasswordResetModal 
+        isOpen={showPasswordReset}
+        onClose={() => setShowPasswordReset(false)}
+      />
     </div>
   );
 }

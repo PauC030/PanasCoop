@@ -41,7 +41,6 @@ export function useAttendance(taskId) {
           }
         }
       } catch (error) {
-        console.error('Error verificando asistencia:', error);
         // Fallback a localStorage solo en caso de error
         const userEmail = localStorage.getItem('userEmail')?.toLowerCase()?.trim();
         if (userEmail) {

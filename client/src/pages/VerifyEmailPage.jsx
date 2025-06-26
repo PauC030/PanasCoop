@@ -86,7 +86,7 @@ const VerifyEmailPage = () => {
           throw new Error(result?.message || 'Error al verificar el email');
         }
       } catch (error) {
-        console.error('Error en verificación:', error);
+       
         setStatus('error');
         setMessage(error.message || 'Error al verificar el email');
         setShowResendForm(true);

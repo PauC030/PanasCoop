@@ -11,8 +11,7 @@ export function ActividadesPromocionadas() {
 
    const currentUserEmail = localStorage.getItem("userEmail");
   
-  console.log('Promoted tasks:', promotedTasks);
-  console.log('Current user email:', currentUserEmail);
+
   
  
   if (promotedTasks.length > 0) {
@@ -20,14 +19,13 @@ export function ActividadesPromocionadas() {
     console.log('User object keys:', Object.keys(promotedTasks[0].user || {}));
   }
   
-  // Separar las actividades en propias y de otros
-  // Método 1: Usando isOwner
+
   const myPromotedTasks = promotedTasks.filter(task => {
     console.log(`Task ${task.title}: user.email = ${task.user?.email}, user.id = ${task.user?._id}`);
     return task.isOwner === true;
   });
   
-  // Método 2: Si isOwner no funciona, usar comparación por email o ID
+  
   const myPromotedTasksAlt = promotedTasks.filter(task => {
         return task.user?.email === currentUserEmail || 
            task.user?.correo === currentUserEmail ||

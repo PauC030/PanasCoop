@@ -78,6 +78,8 @@ export function Navbar() {
 
   const unreadCount = realtimeNotifications.filter((n) => !n.read).length;
 
+
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#002326] text-white shadow-md h-16">
       <div className="max-w-full px-4 sm:px-6 lg:px-8 h-full">
@@ -92,7 +94,7 @@ export function Navbar() {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
+       
           <div className="hidden lg:flex items-center gap-3 xl:gap-4">
             {isAuthenticated ? (
               <>
@@ -109,7 +111,7 @@ export function Navbar() {
                   Crear Actividad
                 </ButtonLink>
 
-                {/* CAMPANA DE NOTIFICACIONES RESPONSIVE */}
+   
                 <div className="relative" ref={notificationRef}>
                   <button
                     onClick={toggleNotifications}
@@ -139,9 +141,8 @@ export function Navbar() {
                         strokeWidth={2.5}
                         d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                       />
-                    </svg>
+                    </svg>  
 
-                    {/* Contador responsive */}
                     {unreadCount > 0 && (
                       <span
                         className={`absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[20px] xl:min-w-[22px] h-[20px] xl:h-[22px] flex items-center justify-center font-bold border-2 border-white shadow-lg transition-all duration-300 ${
@@ -152,7 +153,7 @@ export function Navbar() {
                       </span>
                     )}
 
-                    {/* Efectos de animación */}
+               
                     {hasNewNotifications && (
                       <>
                         <span className="absolute -top-1 -right-1 w-5 h-5 xl:w-6 xl:h-6 bg-red-400 rounded-full animate-ping opacity-60"></span>
@@ -161,7 +162,7 @@ export function Navbar() {
                     )}
                   </button>
 
-                  {/* Panel de notificaciones RESPONSIVE */}
+               
                   {isNotificationOpen && (
                     <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[500px] overflow-hidden">
                       {/* Header del panel */}
@@ -189,7 +190,6 @@ export function Navbar() {
                         </div>
                       </div>
 
-                      {/* Contenido responsive */}
                       <div className="max-h-80 overflow-y-auto">
                         {realtimeNotifications.length === 0 ? (
                           <div className="p-6 sm:p-8 text-center text-gray-500">
@@ -303,13 +303,13 @@ export function Navbar() {
                           <p className="text-sm font-medium text-white truncate">{user?.username}</p>
                           <p className="text-xs text-gray-400 truncate">{user?.email}</p>
                         </div>
-                        <Link
+                       {/* <Link
                           to="/profile"
                           className="block px-4 py-2 text-sm text-white hover:bg-[#002a2d] transition-colors"
                           onClick={() => setIsProfileOpen(false)}
                         >
                           Mi Perfil
-                        </Link>
+                        </Link>*/}
                         <button
                           onClick={() => {
                             logout();
@@ -324,7 +324,7 @@ export function Navbar() {
                   )}
                 </div>
 
-                {/* Botón de prueba - solo en desktop */}
+                {/* Botón de prueba - solo en desktop 
                 {testNotification && (
                   <button
                     onClick={testNotification}
@@ -333,7 +333,7 @@ export function Navbar() {
                   >
                     🧪
                   </button>
-                )}
+                )}*/}
               </>
             ) : (
               <>
@@ -350,7 +350,6 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile menu button */}
           <div className="lg:hidden">
             <button
               onClick={toggleMobileMenu}
@@ -363,13 +362,12 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Mobile menu - NUEVO COLOR DE FONDO */}
         {isMobileMenuOpen && (
           <div className="lg:hidden absolute top-16 left-0 right-0 bg-gradient-to-br from-[#064349] to-[#03683E] border-t border-green-600 shadow-xl backdrop-blur-sm">
             <div className="px-4 py-4 space-y-3">
               {isAuthenticated ? (
                 <>
-                  {/* User info mobile */}
+                
                   <div className="flex items-center space-x-3 pb-3 border-b border-green-600/30">
                     <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center ring-2 ring-white/30">
                       <span className="text-white font-bold text-sm">
@@ -384,7 +382,7 @@ export function Navbar() {
                     </div>
                   </div>
 
-                  {/* Notifications mobile */}
+                 
                   <div className="relative" ref={notificationRef}>
                     <button
                       onClick={toggleNotifications}
@@ -407,7 +405,6 @@ export function Navbar() {
                       )}
                     </button>
 
-                    {/* Mobile notifications panel */}
                     {isNotificationOpen && (
                       <div className="mt-3 bg-white rounded-xl shadow-2xl border border-gray-200 max-h-80 overflow-hidden">
                         <div className="p-3 border-b border-gray-100 bg-gradient-to-r from-[#064349] to-[#03683E]">
@@ -456,7 +453,7 @@ export function Navbar() {
                                             })
                                           : "Ahora"}
                                       </span>
-                                      {notification.taskId && (
+                                    {/*  {notification.taskId && (
                                         <Link
                                           to={`/tasks/view/${notification.taskId}`}
                                           className="text-xs text-[#03683E] bg-green-50 px-2 py-1 rounded-full hover:bg-green-100 transition-colors"
@@ -468,7 +465,7 @@ export function Navbar() {
                                         >
                                           Ver
                                         </Link>
-                                      )}
+                                      )}*/}
                                     </div>
                                   </div>
                                   <button
@@ -488,7 +485,7 @@ export function Navbar() {
                     )}
                   </div>
 
-                  {/* Mobile navigation links */}
+                
                   <Link
                     to="/tasks"
                     className="block text-white text-sm hover:text-green-200 py-3 px-3 rounded-lg hover:bg-white/10 transition-all duration-200"
@@ -503,13 +500,13 @@ export function Navbar() {
                   >
                     ➕ Crear nueva Actividad
                   </Link>
-                  <Link
+                 {/* <Link
                     to="/profile"
                     className="block text-white text-sm hover:text-green-200 py-3 px-3 rounded-lg hover:bg-white/10 transition-all duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     👤 Mi Perfil
-                  </Link>
+                  </Link>*/}
                   <button
                     onClick={() => {
                       logout();

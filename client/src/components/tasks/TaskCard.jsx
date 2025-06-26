@@ -51,7 +51,7 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
       refreshSearch();
     }
   } catch (error) {
-    console.error("Error al eliminar tarea:", error);
+  
     toast.error("Error al eliminar la actividad");
   }
 };
@@ -76,7 +76,7 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
   } catch (error) {
     // Si hay error, revertir el cambio
     setIsPromoted(!newPromotedState);
-    console.error("Error al cambiar promoción:", error);
+  
     toast.error("Error al cambiar promoción");
   }
 };
@@ -153,7 +153,7 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
       setShowCancelModal(false);
       toast.error("Asistencia cancelada correctamente ❌");
     } catch (err) {
-      console.error("Error al cancelar asistencia:", err);
+   
       setIsAttending(true); // Revertir en caso de error
       toast.error(err.response?.data?.message || "Error al cancelar asistencia");
     } finally {

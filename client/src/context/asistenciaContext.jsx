@@ -92,13 +92,9 @@ const cancelAttendance = async ({ taskId, email }) => {
   
   try {
     const lowerEmail = email ? email.trim().toLowerCase() : null;
-    
-    console.log("🚀 Iniciando cancelación:", { taskId, email: lowerEmail });
-    
+   
     // 1. Cancelar en el backend
     const response = await cancelAttendanceRequest({ taskId, email: lowerEmail });
-    
-    console.log("✅ Respuesta del backend:", response.data);
     
     // 2. Actualizar estado global - MEJORADO
     setAttendees(prev => {
@@ -115,8 +111,7 @@ const cancelAttendance = async ({ taskId, email }) => {
             
         return true;
       });
-      
-      console.log("📊 Asistentes antes:", prev.length, "después:", filteredAttendees.length);
+
       return filteredAttendees;
     });
     
@@ -126,9 +121,7 @@ const cancelAttendance = async ({ taskId, email }) => {
         prev.filter(att => att.task?._id !== taskId && att.task !== taskId)
       );
     }
-    
     return response.data; 
-    
   } catch (err) {
     console.error("❌ Error en cancelAttendance:", {
       taskId,

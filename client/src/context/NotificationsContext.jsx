@@ -29,12 +29,104 @@ export function NotificationsProvider({ children }) {
   const [realtimeNotifications, setRealtimeNotifications] = useState([]);
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
 
+  // Clave para localStorage basada en el usuario
+  const getStorageKey = () => {
+    const userId = user?.id || user?._id || 'anonymous';
+    return `notifications_${userId}`;
+  };
+
+  // Cargar notificaciones desde localStorage
+  const loadNotificationsFromStorage = () => {
+    try {
+      const storageKey = getStorageKey();
+      const stored = localStorage.getItem(storageKey);
+      
+      if (stored) {
+        const parsedData = JSON.parse(stored);
+        
+        // Filtrar notificaciones que no sean muy antiguas (ejemplo: últimas 24 horas)
+        const cutoffTime = Date.now() - (24 * 60 * 60 * 1000); // 24 horas
+        const validNotifications = parsedData.notifications.filter(notif => {
+          const notifTime = new Date(notif.timestamp).getTime();
+          return notifTime > cutoffTime;
+        });
+
+        setRealtimeNotifications(validNotifications);
+        
+        // Verificar si hay notificaciones no leídas
+        const unreadCount = validNotifications.filter(n => !n.read).length;
+        setHasNewNotifications(unreadCount > 0);
+
+        // Actualizar localStorage con notificaciones filtradas
+        if (validNotifications.length !== parsedData.notifications.length) {
+          saveNotificationsToStorage(validNotifications);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading notifications from storage:", error);
+      // Si hay error, limpiar localStorage corrupto
+      try {
+        localStorage.removeItem(getStorageKey());
+      } catch (cleanupError) {
+        console.error("Error cleaning up corrupted storage:", cleanupError);
+      }
+    }
+  };
+
+  // Guardar notificaciones en localStorage
+  const saveNotificationsToStorage = (notifications) => {
+    try {
+      const storageKey = getStorageKey();
+      const dataToStore = {
+        notifications: notifications,
+        lastUpdate: Date.now()
+      };
+      localStorage.setItem(storageKey, JSON.stringify(dataToStore));
+    } catch (error) {
+      console.error("Error saving notifications to storage:", error);
+      // Si el localStorage está lleno, limpiar notificaciones antiguas
+      try {
+        const cutoffTime = Date.now() - (12 * 60 * 60 * 1000); // 12 horas
+        const recentNotifications = notifications.filter(notif => {
+          const notifTime = new Date(notif.timestamp).getTime();
+          return notifTime > cutoffTime;
+        });
+        
+        const dataToStore = {
+          notifications: recentNotifications,
+          lastUpdate: Date.now()
+        };
+        localStorage.setItem(getStorageKey(), JSON.stringify(dataToStore));
+      } catch (retryError) {
+        console.error("Error saving notifications after cleanup:", retryError);
+      }
+    }
+  };
+
   // Solicitar permisos para notificaciones del navegador
   useEffect(() => {
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
     }
   }, []);
+
+  // Cargar notificaciones del storage al inicializar o cambiar usuario
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      loadNotificationsFromStorage();
+    } else {
+      // Si no está autenticado, limpiar las notificaciones
+      setRealtimeNotifications([]);
+      setHasNewNotifications(false);
+    }
+  }, [isAuthenticated, user?.id, user?._id]);
+
+  // Guardar en storage cada vez que cambien las notificaciones en tiempo real
+  useEffect(() => {
+    if (isAuthenticated && realtimeNotifications.length >= 0) {
+      saveNotificationsToStorage(realtimeNotifications);
+    }
+  }, [realtimeNotifications, isAuthenticated]);
 
   // obtener notificaciones desde la API
   const fetchNotifications = async () => {
@@ -108,7 +200,7 @@ export function NotificationsProvider({ children }) {
       setError(null);
       const res = await deleteNotificationRequest(notificationId);
       
-      // Actualizar el estado local removiendo la notificación
+     
       setNotifications(prev => 
         prev.filter(notification => notification._id !== notificationId)
       );
@@ -173,7 +265,7 @@ export function NotificationsProvider({ children }) {
     return notification?.daysBefore || 0;
   };
 
-  // Funciones para notificaciones en tiempo real
+  // Funciones para notificaciones en tiempo real (mejoradas con persistencia)
   const addRealtimeNotification = (notification) => {
     const newNotification = {
       id: Date.now(),
@@ -182,7 +274,23 @@ export function NotificationsProvider({ children }) {
       read: false
     };
     
-    setRealtimeNotifications(prev => [newNotification, ...prev]);
+    setRealtimeNotifications(prev => {
+      // Evitar duplicados basándose en taskId y timestamp reciente
+      const isDuplicate = prev.some(n => 
+        n.taskId === newNotification.taskId && 
+        Math.abs(new Date(n.timestamp) - new Date(newNotification.timestamp)) < 5000 // 5 segundos
+      );
+      
+      if (isDuplicate) {
+        return prev;
+      }
+      
+      const updated = [newNotification, ...prev];
+      
+      // Limitar a máximo 50 notificaciones para evitar problemas de rendimiento
+      return updated.slice(0, 50);
+    });
+    
     setHasNewNotifications(true);
     
     // Mostrar notificación del navegador si tiene permisos
@@ -223,6 +331,14 @@ export function NotificationsProvider({ children }) {
   const clearAllNotifications = () => {
     setRealtimeNotifications([]);
     setHasNewNotifications(false);
+    
+    // También limpiar del localStorage
+    try {
+      const storageKey = getStorageKey();
+      localStorage.removeItem(storageKey);
+    } catch (error) {
+      console.error("Error clearing notifications from storage:", error);
+    }
   };
 
   // Limpiar errores
@@ -255,13 +371,16 @@ export function NotificationsProvider({ children }) {
         clearError,
         setError,
         
-        // Notificaciones en tiempo real (frontend)
         realtimeNotifications,
         hasNewNotifications,
         addRealtimeNotification,
         markAsRead,
         clearNotification,
-        clearAllNotifications
+        clearAllNotifications,
+        
+      
+        loadNotificationsFromStorage,
+        saveNotificationsToStorage
       }}
     >
       {children}

@@ -128,11 +128,7 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
   setIsLoading(true);
   try {
     const userEmail = email?.trim().toLowerCase();  
-    console.log("🎯 Iniciando cancelación:", { 
-      taskId: task._id, 
-      userEmail,
-      isAttending 
-    });
+
     // 1. Llamar al contexto para cancelar
     await cancelAttendance({ 
       taskId: task._id, 
@@ -146,7 +142,7 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
       const userAttendances = JSON.parse(localStorage.getItem(storageKey) || '[]');
       const updatedAttendances = userAttendances.filter(id => id !== task._id);
       localStorage.setItem(storageKey, JSON.stringify(updatedAttendances));
-      console.log("💾 LocalStorage actualizado:", updatedAttendances);
+
     }
     
     // 4. Recargar asistentes para asegurar consistencia
@@ -159,8 +155,6 @@ export function TaskCard({ task, showPromoBadge = false, showAttendanceButton = 
     
     // Usar toast.success para mensaje positivo de cancelación
     toast.success("✅ Asistencia cancelada correctamente");
-    
-    console.log("🎉 Cancelación completada exitosamente");
     
   } catch (err) {
     console.error("❌ Error en handleCancel:", err);

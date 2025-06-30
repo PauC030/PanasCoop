@@ -85,43 +85,77 @@ const confirmAttendance = async (data) => {
 
 
   //  Cancelar asistencia
-
+// Función cancelAttendance corregida en el contexto
 const cancelAttendance = async ({ taskId, email }) => {
   setError(null);
   setForbidden(false);
   
   try {
-    const lowerEmail = email.trim().toLowerCase();
+    const lowerEmail = email ? email.trim().toLowerCase() : null;
+    
+    console.log("🚀 Iniciando cancelación:", { taskId, email: lowerEmail });
     
     // 1. Cancelar en el backend
-    await cancelAttendanceRequest({ taskId, email: lowerEmail });
+    const response = await cancelAttendanceRequest({ taskId, email: lowerEmail });
     
-    // 2. Actualizar estado global
-    setAttendees(prev => 
-      prev.filter(a => !(a.task === taskId && a.email === lowerEmail))
-    );
+    console.log("✅ Respuesta del backend:", response.data);
     
-    return true; 
+    // 2. Actualizar estado global - MEJORADO
+    setAttendees(prev => {
+      const filteredAttendees = prev.filter(a => {
+        // Filtrar por task y por email/user
+        if (a.task !== taskId && a.task?._id !== taskId) return true;
+        
+        // Si hay email, filtrar por email
+        if (lowerEmail && a.email?.toLowerCase() === lowerEmail) return false;
+        
+        // Si es usuario autenticado, también filtrar por user ID
+        if (a.user && response.data.deletedAttendance?.user && 
+            a.user.toString() === response.data.deletedAttendance.user.toString()) return false;
+            
+        return true;
+      });
+      
+      console.log("📊 Asistentes antes:", prev.length, "después:", filteredAttendees.length);
+      return filteredAttendees;
+    });
+    
+    // 3. Actualizar userAttendances si es necesario
+    if (lowerEmail) {
+      setUserAttendances(prev => 
+        prev.filter(att => att.task?._id !== taskId && att.task !== taskId)
+      );
+    }
+    
+    return response.data; 
+    
   } catch (err) {
-    console.error("Error en cancelAttendance:", {
+    console.error("❌ Error en cancelAttendance:", {
       taskId,
       email,
-      error: err.response?.data || err.message
+      error: err.response?.data || err.message,
+      status: err.response?.status
     });
     
     if (err.response?.status === 403) {
       setForbidden(true);
-      toast.error('No tienes permiso para esta acción');
+      const errorMsg = 'No tienes permiso para esta acción';
+      setError(errorMsg);
+      throw new Error(errorMsg);
+    } else if (err.response?.status === 404) {
+      const errorMsg = 'Asistencia no encontrada';
+      setError(errorMsg);
+      throw new Error(errorMsg);
     } else {
-      setError(err.response?.data?.message || 'Error al cancelar asistencia');
-      toast.error(err.response?.data?.message || 'Error al cancelar asistencia');
+      const errorMsg = err.response?.data?.message || 'Error al cancelar asistencia';
+      setError(errorMsg);
+      throw new Error(errorMsg);
     }
-    throw err; // Propagar el error para manejo adicional
   }
 };
 
+
   //  Editar asistencia
-  
 const updateAttendance = async (id, updatedData) => {
   setError(null);
   setForbidden(false);

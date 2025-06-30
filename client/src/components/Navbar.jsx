@@ -60,7 +60,6 @@ export function Navbar() {
     clearNotification?.(notificationId);
   };
 
-
   useEffect(() => {
     if (hasNewNotifications) {
       setBellAnimation(true);
@@ -78,8 +77,6 @@ export function Navbar() {
 
   const unreadCount = realtimeNotifications.filter((n) => !n.read).length;
 
-
-
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#002326] text-white shadow-md h-16">
       <div className="max-w-full px-4 sm:px-6 lg:px-8 h-full">
@@ -94,7 +91,6 @@ export function Navbar() {
             </Link>
           </div>
 
-       
           <div className="hidden lg:flex items-center gap-3 xl:gap-4">
             {isAuthenticated ? (
               <>
@@ -111,7 +107,6 @@ export function Navbar() {
                   Crear Actividad
                 </ButtonLink>
 
-   
                 <div className="relative" ref={notificationRef}>
                   <button
                     onClick={toggleNotifications}
@@ -153,7 +148,6 @@ export function Navbar() {
                       </span>
                     )}
 
-               
                     {hasNewNotifications && (
                       <>
                         <span className="absolute -top-1 -right-1 w-5 h-5 xl:w-6 xl:h-6 bg-red-400 rounded-full animate-ping opacity-60"></span>
@@ -162,7 +156,6 @@ export function Navbar() {
                     )}
                   </button>
 
-               
                   {isNotificationOpen && (
                     <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[500px] overflow-hidden">
                       {/* Header del panel */}
@@ -215,17 +208,18 @@ export function Navbar() {
                                   onClick={() => handleNotificationClick(notification)}
                                 >
                                   <div className="flex items-center gap-2 mb-2">
-                                    <h4 className="font-semibold text-sm text-gray-900 line-clamp-1">
+                                    <h4 className="font-semibold text-sm text-gray-900">
                                       {notification.title || "Notificación"}
                                     </h4>
                                     {!notification.read && (
                                       <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse flex-shrink-0"></span>
                                     )}
                                   </div>
-                                  <p className="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                                  {/* Mensaje completo sin truncar */}
+                                  <p className="text-xs sm:text-sm text-gray-600 mb-3 leading-relaxed">
                                     {notification.message || "Sin mensaje"}
                                   </p>
-                                  <div className="flex flex-col xs:flex-row xs:justify-between xs:items-center gap-2">
+                                  <div className="flex items-center justify-between">
                                     <span className="text-xs text-gray-400 flex items-center gap-1">
                                       <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"/>
@@ -239,15 +233,6 @@ export function Navbar() {
                                           })
                                         : "Ahora"}
                                     </span>
-                                    {notification.taskId && (
-                                      <Link
-                                        to={`/tasks/view/${notification.taskId}`}
-                                        className="text-xs text-[#03683E] hover:text-[#028a4b] font-medium bg-green-50 px-2 py-1 rounded-full hover:bg-green-100 transition-colors whitespace-nowrap"
-                                        onClick={(e) => e.stopPropagation()}
-                                      >
-                                        Ver actividad
-                                      </Link>
-                                    )}
                                   </div>
                                 </div>
                                 <button
@@ -303,13 +288,6 @@ export function Navbar() {
                           <p className="text-sm font-medium text-white truncate">{user?.username}</p>
                           <p className="text-xs text-gray-400 truncate">{user?.email}</p>
                         </div>
-                       {/* <Link
-                          to="/profile"
-                          className="block px-4 py-2 text-sm text-white hover:bg-[#002a2d] transition-colors"
-                          onClick={() => setIsProfileOpen(false)}
-                        >
-                          Mi Perfil
-                        </Link>*/}
                         <button
                           onClick={() => {
                             logout();
@@ -323,30 +301,10 @@ export function Navbar() {
                     </div>
                   )}
                 </div>
-
-                {/* Botón de prueba - solo en desktop 
-                {testNotification && (
-                  <button
-                    onClick={testNotification}
-                    className="hidden xl:block p-2 text-xs text-gray-400 hover:text-white hover:bg-[#003d40] rounded-md transition-all duration-200"
-                    title="Probar conexión socket"
-                  >
-                    🧪
-                  </button>
-                )}*/}
               </>
             ) : (
               <>
-                <ButtonLink to="/login" className="bg-[#03683E] hover:bg-[#028a4b] transition-colors px-3 xl:px-4 py-2 text-sm">
-                  Acceder
-                </ButtonLink>
-                <ButtonLink
-                  to="/register"
-                  className="bg-transparent border border-[#03683E] hover:bg-[#03683E] transition-colors px-3 xl:px-4 py-2 text-sm"
-                >
-                  Registrarse
-                </ButtonLink>
-              </>
+              </> 
             )}
           </div>
 
@@ -367,7 +325,6 @@ export function Navbar() {
             <div className="px-4 py-4 space-y-3">
               {isAuthenticated ? (
                 <>
-                
                   <div className="flex items-center space-x-3 pb-3 border-b border-green-600/30">
                     <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center ring-2 ring-white/30">
                       <span className="text-white font-bold text-sm">
@@ -382,7 +339,6 @@ export function Navbar() {
                     </div>
                   </div>
 
-                 
                   <div className="relative" ref={notificationRef}>
                     <button
                       onClick={toggleNotifications}
@@ -441,32 +397,18 @@ export function Navbar() {
                                     <h4 className="font-semibold text-sm text-gray-900 mb-1">
                                       {notification.title || "Notificación"}
                                     </h4>
-                                    <p className="text-xs text-gray-600 mb-2">
+                                    {/* Mensaje completo sin truncar en móvil también */}
+                                    <p className="text-xs text-gray-600 mb-2 leading-relaxed">
                                       {notification.message || "Sin mensaje"}
                                     </p>
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-xs text-gray-400">
-                                        {notification.timestamp
-                                          ? new Date(notification.timestamp).toLocaleTimeString("es-ES", {
-                                              hour: "2-digit",
-                                              minute: "2-digit",
-                                            })
-                                          : "Ahora"}
-                                      </span>
-                                    {/*  {notification.taskId && (
-                                        <Link
-                                          to={`/tasks/view/${notification.taskId}`}
-                                          className="text-xs text-[#03683E] bg-green-50 px-2 py-1 rounded-full hover:bg-green-100 transition-colors"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setIsNotificationOpen(false);
-                                            setIsMobileMenuOpen(false);
-                                          }}
-                                        >
-                                          Ver
-                                        </Link>
-                                      )}*/}
-                                    </div>
+                                    <span className="text-xs text-gray-400">
+                                      {notification.timestamp
+                                        ? new Date(notification.timestamp).toLocaleTimeString("es-ES", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                          })
+                                        : "Ahora"}
+                                    </span>
                                   </div>
                                   <button
                                     onClick={(e) => handleDeleteNotification(e, notification.id)}
@@ -485,7 +427,6 @@ export function Navbar() {
                     )}
                   </div>
 
-                
                   <Link
                     to="/tasks"
                     className="block text-white text-sm hover:text-green-200 py-3 px-3 rounded-lg hover:bg-white/10 transition-all duration-200"
@@ -500,13 +441,6 @@ export function Navbar() {
                   >
                     ➕ Crear nueva Actividad
                   </Link>
-                 {/* <Link
-                    to="/profile"
-                    className="block text-white text-sm hover:text-green-200 py-3 px-3 rounded-lg hover:bg-white/10 transition-all duration-200"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    👤 Mi Perfil
-                  </Link>*/}
                   <button
                     onClick={() => {
                       logout();
@@ -519,20 +453,6 @@ export function Navbar() {
                 </>
               ) : (
                 <>
-                  <Link
-                    to="/login"
-                    className="block bg-white/20 backdrop-blur-sm hover:bg-white/30 text-center py-4 rounded-xl font-semibold text-white border border-white/30 hover:border-white/50 transition-all duration-300"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    🔑 Acceder
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="block border-2 border-white/50 hover:bg-white/20 backdrop-blur-sm text-center py-4 rounded-xl font-semibold text-white hover:border-white transition-all duration-300"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    📝 Registrarse
-                  </Link>
                 </>
               )}
             </div>

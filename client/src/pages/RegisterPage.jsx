@@ -86,12 +86,12 @@ function Register() {
                   </div>
                 )}
 
-                {/* Error Messages */}
+                {/* Error Mensaje */}
                 {registerErrors.map((error, i) => (
                   <Message message={error} key={i} />
                 ))}
 
-                {/* Registration Form */}
+                {/* formulario de registro */}
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-1">
                   <div>
                     <Label className="block text-gray-700 mb-2 text-base font-medium">
@@ -173,7 +173,7 @@ function Register() {
                     )}
                   </div>
                   
-                  {/* Register Button */}
+                  {/* boton de registro */}
                   <div className="mt-19"/>
                   <Button 
                     type="submit"
@@ -212,7 +212,7 @@ function Register() {
                   </p>
                 </div>
                 
-                {/* Resend Email Link */}
+                
                 {successMessage && (
                   <div className="mt-6 text-center p-4 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-600 mb-2">¿No recibiste el email?</p>
@@ -233,7 +233,7 @@ function Register() {
               </div>
             </div>
 
-            {/* Right side - Image/Brand */}
+            {/* Diseño de imagen  */}
             <div className="lg:w-1/2 bg-gradient-to-br from-teal-600 to-teal-800 relative overflow-hidden">
               <img 
                 src={registerImage} 

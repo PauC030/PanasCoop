@@ -308,153 +308,150 @@ export function Navbar() {
             )}
           </div>
 
-          <div className="lg:hidden">
-            <button
-              onClick={toggleMobileMenu}
-              className="text-white hover:text-gray-300 p-2"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
+          {/* Botón de menú móvil - SOLO aparece cuando el usuario está autenticado */}
+          {isAuthenticated && (
+            <div className="lg:hidden">
+              <button
+                onClick={toggleMobileMenu}
+                className="text-white hover:text-gray-300 p-2"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
 
-        {isMobileMenuOpen && (
+        {/* Menú móvil - SOLO se muestra cuando el usuario está autenticado */}
+        {isMobileMenuOpen && isAuthenticated && (
           <div className="lg:hidden absolute top-16 left-0 right-0 bg-gradient-to-br from-[#064349] to-[#03683E] border-t border-green-600 shadow-xl backdrop-blur-sm">
             <div className="px-4 py-4 space-y-3">
-              {isAuthenticated ? (
-                <>
-                  <div className="flex items-center space-x-3 pb-3 border-b border-green-600/30">
-                    <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center ring-2 ring-white/30">
-                      <span className="text-white font-bold text-sm">
-                        {user?.username?.charAt(0).toUpperCase() || "U"}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-white">{user?.username || "Usuario"}</p>
-                      <p className="text-xs text-green-200">
-                        {isConnected ? "🔌 Conectado" : "❌ Desconectado"}
-                      </p>
-                    </div>
+              <div className="flex items-center space-x-3 pb-3 border-b border-green-600/30">
+                <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center ring-2 ring-white/30">
+                  <span className="text-white font-bold text-sm">
+                    {user?.username?.charAt(0).toUpperCase() || "U"}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">{user?.username || "Usuario"}</p>
+                  <p className="text-xs text-green-200">
+                    {isConnected ? "🔌 Conectado" : "❌ Desconectado"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative" ref={notificationRef}>
+                <button
+                  onClick={toggleNotifications}
+                  className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-300 ${
+                    hasNewNotifications 
+                      ? "bg-gradient-to-r from-amber-400 to-orange-500 shadow-lg" 
+                      : "bg-white/10 backdrop-blur-sm hover:bg-white/20 border border-white/20"
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    <span className="text-sm font-medium text-white">Notificaciones</span>
                   </div>
+                  {unreadCount > 0 && (
+                    <span className="bg-red-500 text-white text-xs px-2.5 py-1 rounded-full font-bold shadow-lg">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
 
-                  <div className="relative" ref={notificationRef}>
-                    <button
-                      onClick={toggleNotifications}
-                      className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-300 ${
-                        hasNewNotifications 
-                          ? "bg-gradient-to-r from-amber-400 to-orange-500 shadow-lg" 
-                          : "bg-white/10 backdrop-blur-sm hover:bg-white/20 border border-white/20"
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                        </svg>
-                        <span className="text-sm font-medium text-white">Notificaciones</span>
+                {isNotificationOpen && (
+                  <div className="mt-3 bg-white rounded-xl shadow-2xl border border-gray-200 max-h-80 overflow-hidden">
+                    <div className="p-3 border-b border-gray-100 bg-gradient-to-r from-[#064349] to-[#03683E]">
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-bold text-white text-sm">Notificaciones</h3>
+                        {realtimeNotifications.length > 0 && (
+                          <button
+                            onClick={clearAllNotifications}
+                            className="text-xs text-white/90 hover:text-white bg-white/20 px-3 py-1 rounded-full hover:bg-white/30 transition-colors"
+                          >
+                            Limpiar
+                          </button>
+                        )}
                       </div>
-                      {unreadCount > 0 && (
-                        <span className="bg-red-500 text-white text-xs px-2.5 py-1 rounded-full font-bold shadow-lg">
-                          {unreadCount}
-                        </span>
-                      )}
-                    </button>
-
-                    {isNotificationOpen && (
-                      <div className="mt-3 bg-white rounded-xl shadow-2xl border border-gray-200 max-h-80 overflow-hidden">
-                        <div className="p-3 border-b border-gray-100 bg-gradient-to-r from-[#064349] to-[#03683E]">
-                          <div className="flex justify-between items-center">
-                            <h3 className="font-bold text-white text-sm">Notificaciones</h3>
-                            {realtimeNotifications.length > 0 && (
-                              <button
-                                onClick={clearAllNotifications}
-                                className="text-xs text-white/90 hover:text-white bg-white/20 px-3 py-1 rounded-full hover:bg-white/30 transition-colors"
-                              >
-                                Limpiar
-                              </button>
-                            )}
-                          </div>
+                    </div>
+                    <div className="max-h-60 overflow-y-auto">
+                      {realtimeNotifications.length === 0 ? (
+                        <div className="p-6 text-center text-gray-500">
+                          <p className="text-sm">No hay notificaciones</p>
                         </div>
-                        <div className="max-h-60 overflow-y-auto">
-                          {realtimeNotifications.length === 0 ? (
-                            <div className="p-6 text-center text-gray-500">
-                              <p className="text-sm">No hay notificaciones</p>
-                            </div>
-                          ) : (
-                            realtimeNotifications.map((notification) => (
-                              <div
-                                key={notification.id}
-                                className={`p-3 border-b border-gray-100 group ${
-                                  !notification.read ? "bg-blue-50 border-l-4 border-l-blue-500" : ""
-                                }`}
+                      ) : (
+                        realtimeNotifications.map((notification) => (
+                          <div
+                            key={notification.id}
+                            className={`p-3 border-b border-gray-100 group ${
+                              !notification.read ? "bg-blue-50 border-l-4 border-l-blue-500" : ""
+                            }`}
+                          >
+                            <div className="flex justify-between items-start">
+                              <div 
+                                className="flex-1 mr-2 cursor-pointer"
+                                onClick={() => handleNotificationClick(notification)}
                               >
-                                <div className="flex justify-between items-start">
-                                  <div 
-                                    className="flex-1 mr-2 cursor-pointer"
-                                    onClick={() => handleNotificationClick(notification)}
-                                  >
-                                    <h4 className="font-semibold text-sm text-gray-900 mb-1">
-                                      {notification.title || "Notificación"}
-                                    </h4>
-                                    {/* Mensaje completo sin truncar en móvil también */}
-                                    <p className="text-xs text-gray-600 mb-2 leading-relaxed">
-                                      {notification.message || "Sin mensaje"}
-                                    </p>
-                                    <span className="text-xs text-gray-400">
-                                      {notification.timestamp
-                                        ? new Date(notification.timestamp).toLocaleTimeString("es-ES", {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                          })
-                                        : "Ahora"}
-                                    </span>
-                                  </div>
-                                  <button
-                                    onClick={(e) => handleDeleteNotification(e, notification.id)}
-                                    className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50 flex-shrink-0"
-                                  >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                  </button>
-                                </div>
+                                <h4 className="font-semibold text-sm text-gray-900 mb-1">
+                                  {notification.title || "Notificación"}
+                                </h4>
+                                {/* Mensaje completo sin truncar en móvil también */}
+                                <p className="text-xs text-gray-600 mb-2 leading-relaxed">
+                                  {notification.message || "Sin mensaje"}
+                                </p>
+                                <span className="text-xs text-gray-400">
+                                  {notification.timestamp
+                                    ? new Date(notification.timestamp).toLocaleTimeString("es-ES", {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })
+                                    : "Ahora"}
+                                </span>
                               </div>
-                            ))
-                          )}
-                        </div>
-                      </div>
-                    )}
+                              <button
+                                onClick={(e) => handleDeleteNotification(e, notification.id)}
+                                className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50 flex-shrink-0"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
                   </div>
+                )}
+              </div>
 
-                  <Link
-                    to="/tasks"
-                    className="block text-white text-sm hover:text-green-200 py-3 px-3 rounded-lg hover:bg-white/10 transition-all duration-200"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    📋 Mis actividades
-                  </Link>
-                  <Link
-                    to="/add-task"
-                    className="block bg-white/20 backdrop-blur-sm hover:bg-white/30 text-center py-4 rounded-xl font-semibold text-sm text-white border border-white/30 hover:border-white/50 transition-all duration-300 shadow-lg"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    ➕ Crear nueva Actividad
-                  </Link>
-                  <button
-                    onClick={() => {
-                      logout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="block w-full text-left text-red-300 text-sm hover:text-red-200 py-3 px-3 rounded-lg hover:bg-red-500/20 transition-all duration-200"
-                  >
-                    🚪 Cerrar Sesión
-                  </button>
-                </>
-              ) : (
-                <>
-                </>
-              )}
+              <Link
+                to="/tasks"
+                className="block text-white text-sm hover:text-green-200 py-3 px-3 rounded-lg hover:bg-white/10 transition-all duration-200"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                📋 Mis actividades
+              </Link>
+              <Link
+                to="/add-task"
+                className="block bg-white/20 backdrop-blur-sm hover:bg-white/30 text-center py-4 rounded-xl font-semibold text-sm text-white border border-white/30 hover:border-white/50 transition-all duration-300 shadow-lg"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                ➕ Crear nueva Actividad
+              </Link>
+              <button
+                onClick={() => {
+                  logout();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="block w-full text-left text-red-300 text-sm hover:text-red-200 py-3 px-3 rounded-lg hover:bg-red-500/20 transition-all duration-200"
+              >
+                🚪 Cerrar Sesión
+              </button>
             </div>
           </div>
         )}

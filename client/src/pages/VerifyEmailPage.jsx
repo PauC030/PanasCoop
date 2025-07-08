@@ -160,7 +160,7 @@ const VerifyEmailPage = () => {
       </div>
 
       {/* Contenido principal */}
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
+       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 relative z-10">
         <div className="text-center">
           
           {/* Estado: Verificando */}
@@ -325,11 +325,11 @@ const VerifyEmailPage = () => {
               </div>
 
               {showResendForm && (
-                <div className="bg-white/90 backdrop-blur-sm rounded-xl border border-gray-200 shadow-lg p-6 mb-8 max-w-lg mx-auto">
+                <div className="bg-white border border-gray-200 shadow-lg rounded-xl p-6 mb-8 max-w-lg mx-auto">
                   <div className="flex items-start space-x-3 mb-4">
                     <Mail className="w-6 h-6 text-teal-600 mt-1" />
                     <div className="text-left">
-                      <h3 className="text-lg font-medium text-gray-800 mb-1">
+                      <h3 className="text-lg font-medium text-gray-900 mb-1">
                         ¿Necesitas un nuevo enlace?
                       </h3>
                       <p className="text-sm text-gray-600">
@@ -345,12 +345,12 @@ const VerifyEmailPage = () => {
                         placeholder="tu-email@ejemplo.com"
                         value={email}
                         onChange={handleEmailChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 ${
+                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-300 text-gray-900 placeholder-gray-500 ${
                           emailError 
-                            ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                            ? 'border-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50' 
                             : isEmailValid 
-                              ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                              : 'border-gray-300 focus:ring-teal-500 focus:border-teal-500'
+                              ? 'border-green-300 focus:ring-green-500 focus:border-green-500 bg-green-50'
+                              : 'border-gray-300 focus:ring-teal-500 focus:border-teal-500 bg-white'
                         }`}
                         required
                       />
@@ -389,20 +389,7 @@ const VerifyEmailPage = () => {
                 </div>
               )}
 
-              <div className={`space-y-4 transform transition-all duration-700 ${showActions ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-95'}`}>
-                <button 
-                  onClick={() => navigate('/login')}
-                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white font-semibold rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4"
-                >
-                  Ir al Login
-                </button>
-                <button 
-                  onClick={() => navigate('/register')}
-                  className="inline-flex items-center px-6 py-3 border-2 border-teal-600 text-teal-600 hover:bg-teal-50 hover:border-teal-700 hover:text-teal-700 font-semibold rounded-lg transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-                >
-                  Registrarse de nuevo
-                </button>
-              </div>
+             
             </div>
           )}
 
@@ -461,7 +448,7 @@ const VerifyEmailPage = () => {
       </div>
 
       {/* Footer */}
-      <div className="text-center pb-8">
+      <div className="text-center pb-8 relative z-10">
         <p className="text-sm text-gray-500">
           © 2024 PanascOOp - Plataforma de Gestión Cooperativa
         </p>

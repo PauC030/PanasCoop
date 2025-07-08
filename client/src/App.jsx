@@ -12,7 +12,7 @@ import { GestionarAsistencia } from "./components/taskFragments/GestionarAsisten
 
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
-import EmailVerificationPage from "./pages/EmailVerificationPage";
+//import EmailVerificationPage from "./pages/EmailVerificationPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import WelcomePage from "./pages/WelcomePage"; 
 import { TaskFormPage } from "./pages/TaskFormPage";
@@ -83,7 +83,7 @@ function App() {
                         
                         {/* Ruta para verificación de email - NO protegida */}
                         <Route path="/verify-email" element={<VerifyEmailPage />} />
-                        <Route path="/verificar-email" element={<EmailVerificationPage />} />
+                       {/* <Route path="/verificar-email" element={<EmailVerificationPage />} /> */}
                         {/* Ruta para restablecimiento de contraseña */}
                          <Route path="/reset-password" element={<ResetPasswordPage />} />
 

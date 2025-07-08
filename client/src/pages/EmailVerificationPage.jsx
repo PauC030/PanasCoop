@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+/*import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/authContext';
 
@@ -30,7 +30,7 @@ const EmailVerificationPage = () => {
           
           // Redirigir al dashboard o página principal después de 3 segundos
           setTimeout(() => {
-            navigate('/dashboard'); // Cambia esta ruta según tu aplicación
+            navigate('/tasks'); // Cambia a la ruta que desees
           }, 3000);
         } else {
           setVerificationStatus('error');
@@ -124,4 +124,4 @@ const EmailVerificationPage = () => {
   );
 };
 
-export default EmailVerificationPage;
+export default EmailVerificationPage;*/

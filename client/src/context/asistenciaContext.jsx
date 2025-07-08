@@ -167,7 +167,7 @@ const updateAttendance = async (id, updatedData) => {
     }
     console.error(err);
     throw err;
-  }
+  } 
 };
 
 

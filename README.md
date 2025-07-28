@@ -42,9 +42,9 @@ Puedes ver la app en línea aquí 👉 [https://fronted-cyan.vercel.app/](https:
 
 ## 📦 Instalación Local (opcional)
 
-1. Clona el repositorio:
    ```bash
-   git clone https://github.com/tu-usuario/panascoop.git
+   git clone https://github.com/PauC030/PanasCoop.git
+   cd client
    npm install
    npm run dev
 

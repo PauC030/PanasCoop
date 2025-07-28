@@ -273,7 +273,7 @@ const WelcomePage = () => {
       {/* Footer */}
       <div className="text-center pb-8">
         <p className="text-sm text-gray-500">
-          © 2024 PanascOOp - Plataforma de Gestión Cooperativa
+          © 2025 PanascOOp - Plataforma de Gestión Cooperativa
         </p>
       </div>
     </div>

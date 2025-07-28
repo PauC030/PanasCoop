@@ -450,7 +450,7 @@ const VerifyEmailPage = () => {
       {/* Footer */}
       <div className="text-center pb-8 relative z-10">
         <p className="text-sm text-gray-500">
-          © 2024 PanascOOp - Plataforma de Gestión Cooperativa
+          © 2025 PanascOOp - Plataforma de Gestión Cooperativa
         </p>
       </div>
     </div>

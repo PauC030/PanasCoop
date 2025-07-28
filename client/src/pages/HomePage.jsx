@@ -669,7 +669,7 @@ function HomePage() {
         >
           {/* Boton de descarga */}
           <motion.a 
-            href="#" 
+            href="https://www.mediafire.com/file/z0nxp8zgr2hja38/PanasCOOP.apk/file" 
             className="group bg-[#064349] text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center"
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
